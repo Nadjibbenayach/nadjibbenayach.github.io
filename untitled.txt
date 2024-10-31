@@ -11,18 +11,18 @@
         input[type="text"], input[type="password"], button { width: 100%; padding: 10px; margin: 10px 0; }
         button { background-color: #007BFF; color: #fff; border: none; cursor: pointer; }
         button:hover { background-color: #0056b3; }
-        .content { display: none; }
+        .content-container { display: none; }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container login-container">
         <h2>تسجيل الدخول</h2>
         <input type="text" id="username" placeholder="اسم المستخدم">
         <input type="password" id="password" placeholder="كلمة المرور">
         <button onclick="login()">دخول</button>
     </div>
 
-    <div class="container content">
+    <div class="container content-container">
         <h2>مرحبا بك في موقع نشر المعلومات</h2>
         <p>هذا القسم مخصص لنشر المحتوى والمعلومات.</p>
     </div>
@@ -31,9 +31,17 @@
         function login() {
             var username = document.getElementById("username").value;
             var password = document.getElementById("password").value;
+            
+            // التحقق من الحقول الفارغة
+            if (username === "" || password === "") {
+                alert("يرجى إدخال اسم المستخدم وكلمة المرور.");
+                return;
+            }
+            
+            // التحقق من صحة اسم المستخدم وكلمة المرور
             if (username === "user" && password === "pass") {
-                document.querySelector(".container").style.display = "none";
-                document.querySelector(".content").style.display = "block";
+                document.querySelector(".login-container").style.display = "none";
+                document.querySelector(".content-container").style.display = "block";
             } else {
                 alert("اسم المستخدم أو كلمة المرور غير صحيحة.");
             }
