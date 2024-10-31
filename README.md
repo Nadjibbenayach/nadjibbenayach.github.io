@@ -146,3 +146,52 @@
     </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>موقع نشر المعلومات</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f2f2f2; margin: 0; padding: 0; }
+        
+        /* تنسيق القسم العلوي */
+        header {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+        }
+
+        /* تنسيق أيقونات التواصل الاجتماعي */
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .social-icons a {
+            display: block;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+        }
+        
+        .social-icons a img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .social-icons a:hover {
+            transform: scale(1.1);
+        }
+
+        /* تنسيق المحتوى الأساسي */
+        .container {
+            max-width: 400px;
+            margin:
