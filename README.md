@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar">
 <head>
@@ -18,24 +17,24 @@
         header {
             background-color: #007BFF;
             color: #fff;
-            padding: 15px;
+            padding: 20px;
             text-align: center;
-            font-size: 1.5em;
+            font-size: 1.8em;
         }
 
         /* قسم الروابط الاجتماعية */
         .social-icons {
             display: flex;
             justify-content: center;
-            gap: 15px;
-            padding: 10px 0;
+            gap: 20px;
+            padding: 20px;
             background-color: #0056b3;
         }
 
         .social-icons a {
-            display: block;
-            width: 40px;
-            height: 40px;
+            display: inline-block;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             overflow: hidden;
             box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
@@ -52,24 +51,29 @@
             transform: scale(1.1);
         }
 
-        /* صندوق تسجيل الدخول */
+        /* صندوق تسجيل الدخول والتسجيل */
         .container {
             max-width: 400px;
             margin: 20px auto;
-            padding: 20px;
+            padding: 25px;
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        h2 { text-align: center; }
-        
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
         input[type="text"], input[type="password"], input[type="email"], button {
             width: 100%;
-            padding: 10px;
-            margin: 10px 0;
+            padding: 12px;
+            margin: 8px 0;
             border: 1px solid #ccc;
             border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1em;
         }
 
         button {
@@ -77,21 +81,25 @@
             color: #fff;
             border: none;
             cursor: pointer;
-            font-size: 1em;
+            font-size: 1.1em;
             font-weight: bold;
             transition: background-color 0.3s;
+            padding: 12px;
         }
 
-        button:hover { background-color: #0056b3; }
+        button:hover { 
+            background-color: #0056b3; 
+        }
 
         .footer {
             text-align: center;
-            padding: 20px;
+            padding: 15px;
             background-color: #007BFF;
             color: #fff;
             position: fixed;
             bottom: 0;
             width: 100%;
+            font-size: 0.9em;
         }
 
         /* الوضع الليلي */
@@ -102,6 +110,13 @@
 
         .dark-mode .container, .dark-mode .footer {
             background-color: #444;
+            color: #fff;
+        }
+
+        .dark-mode button {
+            background-color: #444;
+            color: #fff;
+            border: 1px solid #007BFF;
         }
     </style>
 </head>
@@ -164,7 +179,6 @@
             alert("يرجى إدخال اسم المستخدم وكلمة المرور.");
         } else if (username === "user" && password === "pass") {
             alert("تم تسجيل الدخول بنجاح.");
-            // يمكن استبدال هذا الجزء بانتقال لصفحة أخرى أو عرض محتوى خاص
         } else {
             alert("اسم المستخدم أو كلمة المرور غير صحيحة.");
         }
@@ -173,7 +187,6 @@
     // دالة الدخول كضيف
     function guestLogin() {
         alert("تم تسجيل الدخول كضيف.");
-        // يمكن إضافة سلوك خاص للضيف هنا
     }
 
     // دالة إنشاء حساب جديد
