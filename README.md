@@ -5,25 +5,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>موقع نشر المعلومات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f2f2f2; margin: 0; padding: 0; }
-        
-        /* تنسيق القسم العلوي */
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* الرأس */
         header {
             background-color: #007BFF;
             color: #fff;
-            padding: 10px 0;
+            padding: 15px;
             text-align: center;
+            font-size: 1.5em;
         }
 
-        /* تنسيق أيقونات التواصل الاجتماعي */
+        /* قسم الروابط الاجتماعية */
         .social-icons {
             display: flex;
             justify-content: center;
             gap: 15px;
-            margin-top: 10px;
+            padding: 10px 0;
+            background-color: #0056b3;
         }
-        
+
         .social-icons a {
             display: block;
             width: 40px;
@@ -33,165 +41,159 @@
             box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s;
         }
-        
+
         .social-icons a img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        
+
         .social-icons a:hover {
             transform: scale(1.1);
         }
 
-        /* تنسيق المحتوى الأساسي */
+        /* صندوق تسجيل الدخول */
         .container {
             max-width: 400px;
-            margin: auto;
+            margin: 20px auto;
             padding: 20px;
             background-color: #fff;
-            border-radius: 5px;
+            border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 { text-align: center; }
+        
+        input[type="text"], input[type="password"], input[type="email"], button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        button:hover { background-color: #0056b3; }
+
+        .footer {
             text-align: center;
+            padding: 20px;
+            background-color: #007BFF;
+            color: #fff;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        /* الوضع الليلي */
+        .dark-mode {
+            background-color: #333;
+            color: #f9f9f9;
+        }
+
+        .dark-mode .container, .dark-mode .footer {
+            background-color: #444;
         }
     </style>
 </head>
 <body>
-    <!-- القسم العلوي مع روابط التواصل الاجتماعي -->
-    <header>
-        <h2>تابعنا على مواقع التواصل الاجتماعي</h2>
-        <div class="social-icons">
-            <!-- رابط فيسبوك -->
-            <a href="https://www.facebook.com/" target="_blank">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook">
-            </a>
-            <!-- رابط انستغرام الشخصي -->
-            <a href="https://www.instagram.com/nadjibbenayach/profilecard/?igsh=MXA4am9hYjl5Z3NuMQ==" target="_blank">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram">
-            </a>
-            <!-- رابط تيك توك -->
-            <a href="https://www.tiktok.com/" target="_blank">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/TikTok_logo.svg" alt="TikTok">
-            </a>
-        </div>
-    </header>
 
-    <!-- الكود الأساسي للموقع -->
-    <div class="container login-container">
-        <h2>تسجيل الدخول</h2>
-        <input type="text" id="username" placeholder="اسم المستخدم">
-        <input type="password" id="password" placeholder="كلمة المرور">
-        <button onclick="login()">دخول</button>
-        <button onclick="guestLogin()">الدخول كضيف</button>
-        <p style="text-align: center;">أو</p>
-        <button onclick="showRegister()">إنشاء حساب جديد</button>
-    </div>
+<header>
+    مرحبا بكم في موقع نشر المعلومات
+</header>
 
-    <div class="container register-container" style="display:none;">
-        <h2>إنشاء حساب جديد</h2>
-        <input type="text" id="newUsername" placeholder="اسم المستخدم">
-        <input type="email" id="newEmail" placeholder="البريد الإلكتروني">
-        <input type="password" id="newPassword" placeholder="كلمة المرور">
-        <button onclick="register()">تسجيل الحساب</button>
-        <button onclick="showLogin()">العودة لتسجيل الدخول</button>
-    </div>
+<!-- قسم الروابط الاجتماعية -->
+<div class="social-icons">
+    <a href="https://www.facebook.com/"><img src="facebook_icon.jpg" alt="Facebook"></a>
+    <a href="https://www.instagram.com/nadjibbenayach/profilecard/?igsh=MXA4am9hYjl5Z3NuMQ=="><img src="instagram_icon.jpg" alt="Instagram"></a>
+    <a href="https://www.tiktok.com/"><img src="tiktok_icon.jpg" alt="TikTok"></a>
+</div>
 
-    <div class="container content-container" style="display:none;">
-        <h2>مرحبا بك في موقع نشر المعلومات</h2>
-        <p>هذا القسم مخصص لنشر المحتوى والمعلومات.</p>
-    </div>
+<!-- صندوق تسجيل الدخول -->
+<div class="container" id="login-container">
+    <h2>تسجيل الدخول</h2>
+    <input type="text" id="username" placeholder="اسم المستخدم">
+    <input type="password" id="password" placeholder="كلمة المرور">
+    <button onclick="login()">دخول</button>
+    <button onclick="guestLogin()">الدخول كضيف</button>
+    <p>أو</p>
+    <button onclick="showRegisterForm()">إنشاء حساب جديد</button>
+</div>
 
-    <script>
-        function login() {
-            var username = document.getElementById("username").value;
-            var password = document.getElementById("password").value;
-            if (username === "" || password === "") {
-                alert("يرجى إدخال اسم المستخدم وكلمة المرور.");
-                return;
-            }
-            if (username === "user" && password === "pass") {
-                document.querySelector(".login-container").style.display = "none";
-                document.querySelector(".content-container").style.display = "block";
-            } else {
-                alert("اسم المستخدم أو كلمة المرور غير صحيحة.");
-            }
+<!-- صندوق التسجيل -->
+<div class="container" id="register-container" style="display: none;">
+    <h2>إنشاء حساب جديد</h2>
+    <input type="text" id="new-username" placeholder="اسم المستخدم">
+    <input type="email" id="email" placeholder="البريد الإلكتروني">
+    <input type="password" id="new-password" placeholder="كلمة المرور">
+    <button onclick="register()">إنشاء الحساب</button>
+    <button onclick="backToLogin()">عودة لتسجيل الدخول</button>
+</div>
+
+<div class="footer">
+    &copy; 2023 موقع نشر المعلومات. جميع الحقوق محفوظة.
+    <button onclick="toggleDarkMode()">تبديل الوضع الليلي</button>
+</div>
+
+<script>
+    // تبديل بين وضع تسجيل الدخول وإنشاء الحساب
+    function showRegisterForm() {
+        document.getElementById("login-container").style.display = "none";
+        document.getElementById("register-container").style.display = "block";
+    }
+
+    function backToLogin() {
+        document.getElementById("register-container").style.display = "none";
+        document.getElementById("login-container").style.display = "block";
+    }
+
+    // دالة تسجيل الدخول
+    function login() {
+        var username = document.getElementById("username").value;
+        var password = document.getElementById("password").value;
+        if (username === "" || password === "") {
+            alert("يرجى إدخال اسم المستخدم وكلمة المرور.");
+        } else if (username === "user" && password === "pass") {
+            alert("تم تسجيل الدخول بنجاح.");
+            // يمكن استبدال هذا الجزء بانتقال لصفحة أخرى أو عرض محتوى خاص
+        } else {
+            alert("اسم المستخدم أو كلمة المرور غير صحيحة.");
         }
+    }
 
-        function guestLogin() {
-            document.querySelector(".login-container").style.display = "none";
-            document.querySelector(".content-container").style.display = "block";
-        }
+    // دالة الدخول كضيف
+    function guestLogin() {
+        alert("تم تسجيل الدخول كضيف.");
+        // يمكن إضافة سلوك خاص للضيف هنا
+    }
 
-        function showRegister() {
-            document.querySelector(".login-container").style.display = "none";
-            document.querySelector(".register-container").style.display = "block";
+    // دالة إنشاء حساب جديد
+    function register() {
+        var newUsername = document.getElementById("new-username").value;
+        var email = document.getElementById("email").value;
+        var newPassword = document.getElementById("new-password").value;
+        if (newUsername === "" || email === "" || newPassword === "") {
+            alert("يرجى تعبئة جميع الحقول.");
+        } else {
+            alert("تم إنشاء الحساب بنجاح.");
+            backToLogin();
         }
+    }
 
-        function showLogin() {
-            document.querySelector(".register-container").style.display = "none";
-            document.querySelector(".login-container").style.display = "block";
-        }
+    // دالة تبديل الوضع الليلي
+    function toggleDarkMode() {
+        document.body.classList.toggle("dark-mode");
+    }
+</script>
 
-        function register() {
-            var newUsername = document.getElementById("newUsername").value;
-            var newEmail = document.getElementById("newEmail").value;
-            var newPassword = document.getElementById("newPassword").value;
-            if (newUsername === "" || newEmail === "" || newPassword === "") {
-                alert("يرجى ملء جميع الحقول لإنشاء الحساب.");
-                return;
-            }
-            alert("تم إنشاء الحساب بنجاح!");
-            showLogin();
-        }
-    </script>
 </body>
 </html>
-<!DOCTYPE html>
-<html lang="ar">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>موقع نشر المعلومات</title>
-    <style>
-        body { font-family: Arial, sans-serif; background-color: #f2f2f2; margin: 0; padding: 0; }
-        
-        /* تنسيق القسم العلوي */
-        header {
-            background-color: #007BFF;
-            color: #fff;
-            padding: 10px 0;
-            text-align: center;
-        }
-
-        /* تنسيق أيقونات التواصل الاجتماعي */
-        .social-icons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 10px;
-        }
-        
-        .social-icons a {
-            display: block;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            overflow: hidden;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s;
-        }
-        
-        .social-icons a img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .social-icons a:hover {
-            transform: scale(1.1);
-        }
-
-        /* تنسيق المحتوى الأساسي */
-        .container {
-            max-width: 400px;
-            margin:
