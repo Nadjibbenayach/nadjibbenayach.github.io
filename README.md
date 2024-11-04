@@ -40,6 +40,7 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             text-align: center;
             transition: transform 0.3s;
+            cursor: pointer;
         }
 
         .ticket-card:hover {
@@ -57,6 +58,25 @@
             color: #555;
         }
 
+        /* استمارة الطلب */
+        .form-container, .review-container {
+            display: none;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            margin: 20px auto;
+        }
+
+        .form-container input[type="text"], .form-container input[type="tel"], .form-container button,
+        .review-container button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 1em;
+        }
+
         .footer {
             text-align: center;
             padding: 15px;
@@ -66,21 +86,6 @@
             bottom: 0;
             width: 100%;
             font-size: 0.9em;
-        }
-
-        /* الوضع الليلي */
-        .dark-mode {
-            background-color: #333;
-            color: #f9f9f9;
-        }
-
-        .dark-mode .ticket-card {
-            background-color: #444;
-            color: #fff;
-        }
-
-        .dark-mode .footer {
-            background-color: #444;
         }
     </style>
 </head>
@@ -92,29 +97,91 @@
 
 <!-- قسم التذاكر -->
 <div class="tickets-container">
-    <div class="ticket-card">
+    <div class="ticket-card" onclick="showForm('العيايشة', '30 DA')">
         <div class="ticket-title">العيايشة</div>
         <div class="ticket-price">السعر: 30 DA</div>
     </div>
-    <div class="ticket-card">
+    <div class="ticket-card" onclick="showForm('قاوس', '25 DA')">
         <div class="ticket-title">قاوس</div>
         <div class="ticket-price">السعر: 25 DA</div>
     </div>
-    <div class="ticket-card">
+    <div class="ticket-card" onclick="showForm('الكلم 5', '20 DA')">
         <div class="ticket-title">الكلم 5</div>
         <div class="ticket-price">السعر: 20 DA</div>
     </div>
 </div>
 
+<!-- استمارة الطلب -->
+<div class="form-container" id="formContainer">
+    <h2>طلب تذكرة: <span id="ticketName"></span></h2>
+    <input type="text" id="firstName" placeholder="الاسم" required>
+    <input type="text" id="lastName" placeholder="اللقب" required>
+    <input type="tel" id="phoneNumber" placeholder="رقم الهاتف" required>
+    <button onclick="submitRequest()">إرسال الطلب</button>
+</div>
+
+<!-- قسم مراجعة الطلبات -->
+<div class="review-container" id="reviewContainer">
+    <h2>مراجعة الطلب</h2>
+    <p>الاسم: <span id="reviewFirstName"></span></p>
+    <p>اللقب: <span id="reviewLastName"></span></p>
+    <p>رقم الهاتف: <span id="reviewPhoneNumber"></span></p>
+    <p>التذكرة: <span id="reviewTicketName"></span></p>
+    <button onclick="approve()">أوافق</button>
+    <button onclick="reject()">أرفض</button>
+</div>
+
 <div class="footer">
     &copy; 2023 موقع التذاكر. جميع الحقوق محفوظة.
-    <button onclick="toggleDarkMode()">تبديل الوضع الليلي</button>
 </div>
 
 <script>
-    // دالة تبديل الوضع الليلي
-    function toggleDarkMode() {
-        document.body.classList.toggle("dark-mode");
+    let selectedTicket = "";
+
+    // عرض استمارة الطلب
+    function showForm(ticketName, price) {
+        selectedTicket = ticketName + " - " + price;
+        document.getElementById("ticketName").innerText = selectedTicket;
+        document.getElementById("formContainer").style.display = "block";
+        document.getElementById("reviewContainer").style.display = "none";
+    }
+
+    // إرسال الطلب
+    function submitRequest() {
+        const firstName = document.getElementById("firstName").value;
+        const lastName = document.getElementById("lastName").value;
+        const phoneNumber = document.getElementById("phoneNumber").value;
+
+        if (firstName && lastName && phoneNumber) {
+            // عرض الطلب للمراجعة
+            document.getElementById("reviewFirstName").innerText = firstName;
+            document.getElementById("reviewLastName").innerText = lastName;
+            document.getElementById("reviewPhoneNumber").innerText = phoneNumber;
+            document.getElementById("reviewTicketName").innerText = selectedTicket;
+
+            document.getElementById("formContainer").style.display = "none";
+            document.getElementById("reviewContainer").style.display = "block";
+        } else {
+            alert("يرجى ملء جميع الحقول.");
+        }
+    }
+
+    // قبول الطلب
+    function approve() {
+        alert("تمت الموافقة على الطلب بنجاح.");
+        resetForm();
+    }
+
+    // رفض الطلب
+    function reject() {
+        alert("تم رفض الطلب.");
+        resetForm();
+    }
+
+    // إعادة تعيين النموذج
+    function resetForm() {
+        document.getElementById("formContainer").style.display = "none";
+        document.getElementById("reviewContainer").style.display = "none";
     }
 </script>
 
