@@ -102,6 +102,7 @@
             margin-left: 250px;
             padding: 20px;
             width: calc(100% - 250px);
+            display: none;
         }
 
         .container {
@@ -147,6 +148,31 @@
         .buy-button:hover {
             background-color: #0056b3;
         }
+
+        /* تنسيق نافذة اختيار الحافلات */
+        .bus-selection {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            gap: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .bus-button {
+            padding: 15px 30px;
+            color: #fff;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .bus-button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -170,10 +196,16 @@
     <!-- إضافة صورة في أعلى الصفحة -->
     <img src="https://i.pinimg.com/564x/2c/3f/3d/2c3f3d37ebfbc29c.jpg" alt="صورة علوية" class="header-image">
 
-    <!-- المحتوى الرئيسي -->
-    <div class="content">
+    <!-- نافذة اختيار الحافلات -->
+    <div class="bus-selection" id="busSelection">
+        <button class="bus-button" onclick="showTickets('حافلة 1')">حافلة 1</button>
+        <button class="bus-button" onclick="showTickets('حافلة 2')">حافلة 2</button>
+    </div>
+
+    <!-- المحتوى الرئيسي لعرض التذاكر -->
+    <div class="content" id="ticketContent">
         <div class="container">
-            <h2>تذاكر البيع</h2>
+            <h2 id="busTitle">تذاكر البيع</h2>
 
             <!-- التذاكر -->
             <div class="ticket">
@@ -197,13 +229,21 @@
     </div>
 
     <script>
-        // دالة لإخفاء شاشة الترحيب وعرض الموقع
+        // دالة لإخفاء شاشة الترحيب وعرض اختيار الحافلات
         function fadeOutLogo() {
             var welcomeScreen = document.getElementById("welcomeScreen");
             welcomeScreen.classList.add("hide");
             setTimeout(function() {
                 welcomeScreen.style.display = "none";
+                document.getElementById("busSelection").style.display = "flex";
             }, 3000); // 3 ثوانٍ للتحول التدريجي
+        }
+
+        // دالة لعرض التذاكر الخاصة بالحافلة المختارة
+        function showTickets(busName) {
+            document.getElementById("busSelection").style.display = "none";
+            document.getElementById("ticketContent").style.display = "block";
+            document.getElementById("busTitle").innerText = `تذاكر البيع - ${busName}`;
         }
 
         // بدء التأثير عند تحميل الصفحة
