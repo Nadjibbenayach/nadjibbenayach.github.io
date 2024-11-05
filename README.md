@@ -8,10 +8,47 @@
         /* تنسيق عام */
         body {
             font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
             margin: 0;
             padding: 0;
             display: flex;
+            background-color: #f8f9fa;
+        }
+
+        /* شاشة الترحيب */
+        .welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #007BFF;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 1s ease;
+        }
+
+        /* زر الحرف N */
+        .welcome-button {
+            font-size: 80px;
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            animation: bounce 1s infinite;
+        }
+
+        /* تأثير الارتداد */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* اختفاء شاشة الترحيب */
+        .welcome-screen.hide {
+            opacity: 0;
+            visibility: hidden;
         }
 
         /* تنسيق القائمة الجانبية */
@@ -26,7 +63,6 @@
             padding: 20px;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
             overflow-y: auto;
-            transition: transform 0.3s ease;
         }
 
         .sidebar h3 {
@@ -135,6 +171,11 @@
 </head>
 <body>
 
+    <!-- شاشة الترحيب -->
+    <div class="welcome-screen" id="welcomeScreen">
+        <div class="welcome-button" onclick="enterSite()">N</div>
+    </div>
+
     <!-- القائمة الجانبية -->
     <div class="sidebar">
         <h3>القائمة الجانبية</h3>
@@ -165,5 +206,11 @@
         </div>
     </div>
 
+    <script>
+        // دالة لإخفاء شاشة الترحيب وعرض الموقع
+        function enterSite() {
+            document.getElementById("welcomeScreen").classList.add("hide");
+        }
+    </script>
 </body>
 </html>
