@@ -1,1 +1,171 @@
 
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>موقع بيع التذاكر</title>
+    <style>
+        /* تنسيق عام */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        /* شريط التنقل العلوي */
+        .navbar {
+            width: 100%;
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        .navbar button {
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* شاشة الترحيب */
+        .welcome {
+            margin-top: 60px;
+            text-align: center;
+            animation: fade 3s ease-in-out;
+        }
+
+        @keyframes fade {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        /* النافذة الرئيسية */
+        .main-content {
+            display: none;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        /* نافذة اختيار الحافلة */
+        .bus-selection {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px;
+        }
+
+        .bus {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100px;
+            text-align: center;
+        }
+
+        /* صفحة الأسعار */
+        .prices {
+            display: none;
+            text-align: center;
+            margin: 20px;
+        }
+
+        /* رسالة حول الموقع */
+        .about {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            border: 1px solid #ccc;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- شريط التنقل العلوي -->
+    <div class="navbar">
+        <button onclick="toggleSidebar()">☰</button>
+        موقع بيع التذاكر
+    </div>
+
+    <!-- شاشة الترحيب -->
+    <div class="welcome">
+        <h1>مرحبًا بك في موقع بيع التذاكر</h1>
+    </div>
+
+    <!-- النافذة الرئيسية -->
+    <div class="main-content">
+        <!-- نافذة اختيار الحافلة -->
+        <div class="bus-selection">
+            <div class="bus" onclick="showPrices('bus1')">حافلة 1</div>
+            <div class="bus" onclick="showPrices('bus2')">حافلة 2</div>
+        </div>
+
+        <!-- نافذة الأسعار -->
+        <div class="prices" id="prices">
+            <h2>الأسعار</h2>
+            <p>هنا ستظهر أسعار التذاكر بناءً على الحافلة المختارة.</p>
+            <button onclick="goBack()">العودة</button>
+        </div>
+
+        <!-- رسالة حول الموقع -->
+        <div class="about" id="about">
+            <h2>حول الموقع</h2>
+            <p>عزيزي المستخدم، لقد قمنا بتطوير هذا الموقع بعناية وحرص شديد لتوفير تجربة سلسة وسهلة في شراء التذاكر.
+               نهدف إلى تقديم أفضل خدمة لكم ونسعى دائماً إلى تحسين الموقع ليلبي احتياجاتكم. شكراً لاختياركم موقعنا ونتمنى
+               لكم رحلة ممتعة وآمنة.
+            </p>
+            <button onclick="closeAbout()">إغلاق</button>
+        </div>
+    </div>
+
+    <script>
+        // إخفاء شاشة الترحيب وإظهار المحتوى الرئيسي
+        setTimeout(() => {
+            document.querySelector('.welcome').style.display = 'none';
+            document.querySelector('.main-content').style.display = 'block';
+        }, 3000);
+
+        // إظهار الأسعار بناءً على الحافلة المختارة
+        function showPrices(bus) {
+            document.getElementById('prices').style.display = 'block';
+            document.querySelector('.bus-selection').style.display = 'none';
+        }
+
+        // العودة إلى نافذة اختيار الحافلة
+        function goBack() {
+            document.getElementById('prices').style.display = 'none';
+            document.querySelector('.bus-selection').style.display = 'flex';
+        }
+
+        // عرض رسالة حول الموقع
+        function toggleSidebar() {
+            const about = document.getElementById('about');
+            if (about.style.display === 'none' || about.style.display === '') {
+                about.style.display = 'block';
+            } else {
+                about.style.display = 'none';
+            }
+        }
+
+        // إغلاق رسالة حول الموقع
+        function closeAbout() {
+            document.getElementById('about').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
