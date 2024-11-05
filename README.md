@@ -258,16 +258,13 @@
     <script>
         // دالة لإخفاء شاشة الترحيب وعرض الموقع
         function enterSite() {
-            document.getElementById("welcomeScreen").classList.add("hide");
+            var welcomeScreen = document.getElementById("welcomeScreen");
+            welcomeScreen.style.opacity = "0";
+            setTimeout(function() {
+                welcomeScreen.style.display = "none";
+            }, 1000); // 1 ثانية للتحول تدريجيا
         }
 
         // دالة لعرض استمارة الطلب
         function showForm(ticketName, ticketPrice) {
-            document.getElementById("ticketInfo").innerText = `تذكرة: ${ticketName}, السعر: ${ticketPrice}DA`;
-            document.getElementById("popupOverlay").classList.add("show");
-            document.getElementById("popupForm").classList.add("show");
-        }
-
-        // دالة لإغلاق استمارة الطلب
-        function closeForm() {
-            document
+            document.getElementById("ticketInfo").innerText =
