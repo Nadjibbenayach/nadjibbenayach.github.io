@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>موقع نشر المعلومات</title>
+    <title>موقع بيع التذاكر</title>
     <style>
         /* تنسيق عام */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            display: flex;
             background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
         }
 
         /* شاشة الترحيب */
@@ -126,46 +127,72 @@
             text-align: center;
         }
 
-        .container h2 {
-            color: #007BFF;
-            margin-bottom: 20px;
+        /* تنسيق تذاكر البيع */
+        .ticket {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background-color: #f9f9f9;
         }
 
-        /* تنسيق للأزرار */
-        .button {
-            display: inline-block;
-            padding: 10px 20px;
+        .ticket h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #007BFF;
+        }
+
+        .ticket p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+
+        .buy-button {
+            padding: 8px 15px;
             color: #fff;
             background-color: #007BFF;
+            border: none;
             border-radius: 5px;
-            text-decoration: none;
+            cursor: pointer;
             transition: background-color 0.3s;
-            font-weight: bold;
-            margin-top: 15px;
         }
 
-        .button:hover {
+        .buy-button:hover {
             background-color: #0056b3;
         }
 
-        /* تنسيق توافقي للهواتف */
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                box-shadow: none;
-            }
+        /* تنسيق النوافذ المنبثقة */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+        }
 
-            .header-image, .content {
-                width: 100%;
-                margin-left: 0;
-            }
+        .popup.show {
+            display: block;
+        }
 
-            .container {
-                width: 90%;
-                padding: 10px;
-            }
+        /* خلفية معتمة للنوافذ المنبثقة */
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .popup-overlay.show {
+            display: block;
         }
     </style>
 </head>
@@ -180,17 +207,10 @@
     <div class="sidebar">
         <h3>القائمة الجانبية</h3>
         <ul>
-            <li><a href="#">اقتباسات ملهمة</a></li>
-            <li><a href="#">توقعات الطقس</a></li>
-            <li><a href="#">وصفة طعام اليوم</a></li>
-            <li><a href="#">تحديات يومية</a></li>
-            <li><a href="#">ألعاب تفاعلية</a></li>
-            <li><a href="#">جدول نشاطات</a></li>
-            <li><a href="#">نصائح العناية بالصحة</a></li>
-            <li><a href="#">ألغاز للتفكير</a></li>
-            <li><a href="#">أخبار اليوم</a></li>
-            <li><a href="#">توفير الطاقة</a></li>
-            <!-- المزيد من العناصر يمكن إضافتها هنا -->
+            <li><a href="#">الصفحة الرئيسية</a></li>
+            <li><a href="#">حول الموقع</a></li>
+            <li><a href="#">تذاكر البيع</a></li>
+            <li><a href="#">التواصل معنا</a></li>
         </ul>
     </div>
 
@@ -200,10 +220,39 @@
     <!-- المحتوى الرئيسي -->
     <div class="content">
         <div class="container">
-            <h2>مرحبا بك في موقع نشر المعلومات</h2>
-            <p>هذا القسم مخصص لنشر المحتوى والمعلومات التي يمكن أن تكون مفيدة في حياتك اليومية.</p>
-            <a href="#" class="button">المزيد من المعلومات</a>
+            <h2>تذاكر البيع</h2>
+
+            <!-- التذاكر -->
+            <div class="ticket">
+                <h3>العيايشة</h3>
+                <p>السعر: 30DA</p>
+                <button class="buy-button" onclick="showForm('العيايشة', 30)">شراء</button>
+            </div>
+
+            <div class="ticket">
+                <h3>قاوس</h3>
+                <p>السعر: 25DA</p>
+                <button class="buy-button" onclick="showForm('قاوس', 25)">شراء</button>
+            </div>
+
+            <div class="ticket">
+                <h3>الكلم 5</h3>
+                <p>السعر: 20DA</p>
+                <button class="buy-button" onclick="showForm('الكلم 5', 20)">شراء</button>
+            </div>
         </div>
+    </div>
+
+    <!-- نافذة النوافذ المنبثقة لملء الاستمارة -->
+    <div class="popup-overlay" id="popupOverlay"></div>
+    <div class="popup" id="popupForm">
+        <h3>ملء استمارة الطلب</h3>
+        <p id="ticketInfo"></p>
+        <input type="text" id="name" placeholder="الاسم">
+        <input type="text" id="surname" placeholder="اللقب">
+        <input type="text" id="phone" placeholder="رقم الهاتف">
+        <button onclick="submitForm()">إرسال</button>
+        <button onclick="closeForm()">إغلاق</button>
     </div>
 
     <script>
@@ -211,6 +260,15 @@
         function enterSite() {
             document.getElementById("welcomeScreen").classList.add("hide");
         }
-    </script>
-</body>
-</html>
+
+        // دالة لعرض استمارة الطلب
+        function showForm(ticketName, ticketPrice) {
+            document.getElementById("ticketInfo").innerText = `تذكرة: ${ticketName}, السعر: ${ticketPrice}DA`;
+            document.getElementById("popupOverlay").classList.add("show");
+            document.getElementById("popupForm").classList.add("show");
+        }
+
+        // دالة لإغلاق استمارة الطلب
+        function closeForm() {
+            document.getElementById("popupOverlay").classList.remove("show");
+            document.getElementById("popupForm").class
