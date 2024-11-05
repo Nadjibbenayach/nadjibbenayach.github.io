@@ -97,7 +97,7 @@
 <body>
 
     <!-- الصورة في أعلى الصفحة -->
-    <img src="your-image.jpg" alt="صورة في أعلى الصفحة" class="header-image">
+    <img src="https://i.pinimg.com/originals/2c/39/82/2c39829f04b06c5a5f3e4f5e0ab85b3c.jpg" alt="صورة في أعلى الصفحة" class="header-image">
 
     <!-- محتوى الصفحة -->
     <div class="container">
