@@ -134,63 +134,11 @@
             text-align: center;
         }
 
-        /* تنسيق تذاكر البيع */
-        .ticket {
-            border: 1px solid #ddd;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-        }
-
-        .ticket h3 {
-            margin: 0;
-            font-size: 18px;
-            color: #007BFF;
-        }
-
-        .ticket p {
-            margin: 5px 0;
+        /* تنسيق رسالة حول الموقع */
+        .about-message {
+            text-align: justify;
             font-size: 16px;
-        }
-
-        .buy-button {
-            padding: 8px 15px;
-            color: #fff;
-            background-color: #007BFF;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .buy-button:hover {
-            background-color: #0056b3;
-        }
-
-        /* تنسيق نافذة اختيار الحافلات */
-        .bus-selection {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            gap: 20px;
-            background-color: #f8f9fa;
-        }
-
-        .bus-button {
-            padding: 15px 30px;
-            color: #fff;
-            background-color: #007BFF;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 20px;
-            transition: background-color 0.3s;
-        }
-
-        .bus-button:hover {
-            background-color: #0056b3;
+            color: #333;
         }
     </style>
 </head>
@@ -208,9 +156,9 @@
     <div class="sidebar" id="sidebar">
         <h3>القائمة الجانبية</h3>
         <ul>
-            <li><a href="#">الصفحة الرئيسية</a></li>
-            <li><a href="#">حول الموقع</a></li>
-            <li><a href="#">تذاكر البيع</a></li>
+            <li><a href="#" onclick="showContent('home')">الصفحة الرئيسية</a></li>
+            <li><a href="#" onclick="showContent('about')">حول الموقع</a></li>
+            <li><a href="#" onclick="showContent('tickets')">تذاكر البيع</a></li>
             <li><a href="#">التواصل معنا</a></li>
         </ul>
     </div>
@@ -218,46 +166,35 @@
     <!-- إضافة صورة في أعلى الصفحة -->
     <img src="https://i.pinimg.com/564x/2c/3f/3d/2c3f3d37ebfbc29c.jpg" alt="صورة علوية" class="header-image">
 
-    <!-- نافذة اختيار الحافلات -->
-    <div class="bus-selection" id="busSelection">
-        <button class="bus-button" onclick="showTickets('حافلة 1')">حافلة 1</button>
-        <button class="bus-button" onclick="showTickets('حافلة 2')">حافلة 2</button>
+    <!-- المحتوى الرئيسي -->
+    <div class="content" id="homeContent">
+        <div class="container">
+            <h2>الصفحة الرئيسية</h2>
+            <p>مرحبًا بكم في موقع بيع التذاكر!</p>
+        </div>
     </div>
 
-    <!-- المحتوى الرئيسي لعرض التذاكر -->
-    <div class="content" id="ticketContent">
+    <!-- رسالة حول الموقع -->
+    <div class="content" id="aboutContent">
         <div class="container">
-            <h2 id="busTitle">تذاكر البيع</h2>
-
-            <!-- التذاكر -->
-            <div class="ticket">
-                <h3>العيايشة</h3>
-                <p>السعر: 30DA</p>
-                <button class="buy-button" onclick="showForm('العيايشة', 30)">شراء</button>
-            </div>
-
-            <div class="ticket">
-                <h3>قاوس</h3>
-                <p>السعر: 25DA</p>
-                <button class="buy-button" onclick="showForm('قاوس', 25)">شراء</button>
-            </div>
-
-            <div class="ticket">
-                <h3>الكلم 5</h3>
-                <p>السعر: 20DA</p>
-                <button class="buy-button" onclick="showForm('الكلم 5', 20)">شراء</button>
-            </div>
+            <h2>حول الموقع</h2>
+            <p class="about-message">
+                مرحبًا بكم في موقع بيع التذاكر، حيث أسعى جاهدًا لتقديم تجربة مميزة لجميع المستخدمين. من خلال هذا الموقع، أبذل قصارى جهدي لتوفير واجهة سهلة الاستخدام وخدمة سريعة وآمنة. إن الهدف الأساسي من تطوير هذا الموقع هو تمكين الجميع من الحصول على التذاكر بسهولة وراحة، سواء كان ذلك لحضور فعالية معينة أو للاستفادة من وسائل النقل المختلفة.<br><br>
+                
+                كوني مطورًا لهذا الموقع، أنا ملتزم بتقديم تجربة سلسة ومبسطة، وأعمل باستمرار على تحسينه وإضافة المزيد من الميزات التي تخدمكم. أعلم أن تجربة المستخدم هي العامل الأهم، ولذا أحرص على الاستماع إلى ملاحظاتكم ومقترحاتكم لتحسين كل جانب من جوانب الموقع. أتمنى أن تجدوا في هذا الموقع كل ما تحتاجونه، وأعدكم بمواصلة التطوير والسعي للأفضل.<br><br>
+                
+                شكرًا لكم على ثقتكم ودعمكم المتواصل، وأتطلع إلى تقديم المزيد من الخدمات والميزات التي ترتقي بتجربتكم. أتمنى أن تكونوا دائمًا جزءًا من رحلتي في تحسين وتطوير هذا الموقع.
+            </p>
         </div>
     </div>
 
     <script>
-        // دالة لإخفاء شاشة الترحيب وعرض اختيار الحافلات
+        // دالة لإخفاء شاشة الترحيب
         function fadeOutLogo() {
             var welcomeScreen = document.getElementById("welcomeScreen");
             welcomeScreen.classList.add("hide");
             setTimeout(function() {
                 welcomeScreen.style.display = "none";
-                document.getElementById("busSelection").style.display = "flex";
             }, 3000); // 3 ثوانٍ للتحول التدريجي
         }
 
@@ -267,11 +204,24 @@
             sidebar.classList.toggle("open");
         }
 
-        // دالة لعرض التذاكر الخاصة بالحافلة المختارة
-        function showTickets(busName) {
-            document.getElementById("busSelection").style.display = "none";
-            document.getElementById("ticketContent").style.display = "block";
-            document.getElementById("busTitle").innerText = `تذاكر البيع - ${busName}`;
+        // دالة لعرض المحتوى المناسب
+        function showContent(section) {
+            // إخفاء جميع المحتويات
+            document.querySelectorAll(".content").forEach(function(content) {
+                content.style.display = "none";
+            });
+            
+            // إظهار المحتوى المطلوب
+            if (section === 'home') {
+                document.getElementById("homeContent").style.display = "block";
+            } else if (section === 'about') {
+                document.getElementById("aboutContent").style.display = "block";
+            } else if (section === 'tickets') {
+                document.getElementById("ticketContent").style.display = "block";
+            }
+            
+            // إغلاق القائمة الجانبية بعد الاختيار
+            toggleSidebar();
         }
 
         // بدء التأثير عند تحميل الصفحة
@@ -279,4 +229,3 @@
     </script>
 </body>
 </html>
-``
