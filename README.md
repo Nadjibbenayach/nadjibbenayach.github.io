@@ -26,30 +26,26 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            color: white;
+            font-size: 100px;
             z-index: 1000;
-            transition: opacity 1s ease;
-        }
-
-        /* زر الحرف N */
-        .welcome-button {
-            font-size: 80px;
-            color: #fff;
-            cursor: pointer;
-            font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-            animation: bounce 1s infinite;
-        }
-
-        /* تأثير الارتداد */
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
+            opacity: 1;
+            transition: opacity 3s ease;
         }
 
         /* اختفاء شاشة الترحيب */
         .welcome-screen.hide {
             opacity: 0;
             visibility: hidden;
+        }
+
+        /* تنسيق الجزء العلوي */
+        .header-image {
+            width: calc(100% - 250px);
+            margin-left: 250px;
+            max-height: 200px;
+            object-fit: cover;
+            display: block;
         }
 
         /* تنسيق القائمة الجانبية */
@@ -99,15 +95,6 @@
         .sidebar ul li a:hover {
             background-color: #555;
             transform: scale(1.05);
-        }
-
-        /* تنسيق الجزء العلوي */
-        .header-image {
-            width: calc(100% - 250px);
-            margin-left: 250px;
-            max-height: 200px;
-            object-fit: cover;
-            display: block;
         }
 
         /* تنسيق المحتوى الرئيسي */
@@ -160,47 +147,13 @@
         .buy-button:hover {
             background-color: #0056b3;
         }
-
-        /* تنسيق النوافذ المنبثقة */
-        .popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-            z-index: 1001;
-        }
-
-        .popup.show {
-            display: block;
-        }
-
-        /* خلفية معتمة للنوافذ المنبثقة */
-        .popup-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-        }
-
-        .popup-overlay.show {
-            display: block;
-        }
     </style>
 </head>
 <body>
 
     <!-- شاشة الترحيب -->
     <div class="welcome-screen" id="welcomeScreen">
-        <div class="welcome-button" onclick="enterSite()">N</div>
+        <div id="logo">N</div>
     </div>
 
     <!-- القائمة الجانبية -->
@@ -243,28 +196,18 @@
         </div>
     </div>
 
-    <!-- نافذة النوافذ المنبثقة لملء الاستمارة -->
-    <div class="popup-overlay" id="popupOverlay"></div>
-    <div class="popup" id="popupForm">
-        <h3>ملء استمارة الطلب</h3>
-        <p id="ticketInfo"></p>
-        <input type="text" id="name" placeholder="الاسم">
-        <input type="text" id="surname" placeholder="اللقب">
-        <input type="text" id="phone" placeholder="رقم الهاتف">
-        <button onclick="submitForm()">إرسال</button>
-        <button onclick="closeForm()">إغلاق</button>
-    </div>
-
     <script>
         // دالة لإخفاء شاشة الترحيب وعرض الموقع
-        function enterSite() {
+        function fadeOutLogo() {
             var welcomeScreen = document.getElementById("welcomeScreen");
-            welcomeScreen.style.opacity = "0";
+            welcomeScreen.classList.add("hide");
             setTimeout(function() {
                 welcomeScreen.style.display = "none";
-            }, 1000); // 1 ثانية للتحول تدريجيا
+            }, 3000); // 3 ثوانٍ للتحول التدريجي
         }
 
-        // دالة لعرض استمارة الطلب
-        function showForm(ticketName, ticketPrice) {
-            document.getElementById("ticketInfo").innerText =
+        // بدء التأثير عند تحميل الصفحة
+        window.onload = fadeOutLogo;
+    </script>
+</body>
+</html>
