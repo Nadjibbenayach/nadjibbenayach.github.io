@@ -5,25 +5,84 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>موقع نشر المعلومات</title>
     <style>
-        /* تنسيق الصفحة */
+        /* تنسيق عام */
         body {
             font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
+            background-color: #f8f9fa;
             margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        /* تنسيق القائمة الجانبية */
+        .sidebar {
+            width: 250px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar h3 {
+            font-size: 20px;
+            color: #f2f2f2;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 1px solid #555;
+            padding-bottom: 10px;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
             padding: 0;
         }
 
-        /* تنسيق الصورة في الأعلى */
+        .sidebar ul li {
+            margin: 15px 0;
+        }
+
+        .sidebar ul li a {
+            color: #f2f2f2;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #444;
+            transition: background-color 0.3s, transform 0.2s;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #555;
+            transform: scale(1.05);
+        }
+
+        /* تنسيق الجزء العلوي */
         .header-image {
-            width: 100%;
-            height: auto;
+            width: calc(100% - 250px);
+            margin-left: 250px;
+            max-height: 200px;
+            object-fit: cover;
             display: block;
         }
 
-        /* تنسيق الأزرار الرئيسية */
+        /* تنسيق المحتوى الرئيسي */
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            width: calc(100% - 250px);
+        }
+
         .container {
-            max-width: 400px;
-            margin: 20px auto;
+            max-width: 700px;
+            margin: auto;
             padding: 20px;
             background-color: #fff;
             border-radius: 5px;
@@ -31,126 +90,80 @@
             text-align: center;
         }
 
-        h2 { 
+        .container h2 {
+            color: #007BFF;
             margin-bottom: 20px;
         }
 
-        /* تنسيق الروابط لأزرار التواصل الاجتماعي */
-        .social-icons {
-            display: flex;
-            justify-content: center;
-            margin: 10px 0;
-        }
-
-        .social-icons a {
+        /* تنسيق للأزرار */
+        .button {
             display: inline-block;
-            margin: 0 10px;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            overflow: hidden;
-        }
-
-        .social-icons img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* تنسيق بطاقات التذاكر */
-        .ticket {
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 10px;
-            margin: 10px 0;
-            background-color: #f9f9f9;
-            cursor: pointer;
-        }
-
-        /* استمارة الطلب */
-        .form-container {
-            display: none;
-            text-align: left;
-        }
-
-        input[type="text"], input[type="tel"] {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #007BFF;
+            padding: 10px 20px;
             color: #fff;
-            border: none;
-            cursor: pointer;
-            margin-top: 10px;
+            background-color: #007BFF;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+            font-weight: bold;
+            margin-top: 15px;
         }
 
-        button:hover { background-color: #0056b3; }
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+        /* تنسيق توافقي للهواتف */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                box-shadow: none;
+            }
+
+            .header-image, .content {
+                width: 100%;
+                margin-left: 0;
+            }
+
+            .container {
+                width: 90%;
+                padding: 10px;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <!-- الصورة في أعلى الصفحة -->
-    <img src="https://i.pinimg.com/originals/2c/39/82/2c39829f04b06c5a5f3e4f5e0ab85b3c.jpg" alt="صورة في أعلى الصفحة" class="header-image">
-
-    <!-- محتوى الصفحة -->
-    <div class="container">
-        <h2>مرحباً بك في موقعنا</h2>
-        <p>تابعنا على مواقع التواصل الاجتماعي</p>
-
-        <!-- روابط التواصل الاجتماعي -->
-        <div class="social-icons">
-            <a href="https://www.facebook.com"><img src="facebook-icon.jpg" alt="Facebook"></a>
-            <a href="https://www.instagram.com/nadjibbenayach"><img src="instagram-icon.jpg" alt="Instagram"></a>
-            <a href="https://www.tiktok.com"><img src="tiktok-icon.jpg" alt="TikTok"></a>
-        </div>
-
-        <!-- بطاقات التذاكر -->
-        <div class="ticket" onclick="showForm('العيايشة', 30)">العيايشة - 30DA</div>
-        <div class="ticket" onclick="showForm('قاوس', 25)">قاوس - 25DA</div>
-        <div class="ticket" onclick="showForm('الكلم', 20)">الكلم - 20DA</div>
-
-        <!-- استمارة الطلب -->
-        <div class="form-container" id="orderForm">
-            <h3>طلب التذكرة</h3>
-            <p>الاسم: <span id="ticketName"></span></p>
-            <p>السعر: <span id="ticketPrice"></span> DA</p>
-            <input type="text" id="userName" placeholder="الاسم">
-            <input type="text" id="userSurname" placeholder="اللقب">
-            <input type="tel" id="userPhone" placeholder="رقم الهاتف">
-            <button onclick="submitForm()">إرسال الطلب</button>
-        </div>
+    <!-- القائمة الجانبية -->
+    <div class="sidebar">
+        <h3>القائمة الجانبية</h3>
+        <ul>
+            <li><a href="#">اقتباسات ملهمة</a></li>
+            <li><a href="#">توقعات الطقس</a></li>
+            <li><a href="#">وصفة طعام اليوم</a></li>
+            <li><a href="#">تحديات يومية</a></li>
+            <li><a href="#">ألعاب تفاعلية</a></li>
+            <li><a href="#">جدول نشاطات</a></li>
+            <li><a href="#">نصائح العناية بالصحة</a></li>
+            <li><a href="#">ألغاز للتفكير</a></li>
+            <li><a href="#">أخبار اليوم</a></li>
+            <li><a href="#">توفير الطاقة</a></li>
+            <!-- المزيد من العناصر يمكن إضافتها هنا -->
+        </ul>
     </div>
 
-    <!-- سكريبت الجافا سكريبت -->
-    <script>
-        function showForm(ticketName, ticketPrice) {
-            document.getElementById('ticketName').innerText = ticketName;
-            document.getElementById('ticketPrice').innerText = ticketPrice;
-            document.getElementById('orderForm').style.display = 'block';
-        }
+    <!-- إضافة صورة في أعلى الصفحة -->
+    <img src="https://i.pinimg.com/564x/2c/3f/3d/2c3f3d37ebfbc29c.jpg" alt="صورة علوية" class="header-image">
 
-        function submitForm() {
-            var name = document.getElementById("userName").value;
-            var surname = document.getElementById("userSurname").value;
-            var phone = document.getElementById("userPhone").value;
-            
-            if(name && surname && phone) {
-                alert("تم إرسال الطلب بنجاح! \n\n" +
-                      "الاسم: " + name + "\n" +
-                      "اللقب: " + surname + "\n" +
-                      "رقم الهاتف: " + phone);
-            } else {
-                alert("يرجى ملء جميع الحقول.");
-            }
-        }
-    </script>
+    <!-- المحتوى الرئيسي -->
+    <div class="content">
+        <div class="container">
+            <h2>مرحبا بك في موقع نشر المعلومات</h2>
+            <p>هذا القسم مخصص لنشر المحتوى والمعلومات التي يمكن أن تكون مفيدة في حياتك اليومية.</p>
+            <a href="#" class="button">المزيد من المعلومات</a>
+        </div>
+    </div>
 
 </body>
 </html>
