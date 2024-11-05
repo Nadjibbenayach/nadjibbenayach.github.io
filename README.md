@@ -270,5 +270,4 @@
 
         // دالة لإغلاق استمارة الطلب
         function closeForm() {
-            document.getElementById("popupOverlay").classList.remove("show");
-            document.getElementById("popupForm").class
+            document
