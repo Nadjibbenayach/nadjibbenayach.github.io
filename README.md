@@ -3,187 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>موقع التذاكر</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <title>موقع حجز التذاكر</title>
     <style>
-        body {
-            font-family: 'Tajawal', sans-serif;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 0;
-            text-align: center;
-            color: #333;
-        }
-
-        /* الرأس */
-        header {
-            background-color: #007BFF;
-            color: #fff;
-            padding: 20px;
-            font-size: 1.8em;
-        }
-
-        /* قسم التذاكر */
-        .tickets-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-            padding: 20px;
-        }
-
-        .ticket-card {
-            width: 300px;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            transition: transform 0.3s;
-            cursor: pointer;
-        }
-
-        .ticket-card:hover {
-            transform: scale(1.05);
-        }
-
-        .ticket-title {
-            font-size: 1.5em;
-            margin-bottom: 10px;
-            color: #007BFF;
-        }
-
-        .ticket-price {
-            font-size: 1.2em;
-            color: #555;
-        }
-
-        /* استمارة الطلب */
-        .form-container, .review-container {
-            display: none;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
-            margin: 20px auto;
-        }
-
-        .form-container input[type="text"], .form-container input[type="tel"], .form-container button,
-        .review-container button {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            font-size: 1em;
-        }
-
-        .footer {
-            text-align: center;
-            padding: 15px;
-            background-color: #007BFF;
-            color: #fff;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            font-size: 0.9em;
-        }
+        body { font-family: Arial, sans-serif; background-color: #f2f2f2; margin: 0; padding: 0; }
+        .container { max-width: 400px; margin: auto; padding: 20px; background-color: #fff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); margin-top: 20px; }
+        h2 { text-align: center; }
+        .ticket { padding: 15px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; cursor: pointer; text-align: center; background-color: #007BFF; color: #fff; }
+        .ticket:hover { background-color: #0056b3; }
+        .form-container, .confirmation-container { display: none; }
+        .form-field { width: 100%; padding: 10px; margin: 10px 0; }
+        .form-button { width: 100%; padding: 10px; background-color: #28a745; color: #fff; border: none; cursor: pointer; border-radius: 5px; }
+        .form-button:hover { background-color: #218838; }
+        .confirm-button, .cancel-button { width: 48%; padding: 10px; margin: 5px 1%; border: none; border-radius: 5px; cursor: pointer; color: #fff; }
+        .confirm-button { background-color: #28a745; }
+        .cancel-button { background-color: #dc3545; }
+        .confirm-button:hover { background-color: #218838; }
+        .cancel-button:hover { background-color: #c82333; }
     </style>
 </head>
 <body>
-
-<header>
-    مرحبا بكم في موقع التذاكر
-</header>
-
-<!-- قسم التذاكر -->
-<div class="tickets-container">
-    <div class="ticket-card" onclick="showForm('العيايشة', '30 DA')">
-        <div class="ticket-title">العيايشة</div>
-        <div class="ticket-price">السعر: 30 DA</div>
+    <!-- شاشة اختيار التذاكر -->
+    <div class="container ticket-container">
+        <h2>اختر تذكرتك</h2>
+        <div class="ticket" onclick="selectTicket('العيايشة', 30)">تذكرة العيايشة - 30DA</div>
+        <div class="ticket" onclick="selectTicket('قاوس', 25)">تذكرة قاوس - 25DA</div>
+        <div class="ticket" onclick="selectTicket('الكلم 5', 20)">تذكرة الكلم 5 - 20DA</div>
     </div>
-    <div class="ticket-card" onclick="showForm('قاوس', '25 DA')">
-        <div class="ticket-title">قاوس</div>
-        <div class="ticket-price">السعر: 25 DA</div>
+
+    <!-- شاشة ملء الاستمارة -->
+    <div class="container form-container">
+        <h2>أدخل معلوماتك</h2>
+        <input type="text" id="firstName" placeholder="الاسم" class="form-field">
+        <input type="text" id="lastName" placeholder="اللقب" class="form-field">
+        <input type="text" id="phone" placeholder="رقم الهاتف" class="form-field">
+        <button class="form-button" onclick="submitForm()">طلب التذكرة</button>
     </div>
-    <div class="ticket-card" onclick="showForm('الكلم 5', '20 DA')">
-        <div class="ticket-title">الكلم 5</div>
-        <div class="ticket-price">السعر: 20 DA</div>
+
+    <!-- شاشة تأكيد نجاح الطلب -->
+    <div class="container confirmation-container">
+        <h2>تم الطلب بنجاح!</h2>
+        <p>التذكرة المطلوبة: <span id="ticketType"></span></p>
+        <p>السعر: <span id="ticketPrice"></span>DA</p>
+        <p>الاسم: <span id="confirmFirstName"></span></p>
+        <p>اللقب: <span id="confirmLastName"></span></p>
+        <p>رقم الهاتف: <span id="confirmPhone"></span></p>
+        <button class="confirm-button" onclick="confirmOrder()">أوافق</button>
+        <button class="cancel-button" onclick="cancelOrder()">أرفض</button>
     </div>
-</div>
 
-<!-- استمارة الطلب -->
-<div class="form-container" id="formContainer">
-    <h2>طلب تذكرة: <span id="ticketName"></span></h2>
-    <input type="text" id="firstName" placeholder="الاسم" required>
-    <input type="text" id="lastName" placeholder="اللقب" required>
-    <input type="tel" id="phoneNumber" placeholder="رقم الهاتف" required>
-    <button onclick="submitRequest()">إرسال الطلب</button>
-</div>
-
-<!-- قسم مراجعة الطلبات -->
-<div class="review-container" id="reviewContainer">
-    <h2>مراجعة الطلب</h2>
-    <p>الاسم: <span id="reviewFirstName"></span></p>
-    <p>اللقب: <span id="reviewLastName"></span></p>
-    <p>رقم الهاتف: <span id="reviewPhoneNumber"></span></p>
-    <p>التذكرة: <span id="reviewTicketName"></span></p>
-    <button onclick="approve()">أوافق</button>
-    <button onclick="reject()">أرفض</button>
-</div>
-
-<div class="footer">
-    &copy; 2023 موقع التذاكر. جميع الحقوق محفوظة.
-</div>
-
-<script>
-    let selectedTicket = "";
-
-    // عرض استمارة الطلب
-    function showForm(ticketName, price) {
-        selectedTicket = ticketName + " - " + price;
-        document.getElementById("ticketName").innerText = selectedTicket;
-        document.getElementById("formContainer").style.display = "block";
-        document.getElementById("reviewContainer").style.display = "none";
-    }
-
-    // إرسال الطلب
-    function submitRequest() {
-        const firstName = document.getElementById("firstName").value;
-        const lastName = document.getElementById("lastName").value;
-        const phoneNumber = document.getElementById("phoneNumber").value;
-
-        if (firstName && lastName && phoneNumber) {
-            // عرض الطلب للمراجعة
-            document.getElementById("reviewFirstName").innerText = firstName;
-            document.getElementById("reviewLastName").innerText = lastName;
-            document.getElementById("reviewPhoneNumber").innerText = phoneNumber;
-            document.getElementById("reviewTicketName").innerText = selectedTicket;
-
-            document.getElementById("formContainer").style.display = "none";
-            document.getElementById("reviewContainer").style.display = "block";
-        } else {
-            alert("يرجى ملء جميع الحقول.");
+    <script>
+        let selectedTicket = {};
+        
+        function selectTicket(name, price) {
+            selectedTicket = { name, price };
+            document.querySelector('.ticket-container').style.display = 'none';
+            document.querySelector('.form-container').style.display = 'block';
         }
-    }
 
-    // قبول الطلب
-    function approve() {
-        alert("تمت الموافقة على الطلب بنجاح.");
-        resetForm();
-    }
+        function submitForm() {
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const phone = document.getElementById('phone').value;
 
-    // رفض الطلب
-    function reject() {
-        alert("تم رفض الطلب.");
-        resetForm();
-    }
+            if (!firstName || !lastName || !phone) {
+                alert("يرجى ملء جميع الحقول.");
+                return;
+            }
 
-    // إعادة تعيين النموذج
-    function resetForm() {
-        document.getElementById("formContainer").style.display = "none";
-        document.getElementById("reviewContainer").style.display = "none";
-    }
-</script>
+            document.getElementById('ticketType').innerText = selectedTicket.name;
+            document.getElementById('ticketPrice').innerText = selectedTicket.price;
+            document.getElementById('confirmFirstName').innerText = firstName;
+            document.getElementById('confirmLastName').innerText = lastName;
+            document.getElementById('confirmPhone').innerText = phone;
 
+            document.querySelector('.form-container').style.display = 'none';
+            document.querySelector('.confirmation-container').style.display = 'block';
+        }
+
+        function confirmOrder() {
+            alert("تمت الموافقة على الطلب. شكراً لطلبك!");
+            resetForm();
+        }
+
+        function cancelOrder() {
+            alert("تم إلغاء الطلب.");
+            resetForm();
+        }
+
+        function resetForm() {
+            document.querySelector('.confirmation-container').style.display = 'none';
+            document.querySelector('.ticket-container').style.display = 'block';
+            document.getElementById('firstName').value = '';
+            document.getElementById('lastName').value = '';
+            document.getElementById('phone').value = '';
+            selectedTicket = {};
+        }
+    </script>
 </body>
 </html>
