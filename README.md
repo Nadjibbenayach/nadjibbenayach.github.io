@@ -39,20 +39,26 @@
             visibility: hidden;
         }
 
-        /* تنسيق الجزء العلوي */
-        .header-image {
-            width: calc(100% - 250px);
-            margin-left: 250px;
-            max-height: 200px;
-            object-fit: cover;
-            display: block;
+        /* زر القائمة الجانبية */
+        .menu-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 10px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            z-index: 1100;
         }
 
         /* تنسيق القائمة الجانبية */
         .sidebar {
             width: 250px;
             position: fixed;
-            left: 0;
+            left: -250px;
             top: 0;
             height: 100%;
             background-color: #333;
@@ -60,6 +66,12 @@
             padding: 20px;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
             overflow-y: auto;
+            transition: left 0.3s ease;
+            z-index: 1050;
+        }
+
+        .sidebar.open {
+            left: 0;
         }
 
         .sidebar h3 {
@@ -97,11 +109,18 @@
             transform: scale(1.05);
         }
 
+        /* تنسيق الجزء العلوي */
+        .header-image {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            display: block;
+        }
+
         /* تنسيق المحتوى الرئيسي */
         .content {
-            margin-left: 250px;
             padding: 20px;
-            width: calc(100% - 250px);
+            width: 100%;
             display: none;
         }
 
@@ -182,8 +201,11 @@
         <div id="logo">N</div>
     </div>
 
+    <!-- زر القائمة الجانبية -->
+    <button class="menu-button" onclick="toggleSidebar()">☰ القائمة</button>
+
     <!-- القائمة الجانبية -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
         <h3>القائمة الجانبية</h3>
         <ul>
             <li><a href="#">الصفحة الرئيسية</a></li>
@@ -239,6 +261,12 @@
             }, 3000); // 3 ثوانٍ للتحول التدريجي
         }
 
+        // دالة لفتح وإغلاق القائمة الجانبية
+        function toggleSidebar() {
+            var sidebar = document.getElementById("sidebar");
+            sidebar.classList.toggle("open");
+        }
+
         // دالة لعرض التذاكر الخاصة بالحافلة المختارة
         function showTickets(busName) {
             document.getElementById("busSelection").style.display = "none";
@@ -251,3 +279,4 @@
     </script>
 </body>
 </html>
+``
