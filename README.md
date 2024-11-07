@@ -3,270 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>موقع بيع التذاكر - تجربة تفاعلية</title>
+    <title>موقع لبيع التذاكر - حافلات</title>
     <style>
-        /* تنسيق أساسي للصفحة */
+        /* تنسيقات عامة */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #ffdddd;
+            background-color: #f8f8f8;
             display: flex;
             flex-direction: column;
             align-items: center;
-            overflow-x: hidden;
         }
 
-        /* شريط التنقل العلوي */
-        .navbar {
-            width: 100%;
-            background-color: #ff4d4d;
-            color: white;
-            padding: 15px;
-            text-align: center;
+        /* الشريط الجانبي */
+        .sidebar {
             position: fixed;
             top: 0;
             left: 0;
-            z-index: 10;
+            width: 200px;
+            height: 100%;
+            background-color: #333;
+            padding-top: 20px;
+            display: flex;
+            flex-direction: column;
         }
 
-        .navbar button {
-            position: absolute;
-            left: 10px;
-            top: 15px;
-            background: none;
-            border: none;
+        .sidebar button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #ff4d4d;
             color: white;
-            font-size: 24px;
+            border: none;
             cursor: pointer;
+            font-size: 16px;
+            text-align: left;
         }
 
-        /* حركة اسم الموقع */
-        .navbar h1 {
-            display: inline-block;
-            animation: scrollText 10s linear infinite;
+        .sidebar button:hover {
+            background-color: #ff7878;
         }
 
-        @keyframes scrollText {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
+        /* تنسيق المحتوى */
+        #content {
+            margin-left: 220px;
+            padding: 20px;
+            width: 100%;
+            max-width: 800px;
         }
 
-        /* شكل التنين في أعلى الشاشة */
-        .dragon {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 100px;
-            background: url('https://www.example.com/chinese-dragon.png') no-repeat center center;
-            background-size: contain;
-            animation: moveDragon 5s linear infinite;
-            z-index: 5;
-        }
-
-        @keyframes moveDragon {
-            0% { transform: translate(-50%, 0); }
-            50% { transform: translate(-50%, 20px); }
-            100% { transform: translate(-50%, 0); }
-        }
-
-        /* النافذة الرئيسية */
-        .main-content {
-            margin-top: 100px;
+        /* تنسيق الفيديو */
+        .series-video {
+            margin-top: 20px;
             text-align: center;
             width: 100%;
             max-width: 600px;
             padding: 20px;
-        }
-
-        /* نافذة اختيار الحافلة */
-        .bus-selection {
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .bus {
-            background-color: #ff4d4d;
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            cursor: pointer;
-            width: 45%;
-            text-align: center;
-            transition: transform 0.3s;
-        }
-
-        .bus:hover {
-            transform: scale(1.05);
-        }
-
-        /* صفحة الأسعار */
-        .prices {
-            display: none;
-            text-align: center;
-            margin-top: 20px;
-            padding: 15px;
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        /* القائمة الجانبية */
-        .sidebar {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 250px;
-            background-color: #333;
-            color: white;
-            padding: 20px;
-            z-index: 20;
-        }
-
-        .sidebar h2 {
+        /* تنسيق اسم الموقع المتحرك */
+        .site-title {
             font-size: 24px;
-            margin-bottom: 20px;
+            color: red;
+            font-weight: bold;
+            animation: slide 3s infinite alternate;
+            margin: 20px 0;
         }
 
-        .sidebar button {
-            background-color: #ff4d4d;
-            color: white;
-            padding: 10px;
-            border: none;
-            margin-bottom: 10px;
-            cursor: pointer;
-            width: 100%;
-        }
-
-        .sidebar button:hover {
-            background-color: #cc3a3a;
-        }
-
-        /* شاشة رفع التوصيات */
-        .upload-section {
-            display: none;
-            text-align: center;
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        /* أزرار العودة */
-        .back-button {
-            background-color: #ff4d4d;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 15px;
-        }
-
-        .back-button:hover {
-            background-color: #cc3a3a;
+        @keyframes slide {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(20px); }
         }
     </style>
 </head>
 <body>
-    <!-- شريط التنقل العلوي -->
-    <div class="navbar">
-        <button onclick="toggleSidebar()">☰</button>
-        <h1>موقع بيع التذاكر</h1>
-    </div>
 
-    <!-- شكل التنين في أعلى الشاشة -->
-    <div class="dragon"></div>
+<!-- اسم الموقع المتحرك -->
+<h1 class="site-title">موقع لبيع التذاكر - حافلات بن عياش</h1>
 
-    <!-- القائمة الجانبية -->
-    <div class="sidebar" id="sidebar">
-        <h2>خيارات الترفيه</h2>
-        <button onclick="showUploadSection('movies')">أفلام مختارة</button>
-        <button onclick="showUploadSection('series')">مسلسلات مختارة</button>
-        <button class="back-button" onclick="closeSidebar()">إغلاق القائمة</button>
-    </div>
+<!-- الشريط الجانبي -->
+<div class="sidebar">
+    <button onclick="showBuses()">التذاكر المتاحة</button>
+    <button onclick="showMovies()">أفلام مختارة</button>
+    <button onclick="showSeries()">مسلسلات مختارة</button>
+</div>
 
-    <!-- النافذة الرئيسية -->
-    <div class="main-content">
-        <!-- نافذة اختيار الحافلة -->
-        <div class="bus-selection">
-            <div class="bus" onclick="showPrices('bus1')">بن عياش بوالنوار</div>
-            <div class="bus" onclick="showPrices('bus2')">بن عياش عنتر</div>
-        </div>
+<!-- قسم المحتوى الرئيسي -->
+<div id="content">
+    <h2>التذاكر المتاحة</h2>
+    <ul>
+        <li>حافلة بنعياش بوالنوار</li>
+        <li>حافلة بن عياش عنتر</li>
+    </ul>
+</div>
 
-        <!-- نافذة الأسعار -->
-        <div class="prices" id="prices">
-            <h2>الأسعار</h2>
-            <p id="price-details">هنا ستظهر أسعار التذاكر بناءً على الحافلة المختارة.</p>
-            <button class="back-button" onclick="goBack()">العودة</button>
-        </div>
+<script>
+    // عرض خيارات الحافلات
+    function showBuses() {
+        document.getElementById("content").innerHTML = `
+            <h2>التذاكر المتاحة</h2>
+            <ul>
+                <li>حافلة بنعياش بوالنوار</li>
+                <li>حافلة بن عياش عنتر</li>
+            </ul>
+        `;
+    }
 
-        <!-- شاشة رفع التوصيات -->
-        <div class="upload-section" id="uploadSection">
-            <h2 id="uploadTitle"></h2>
-            <form>
-                <input type="text" placeholder="اسم الفيلم أو المسلسل" required><br><br>
-                <textarea placeholder="لماذا توصي به؟" required></textarea><br><br>
-                <button type="submit">رفع التوصية</button>
-            </form>
-            <button class="back-button" onclick="goBackToMain()">العودة</button>
-        </div>
-    </div>
+    // عرض قسم الأفلام
+    function showMovies() {
+        document.getElementById("content").innerHTML = `
+            <h2>أفلام مختارة</h2>
+            <p>هنا يمكنك عرض الأفلام المختارة التي يقترحها المستخدمون.</p>
+        `;
+    }
 
-    <script>
-        // فتح القائمة الجانبية
-        function toggleSidebar() {
-            document.getElementById('sidebar').style.display = 'block';
-        }
+    // عرض قسم المسلسلات مع الفيديو
+    function showSeries() {
+        document.getElementById("content").innerHTML = `
+            <h2>مسلسلات مختارة</h2>
+            <div class="series-video">
+                <video controls width="100%">
+                    <source src="https://your-github-username.github.io/repository-name/videos/your-series-video.mp4" type="video/mp4">
+                    المتصفح الخاص بك لا يدعم تشغيل الفيديو.
+                </video>
+            </div>
+        `;
+    }
+</script>
 
-        // إغلاق القائمة الجانبية
-        function closeSidebar() {
-            document.getElementById('sidebar').style.display = 'none';
-        }
-
-        // عرض شاشة رفع التوصيات
-        function showUploadSection(type) {
-            document.getElementById('uploadSection').style.display = 'block';
-            document.querySelector('.bus-selection').style.display = 'none';
-            document.getElementById('sidebar').style.display = 'none';
-            
-            if (type === 'movies') {
-                document.getElementById('uploadTitle').textContent = 'رفع توصيات الأفلام';
-            } else {
-                document.getElementById('uploadTitle').textContent = 'رفع توصيات المسلسلات';
-            }
-        }
-
-        // العودة إلى النافذة الرئيسية
-        function goBackToMain() {
-            document.getElementById('uploadSection').style.display = 'none';
-            document.querySelector('.bus-selection').style.display = 'flex';
-        }
-
-        // عرض الأسعار بناءً على الحافلة المختارة
-        function showPrices(bus) {
-            const prices = {
-                bus1: "السعر لحافلة بن عياش بوالنوار: 50 درهم",
-                bus2: "السعر لحافلة بن عياش عنتر: 40 درهم"
-            };
-            document.getElementById('price-details').textContent = prices[bus];
-            document.getElementById('prices').style.display = 'block';
-            document.querySelector('.bus-selection').style.display = 'none';
-        }
-
-        // العودة إلى نافذة اختيار الحافلة
-        function goBack() {
-            document.getElementById('prices').style.display = 'none';
-            document.querySelector('.bus-selection').style.display = 'flex';
-        }
-    </script>
 </body>
 </html>
