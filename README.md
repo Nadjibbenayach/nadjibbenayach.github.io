@@ -41,6 +41,17 @@
             cursor: pointer;
         }
 
+        /* حركة اسم الموقع */
+        .navbar h1 {
+            display: inline-block;
+            animation: scrollText 10s linear infinite;
+        }
+
+        @keyframes scrollText {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
         /* شكل التنين في أعلى الشاشة */
         .dragon {
             position: absolute;
@@ -61,24 +72,10 @@
             100% { transform: translate(-50%, 0); }
         }
 
-        /* شاشة الترحيب */
-        .welcome {
-            margin-top: 150px;
-            text-align: center;
-            color: #333;
-            animation: fade 3s ease-in-out;
-        }
-
-        @keyframes fade {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
-
         /* النافذة الرئيسية */
         .main-content {
-            display: none;
-            text-align: center;
             margin-top: 100px;
+            text-align: center;
             width: 100%;
             max-width: 600px;
             padding: 20px;
@@ -149,18 +146,12 @@
 <body>
     <!-- شريط التنقل العلوي -->
     <div class="navbar">
-        <button onclick="toggleSidebar()">☰</button>
-        موقع بيع التذاكر
+        <button onclick="toggleAbout()">☰</button>
+        <h1>موقع بيع التذاكر</h1>
     </div>
 
     <!-- شكل التنين في أعلى الشاشة -->
     <div class="dragon"></div>
-
-    <!-- شاشة الترحيب -->
-    <div class="welcome">
-        <h1>مرحبًا بك في موقع بيع التذاكر</h1>
-        <p>احجز تذاكرك الآن بسهولة وبضغطة زر.</p>
-    </div>
 
     <!-- النافذة الرئيسية -->
     <div class="main-content">
@@ -186,12 +177,6 @@
     </div>
 
     <script>
-        // إخفاء شاشة الترحيب وإظهار المحتوى الرئيسي
-        setTimeout(() => {
-            document.querySelector('.welcome').style.display = 'none';
-            document.querySelector('.main-content').style.display = 'block';
-        }, 3000);
-
         // إظهار الأسعار بناءً على الحافلة المختارة
         function showPrices(bus) {
             const prices = {
@@ -209,14 +194,10 @@
             document.querySelector('.bus-selection').style.display = 'flex';
         }
 
-        // عرض رسالة حول الموقع
-        function toggleSidebar() {
+        // عرض أو إخفاء رسالة حول الموقع
+        function toggleAbout() {
             const about = document.getElementById('about');
-            if (about.style.display === 'none' || about.style.display === '') {
-                about.style.display = 'block';
-            } else {
-                about.style.display = 'none';
-            }
+            about.style.display = (about.style.display === 'none' || about.style.display === '') ? 'block' : 'none';
         }
 
         // إغلاق رسالة حول الموقع
