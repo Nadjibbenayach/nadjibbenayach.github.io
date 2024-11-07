@@ -116,15 +116,48 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        /* رسالة حول الموقع */
-        .about {
+        /* القائمة الجانبية */
+        .sidebar {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 250px;
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            z-index: 20;
+        }
+
+        .sidebar h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .sidebar button {
+            background-color: #ff4d4d;
+            color: white;
+            padding: 10px;
+            border: none;
+            margin-bottom: 10px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .sidebar button:hover {
+            background-color: #cc3a3a;
+        }
+
+        /* شاشة رفع التوصيات */
+        .upload-section {
             display: none;
             text-align: center;
-            padding: 20px;
-            border: 1px solid #ccc;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fff;
             border-radius: 10px;
-            background-color: #f8f9fa;
-            margin: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         /* أزرار العودة */
@@ -146,12 +179,20 @@
 <body>
     <!-- شريط التنقل العلوي -->
     <div class="navbar">
-        <button onclick="toggleAbout()">☰</button>
+        <button onclick="toggleSidebar()">☰</button>
         <h1>موقع بيع التذاكر</h1>
     </div>
 
     <!-- شكل التنين في أعلى الشاشة -->
     <div class="dragon"></div>
+
+    <!-- القائمة الجانبية -->
+    <div class="sidebar" id="sidebar">
+        <h2>خيارات الترفيه</h2>
+        <button onclick="showUploadSection('movies')">أفلام مختارة</button>
+        <button onclick="showUploadSection('series')">مسلسلات مختارة</button>
+        <button class="back-button" onclick="closeSidebar()">إغلاق القائمة</button>
+    </div>
 
     <!-- النافذة الرئيسية -->
     <div class="main-content">
@@ -168,16 +209,49 @@
             <button class="back-button" onclick="goBack()">العودة</button>
         </div>
 
-        <!-- رسالة حول الموقع -->
-        <div class="about" id="about">
-            <h2>حول الموقع</h2>
-            <p>تم تطوير هذا الموقع لتوفير تجربة حجز تذاكر سهلة وسريعة للمسافرين. نعمل دائمًا على تحسين خدماتنا لتلبية احتياجاتكم.</p>
-            <button class="back-button" onclick="closeAbout()">إغلاق</button>
+        <!-- شاشة رفع التوصيات -->
+        <div class="upload-section" id="uploadSection">
+            <h2 id="uploadTitle"></h2>
+            <form>
+                <input type="text" placeholder="اسم الفيلم أو المسلسل" required><br><br>
+                <textarea placeholder="لماذا توصي به؟" required></textarea><br><br>
+                <button type="submit">رفع التوصية</button>
+            </form>
+            <button class="back-button" onclick="goBackToMain()">العودة</button>
         </div>
     </div>
 
     <script>
-        // إظهار الأسعار بناءً على الحافلة المختارة
+        // فتح القائمة الجانبية
+        function toggleSidebar() {
+            document.getElementById('sidebar').style.display = 'block';
+        }
+
+        // إغلاق القائمة الجانبية
+        function closeSidebar() {
+            document.getElementById('sidebar').style.display = 'none';
+        }
+
+        // عرض شاشة رفع التوصيات
+        function showUploadSection(type) {
+            document.getElementById('uploadSection').style.display = 'block';
+            document.querySelector('.bus-selection').style.display = 'none';
+            document.getElementById('sidebar').style.display = 'none';
+            
+            if (type === 'movies') {
+                document.getElementById('uploadTitle').textContent = 'رفع توصيات الأفلام';
+            } else {
+                document.getElementById('uploadTitle').textContent = 'رفع توصيات المسلسلات';
+            }
+        }
+
+        // العودة إلى النافذة الرئيسية
+        function goBackToMain() {
+            document.getElementById('uploadSection').style.display = 'none';
+            document.querySelector('.bus-selection').style.display = 'flex';
+        }
+
+        // عرض الأسعار بناءً على الحافلة المختارة
         function showPrices(bus) {
             const prices = {
                 bus1: "السعر لحافلة بن عياش بوالنوار: 50 درهم",
@@ -192,17 +266,6 @@
         function goBack() {
             document.getElementById('prices').style.display = 'none';
             document.querySelector('.bus-selection').style.display = 'flex';
-        }
-
-        // عرض أو إخفاء رسالة حول الموقع
-        function toggleAbout() {
-            const about = document.getElementById('about');
-            about.style.display = (about.style.display === 'none' || about.style.display === '') ? 'block' : 'none';
-        }
-
-        // إغلاق رسالة حول الموقع
-        function closeAbout() {
-            document.getElementById('about').style.display = 'none';
         }
     </script>
 </body>
