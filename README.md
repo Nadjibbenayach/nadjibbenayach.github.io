@@ -10,16 +10,17 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f9;
+            background-color: #ffdddd;
             display: flex;
             flex-direction: column;
             align-items: center;
+            overflow-x: hidden;
         }
 
         /* شريط التنقل العلوي */
         .navbar {
             width: 100%;
-            background-color: #007bff;
+            background-color: #ff4d4d;
             color: white;
             padding: 15px;
             text-align: center;
@@ -40,9 +41,29 @@
             cursor: pointer;
         }
 
+        /* شكل التنين في أعلى الشاشة */
+        .dragon {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 100px;
+            background: url('https://www.example.com/chinese-dragon.png') no-repeat center center;
+            background-size: contain;
+            animation: moveDragon 5s linear infinite;
+            z-index: 5;
+        }
+
+        @keyframes moveDragon {
+            0% { transform: translate(-50%, 0); }
+            50% { transform: translate(-50%, 20px); }
+            100% { transform: translate(-50%, 0); }
+        }
+
         /* شاشة الترحيب */
         .welcome {
-            margin-top: 80px;
+            margin-top: 150px;
             text-align: center;
             color: #333;
             animation: fade 3s ease-in-out;
@@ -57,7 +78,7 @@
         .main-content {
             display: none;
             text-align: center;
-            margin-top: 80px;
+            margin-top: 100px;
             width: 100%;
             max-width: 600px;
             padding: 20px;
@@ -73,7 +94,7 @@
         }
 
         .bus {
-            background-color: #007bff;
+            background-color: #ff4d4d;
             color: white;
             padding: 15px;
             border-radius: 10px;
@@ -111,7 +132,7 @@
 
         /* أزرار العودة */
         .back-button {
-            background-color: #007bff;
+            background-color: #ff4d4d;
             color: white;
             padding: 10px 15px;
             border: none;
@@ -121,7 +142,7 @@
         }
 
         .back-button:hover {
-            background-color: #0056b3;
+            background-color: #cc3a3a;
         }
     </style>
 </head>
@@ -131,6 +152,9 @@
         <button onclick="toggleSidebar()">☰</button>
         موقع بيع التذاكر
     </div>
+
+    <!-- شكل التنين في أعلى الشاشة -->
+    <div class="dragon"></div>
 
     <!-- شاشة الترحيب -->
     <div class="welcome">
@@ -142,10 +166,8 @@
     <div class="main-content">
         <!-- نافذة اختيار الحافلة -->
         <div class="bus-selection">
-            <div class="bus" onclick="showPrices('bus1')">حافلة 1</div>
-            <div class="bus" onclick="showPrices('bus2')">حافلة 2</div>
-            <div class="bus" onclick="showPrices('bus3')">حافلة 3</div>
-            <div class="bus" onclick="showPrices('bus4')">حافلة 4</div>
+            <div class="bus" onclick="showPrices('bus1')">بن عياش بوالنوار</div>
+            <div class="bus" onclick="showPrices('bus2')">بن عياش عنتر</div>
         </div>
 
         <!-- نافذة الأسعار -->
@@ -173,10 +195,8 @@
         // إظهار الأسعار بناءً على الحافلة المختارة
         function showPrices(bus) {
             const prices = {
-                bus1: "السعر لحافلة 1: 50 درهم",
-                bus2: "السعر لحافلة 2: 40 درهم",
-                bus3: "السعر لحافلة 3: 60 درهم",
-                bus4: "السعر لحافلة 4: 55 درهم"
+                bus1: "السعر لحافلة بن عياش بوالنوار: 50 درهم",
+                bus2: "السعر لحافلة بن عياش عنتر: 40 درهم"
             };
             document.getElementById('price-details').textContent = prices[bus];
             document.getElementById('prices').style.display = 'block';
