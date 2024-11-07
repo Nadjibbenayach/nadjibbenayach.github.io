@@ -90,60 +90,58 @@
             max-width: 600px;
         }
 
-        /* النافذة المنبثقة */
-        .popup {
+        /* تأثير ثلاثي الأبعاد لأزرار الحافلات */
+        .bus-button {
+            background-color: #ff4d4d;
+            color: white;
+            font-size: 20px;
+            padding: 15px 30px;
+            margin: 15px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .bus-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* صفحة عرض قائمة الأسعار */
+        .price-list {
             display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80%;
-            max-width: 400px;
+            padding: 20px;
             background-color: #fff;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             border-radius: 10px;
-            z-index: 102;
-            padding: 20px;
+            max-width: 600px;
+            margin-top: 20px;
             text-align: center;
         }
 
-        .popup.active {
+        .price-list.active {
             display: block;
         }
 
-        .popup h3 {
-            margin-bottom: 10px;
+        .price-list h3 {
+            margin-bottom: 20px;
         }
 
-        .popup button {
-            margin: 5px;
-            padding: 10px;
-            font-size: 16px;
+        .price-option {
+            padding: 15px;
+            font-size: 18px;
             background-color: #ff4d4d;
             color: white;
-            border: none;
+            margin: 10px 0;
             border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.2s;
         }
 
-        .popup button:hover {
+        .price-option:hover {
             background-color: #ff7878;
-        }
-
-        /* تصميم متجاوب للهواتف */
-        @media (max-width: 600px) {
-            .site-title {
-                font-size: 20px;
-                margin-top: 60px;
-            }
-
-            .menu-button {
-                font-size: 20px;
-            }
-            
-            .sidebar button {
-                font-size: 16px;
-            }
         }
     </style>
 </head>
@@ -165,20 +163,17 @@
 <!-- قسم المحتوى الرئيسي -->
 <div id="content">
     <h2>التذاكر المتاحة</h2>
-    <ul>
-        <li><button onclick="selectBus('بنعياش بوالنوار')">حافلة بنعياش بوالنوار</button></li>
-        <li><button onclick="selectBus('بن عياش عنتر')">حافلة بن عياش عنتر</button></li>
-    </ul>
+    <button class="bus-button" onclick="showPriceList('بنعياش بوالنوار')">حافلة بنعياش بوالنوار</button>
+    <button class="bus-button" onclick="showPriceList('بن عياش عنتر')">حافلة بن عياش عنتر</button>
 </div>
 
-<!-- نافذة منبثقة لاختيار السعر -->
-<div class="popup" id="pricePopup">
-    <h3 id="busName"></h3>
-    <p>اختر السعر:</p>
-    <button onclick="purchaseTicket(30)">30 دج</button>
-    <button onclick="purchaseTicket(25)">25 دج</button>
-    <button onclick="purchaseTicket(20)">20 دج</button>
-    <button onclick="closePopup()">إلغاء</button>
+<!-- صفحة عرض قائمة الأسعار -->
+<div class="price-list" id="priceList">
+    <h3 id="selectedBusName"></h3>
+    <div class="price-option" onclick="purchaseTicket(30)">سعر التذكرة: 30 دج</div>
+    <div class="price-option" onclick="purchaseTicket(25)">سعر التذكرة: 25 دج</div>
+    <div class="price-option" onclick="purchaseTicket(20)">سعر التذكرة: 20 دج</div>
+    <button onclick="closePriceList()">إغلاق</button>
 </div>
 
 <script>
@@ -191,15 +186,13 @@
     function showBuses() {
         document.getElementById("content").innerHTML = `
             <h2>التذاكر المتاحة</h2>
-            <ul>
-                <li><button onclick="selectBus('بنعياش بوالنوار')">حافلة بنعياش بوالنوار</button></li>
-                <li><button onclick="selectBus('بن عياش عنتر')">حافلة بن عياش عنتر</button></li>
-            </ul>
+            <button class="bus-button" onclick="showPriceList('بنعياش بوالنوار')">حافلة بنعياش بوالنوار</button>
+            <button class="bus-button" onclick="showPriceList('بن عياش عنتر')">حافلة بن عياش عنتر</button>
         `;
         toggleSidebar();
     }
 
-    // عرض قسم الأفلام
+    // عرض صفحة الأفلام
     function showMovies() {
         document.getElementById("content").innerHTML = `
             <h2>أفلام مختارة</h2>
@@ -208,7 +201,7 @@
         toggleSidebar();
     }
 
-    // عرض قسم المسلسلات مع الفيديو
+    // عرض صفحة المسلسلات مع الفيديو
     function showSeries() {
         document.getElementById("content").innerHTML = `
             <h2>مسلسلات مختارة</h2>
@@ -222,21 +215,21 @@
         toggleSidebar();
     }
 
-    // وظيفة اختيار الحافلة وفتح النافذة المنبثقة لاختيار السعر
-    function selectBus(busName) {
-        document.getElementById("busName").innerText = "حافلة " + busName;
-        document.getElementById("pricePopup").classList.add("active");
+    // عرض قائمة الأسعار لحافلة معينة
+    function showPriceList(busName) {
+        document.getElementById("selectedBusName").innerText = "قائمة الأسعار - " + busName;
+        document.getElementById("priceList").classList.add("active");
     }
 
-    // وظيفة شراء التذكرة وإغلاق النافذة المنبثقة
+    // إغلاق قائمة الأسعار
+    function closePriceList() {
+        document.getElementById("priceList").classList.remove("active");
+    }
+
+    // شراء التذكرة
     function purchaseTicket(price) {
         alert("تم شراء التذكرة بسعر " + price + " دج. شكرًا لك!");
-        closePopup();
-    }
-
-    // إغلاق النافذة المنبثقة
-    function closePopup() {
-        document.getElementById("pricePopup").classList.remove("active");
+        closePriceList();
     }
 </script>
 
