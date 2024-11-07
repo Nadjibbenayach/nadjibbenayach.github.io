@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>موقع لبيع التذاكر - حافلات</title>
+    <title>موقع لبيع التذاكر - حافلات بن عياش</title>
     <style>
         /* تنسيقات عامة */
         body {
@@ -90,16 +90,44 @@
             max-width: 600px;
         }
 
-        /* تنسيق الفيديو */
-        .series-video {
-            margin-top: 20px;
-            text-align: center;
-            width: 100%;
-            max-width: 100%;
-            padding: 10px;
+        /* النافذة المنبثقة */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 400px;
             background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 102;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .popup.active {
+            display: block;
+        }
+
+        .popup h3 {
+            margin-bottom: 10px;
+        }
+
+        .popup button {
+            margin: 5px;
+            padding: 10px;
+            font-size: 16px;
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .popup button:hover {
+            background-color: #ff7878;
         }
 
         /* تصميم متجاوب للهواتف */
@@ -115,10 +143,6 @@
             
             .sidebar button {
                 font-size: 16px;
-            }
-
-            .series-video {
-                padding: 5px;
             }
         }
     </style>
@@ -142,9 +166,19 @@
 <div id="content">
     <h2>التذاكر المتاحة</h2>
     <ul>
-        <li>حافلة بنعياش بوالنوار</li>
-        <li>حافلة بن عياش عنتر</li>
+        <li><button onclick="selectBus('بنعياش بوالنوار')">حافلة بنعياش بوالنوار</button></li>
+        <li><button onclick="selectBus('بن عياش عنتر')">حافلة بن عياش عنتر</button></li>
     </ul>
+</div>
+
+<!-- نافذة منبثقة لاختيار السعر -->
+<div class="popup" id="pricePopup">
+    <h3 id="busName"></h3>
+    <p>اختر السعر:</p>
+    <button onclick="purchaseTicket(30)">30 دج</button>
+    <button onclick="purchaseTicket(25)">25 دج</button>
+    <button onclick="purchaseTicket(20)">20 دج</button>
+    <button onclick="closePopup()">إلغاء</button>
 </div>
 
 <script>
@@ -158,8 +192,8 @@
         document.getElementById("content").innerHTML = `
             <h2>التذاكر المتاحة</h2>
             <ul>
-                <li>حافلة بنعياش بوالنوار</li>
-                <li>حافلة بن عياش عنتر</li>
+                <li><button onclick="selectBus('بنعياش بوالنوار')">حافلة بنعياش بوالنوار</button></li>
+                <li><button onclick="selectBus('بن عياش عنتر')">حافلة بن عياش عنتر</button></li>
             </ul>
         `;
         toggleSidebar();
@@ -186,6 +220,23 @@
             </div>
         `;
         toggleSidebar();
+    }
+
+    // وظيفة اختيار الحافلة وفتح النافذة المنبثقة لاختيار السعر
+    function selectBus(busName) {
+        document.getElementById("busName").innerText = "حافلة " + busName;
+        document.getElementById("pricePopup").classList.add("active");
+    }
+
+    // وظيفة شراء التذكرة وإغلاق النافذة المنبثقة
+    function purchaseTicket(price) {
+        alert("تم شراء التذكرة بسعر " + price + " دج. شكرًا لك!");
+        closePopup();
+    }
+
+    // إغلاق النافذة المنبثقة
+    function closePopup() {
+        document.getElementById("pricePopup").classList.remove("active");
     }
 </script>
 
