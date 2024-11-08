@@ -201,15 +201,12 @@
         toggleSidebar();
     }
 
-    // عرض صفحة المسلسلات مع الفيديو
+    // عرض صفحة المسلسلات مع فيديو Vimeo
     function showSeries() {
         document.getElementById("content").innerHTML = `
             <h2>مسلسلات مختارة</h2>
             <div class="series-video">
-                <video controls width="100%">
-                    <source src="https://your-github-username.github.io/repository-name/videos/your-series-video.mp4" type="video/mp4">
-                    المتصفح الخاص بك لا يدعم تشغيل الفيديو.
-                </video>
+                <iframe src="https://player.vimeo.com/video/1027608824?h=3f27f344ef" width="100%" height="315" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
             </div>
         `;
         toggleSidebar();
