@@ -143,6 +143,12 @@
         .price-option:hover {
             background-color: #ff7878;
         }
+
+        /* مشغل الفيديو */
+        .video-container {
+            margin-top: 20px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -158,6 +164,8 @@
     <button onclick="showBuses()">التذاكر المتاحة</button>
     <button onclick="showMovies()">أفلام مختارة</button>
     <button onclick="showSeries()">مسلسلات مختارة</button>
+    <button onclick="showChallenges()">تحديات ممتعة</button>
+    <button onclick="showVirtualTours()">سفر افتراضي</button>
 </div>
 
 <!-- قسم المحتوى الرئيسي -->
@@ -201,13 +209,31 @@
         toggleSidebar();
     }
 
-    // عرض صفحة المسلسلات مع فيديو Vimeo
+    // عرض صفحة المسلسلات مع الفيديو
     function showSeries() {
         document.getElementById("content").innerHTML = `
             <h2>مسلسلات مختارة</h2>
-            <div class="series-video">
-                <iframe src="https://player.vimeo.com/video/1027608824?h=3f27f344ef" width="100%" height="315" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+            <div class="video-container">
+                <iframe src="https://player.vimeo.com/video/1027608824?h=3f27f344ef" width="100%" height="315" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
             </div>
+        `;
+        toggleSidebar();
+    }
+
+    // عرض تحديات ممتعة
+    function showChallenges() {
+        document.getElementById("content").innerHTML = `
+            <h2>تحديات ممتعة</h2>
+            <p>اختر تحديًا وشارك إنجازاتك مع الآخرين!</p>
+        `;
+        toggleSidebar();
+    }
+
+    // عرض السفر الافتراضي
+    function showVirtualTours() {
+        document.getElementById("content").innerHTML = `
+            <h2>السفر الافتراضي</h2>
+            <p>استمتع بجولات افتراضية للوجهات السياحية الشهيرة حول العالم!</p>
         `;
         toggleSidebar();
     }
@@ -227,8 +253,3 @@
     function purchaseTicket(price) {
         alert("تم شراء التذكرة بسعر " + price + " دج. شكرًا لك!");
         closePriceList();
-    }
-</script>
-
-</body>
-</html>
