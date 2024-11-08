@@ -241,15 +241,4 @@
     // عرض قائمة الأسعار لحافلة معينة
     function showPriceList(busName) {
         document.getElementById("selectedBusName").innerText = "قائمة الأسعار - " + busName;
-        document.getElementById("priceList").classList.add("active");
-    }
-
-    // إغلاق قائمة الأسعار
-    function closePriceList() {
-        document.getElementById("priceList").classList.remove("active");
-    }
-
-    // شراء التذكرة
-    function purchaseTicket(price) {
-        alert("تم شراء التذكرة بسعر " + price + " دج. شكرًا لك!");
-        closePriceList();
+        document.getElementById("priceList").class
