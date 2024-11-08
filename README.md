@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>موقع حافلات بن عياش</title>
+    <title>موقع حافلات بن عياش - بيع التذاكر</title>
     <style>
         /* تنسيقات عامة */
         body {
@@ -128,6 +128,12 @@
         .info-section.active {
             display: block;
         }
+
+        /* مشغل الفيديو */
+        .video-container {
+            margin-top: 20px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -141,6 +147,8 @@
 <!-- الشريط الجانبي -->
 <div class="sidebar" id="sidebar">
     <button onclick="showBuses()">التذاكر المتاحة</button>
+    <button onclick="showMovies()">أفلام مختارة</button>
+    <button onclick="showSeries()">مسلسلات مختارة</button>
     <button onclick="showBusInfo()">معلومات الحافلات</button>
     <button onclick="showTours()">الرحلات السياحية</button>
     <button onclick="showFAQ()">الأسئلة المتكررة</button>
@@ -172,6 +180,20 @@
     <p>هل هناك خصومات متاحة؟ <br> نعم، نقدم خصومات على بعض الرحلات، تابعونا لمعرفة التفاصيل.</p>
 </div>
 
+<!-- صفحة عرض الأفلام -->
+<div class="info-section" id="movies">
+    <h2>أفلام مختارة</h2>
+    <p>هنا يمكنك عرض الأفلام المختارة التي يقترحها المستخدمون.</p>
+</div>
+
+<!-- صفحة عرض المسلسلات مع الفيديو -->
+<div class="info-section" id="series">
+    <h2>مسلسلات مختارة</h2>
+    <div class="video-container">
+        <iframe src="https://player.vimeo.com/video/1027608824?h=3f27f344ef" width="100%" height="315" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+    </div>
+</div>
+
 <script>
     // وظيفة إظهار وإخفاء الشريط الجانبي
     function toggleSidebar() {
@@ -180,12 +202,24 @@
 
     // عرض قائمة الحافلات المتاحة
     function showBuses() {
+        closeAllSections();
         document.getElementById("content").innerHTML = `
             <h2>التذاكر المتاحة</h2>
             <button class="bus-button" onclick="showPriceList('بنعياش بوالنوار')">حافلة بنعياش بوالنوار</button>
             <button class="bus-button" onclick="showPriceList('بن عياش عنتر')">حافلة بن عياش عنتر</button>
         `;
+    }
+
+    // عرض الأفلام
+    function showMovies() {
         closeAllSections();
+        document.getElementById("movies").classList.add("active");
+    }
+
+    // عرض المسلسلات
+    function showSeries() {
+        closeAllSections();
+        document.getElementById("series").classList.add("active");
     }
 
     // عرض معلومات الحافلات
@@ -212,10 +246,3 @@
     }
 
     // عرض قائمة الأسعار
-    function showPriceList(busName) {
-        alert(`تم اختيار حافلة ${busName}. يمكنكم الاطلاع على الأسعار عند الحجز.`);
-    }
-</script>
-
-</body>
-</html>
