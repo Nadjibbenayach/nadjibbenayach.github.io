@@ -152,97 +152,39 @@
     <button onclick="showBusInfo()">معلومات الحافلات</button>
     <button onclick="showTours()">الرحلات السياحية</button>
     <button onclick="showFAQ()">الأسئلة المتكررة</button>
+    <button onclick="showGame()">لعبة المغامر</button>
 </div>
 
 <!-- قسم المحتوى الرئيسي -->
 <div id="content">
     <h2>التذاكر المتاحة</h2>
-    <button class="bus-button" onclick="showPriceList('بنعياش بوالنوار')">حافلة بنعياش بوالنوار</button>
+    <button class="bus-button" onclick="showPriceList('بن عياش بوالنوار')">حافلة بنعياش بوالنوار</button>
     <button class="bus-button" onclick="showPriceList('بن عياش عنتر')">حافلة بن عياش عنتر</button>
 </div>
 
-<!-- قسم معلومات الحافلات -->
-<div class="info-section" id="busInfo">
-    <h2>معلومات الحافلات</h2>
-    <p>حافلاتنا مجهزة بأحدث التقنيات لضمان راحة وأمان المسافرين. جميع الحافلات مجهزة بمقاعد مريحة ونظام تكييف حديث.</p>
-</div>
-
-<!-- قسم الرحلات السياحية -->
-<div class="info-section" id="tours">
-    <h2>الرحلات السياحية</h2>
-    <p>نقدم رحلات سياحية منظمة لأجمل الأماكن السياحية في الجزائر. انضم إلينا لاستكشاف المناظر الطبيعية الخلابة والاستمتاع بأجمل اللحظات.</p>
-</div>
-
-<!-- قسم الأسئلة المتكررة -->
-<div class="info-section" id="faq">
-    <h2>الأسئلة المتكررة</h2>
-    <p>هل يمكنني حجز التذاكر عبر الإنترنت؟ <br> نعم، يمكنك الحجز عبر الموقع بكل سهولة.</p>
-    <p>هل هناك خصومات متاحة؟ <br> نعم، نقدم خصومات على بعض الرحلات، تابعونا لمعرفة التفاصيل.</p>
-</div>
-
-<!-- صفحة عرض الأفلام -->
-<div class="info-section" id="movies">
-    <h2>أفلام مختارة</h2>
-    <p>هنا يمكنك عرض الأفلام المختارة التي يقترحها المستخدمون.</p>
-</div>
-
-<!-- صفحة عرض المسلسلات مع الفيديو -->
-<div class="info-section" id="series">
-    <h2>مسلسلات مختارة</h2>
-    <div class="video-container">
-        <iframe src="https://player.vimeo.com/video/1027608824?h=3f27f344ef" width="100%" height="315" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
-    </div>
+<!-- قسم تفاصيل اللعبة -->
+<div class="info-section" id="game">
+    <h2>لعبة المغامر</h2>
+    <p><strong>القصة:</strong> في عالم خيالي، يسعى المغامر لاستعادة الحجر السحري المسروق من قريته، في رحلة مليئة بالمغامرات والتحديات.</p>
+    <p><strong>التحديات:</strong> الوحوش والألغاز، وتجاوز العقبات الطبيعية.</p>
+    <p><strong>طريقة اللعب:</strong> تحكم باستخدام أزرار الاتجاهات للتنقل، وجمع الجرعات لتجديد الصحة.</p>
 </div>
 
 <script>
-    // وظيفة إظهار وإخفاء الشريط الجانبي
     function toggleSidebar() {
         document.getElementById("sidebar").classList.toggle("active");
     }
 
-    // عرض قائمة الحافلات المتاحة
-    function showBuses() {
+    function showGame() {
         closeAllSections();
-        document.getElementById("content").innerHTML = `
-            <h2>التذاكر المتاحة</h2>
-            <button class="bus-button" onclick="showPriceList('بنعياش بوالنوار')">حافلة بنعياش بوالنوار</button>
-            <button class="bus-button" onclick="showPriceList('بن عياش عنتر')">حافلة بن عياش عنتر</button>
-        `;
+        document.getElementById("game").classList.add("active");
     }
 
-    // عرض الأفلام
-    function showMovies() {
-        closeAllSections();
-        document.getElementById("movies").classList.add("active");
-    }
-
-    // عرض المسلسلات
-    function showSeries() {
-        closeAllSections();
-        document.getElementById("series").classList.add("active");
-    }
-
-    // عرض معلومات الحافلات
-    function showBusInfo() {
-        closeAllSections();
-        document.getElementById("busInfo").classList.add("active");
-    }
-
-    // عرض قسم الرحلات السياحية
-    function showTours() {
-        closeAllSections();
-        document.getElementById("tours").classList.add("active");
-    }
-
-    // عرض قسم الأسئلة المتكررة
-    function showFAQ() {
-        closeAllSections();
-        document.getElementById("faq").classList.add("active");
-    }
-
-    // إغلاق جميع الأقسام
+    // إغلاق الأقسام
     function closeAllSections() {
         document.querySelectorAll('.info-section').forEach(section => section.classList.remove('active'));
     }
 
-    // عرض قائمة الأسعار
+</script>
+</body>
+</html>
