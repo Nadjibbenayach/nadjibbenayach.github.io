@@ -23,7 +23,8 @@
       position: absolute;
       width: 40px;
       height: 40px;
-      background-color: yellow;
+      background-image: url('https://via.placeholder.com/40'); /* صورة الطائر */
+      background-size: cover;
       border-radius: 50%;
       top: 50%;
       left: 20%;
@@ -33,18 +34,11 @@
     .column {
       position: absolute;
       width: 80px;
-      height: 100vh;
+      height: 200px;
       background-color: green;
-      top: 0;
+      border: 2px solid #006400;
+      border-radius: 10px;
       animation: moveColumns 4s linear infinite;
-    }
-
-    .column1 {
-      left: 50%;
-    }
-
-    .column2 {
-      left: 75%;
     }
 
     .letter {
@@ -52,84 +46,120 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 24px;
+      font-size: 32px;
       font-weight: bold;
       color: white;
+      text-shadow: 2px 2px 2px #000;
+    }
+
+    .score {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 24px;
+      color: #fff;
+      text-shadow: 2px 2px 2px #000;
     }
 
     @keyframes moveColumns {
       from {
-        transform: translateX(100%);
+        transform: translateX(100vw);
       }
       to {
-        transform: translateX(-100%);
+        transform: translateX(-100vw);
       }
     }
   </style>
 </head>
 <body>
   <div class="game-container">
+    <div class="score">Score: 0</div>
     <div class="bird"></div>
-    <div class="column column1">
-      <span class="letter">A</span>
-    </div>
-    <div class="column column2">
-      <span class="letter">B</span>
-    </div>
   </div>
   <script>
     const bird = document.querySelector('.bird');
-    const columns = document.querySelectorAll('.column');
+    const gameContainer = document.querySelector('.game-container');
+    const scoreDisplay = document.querySelector('.score');
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('');
     let birdPosition = window.innerHeight / 2;
     let gravity = 2;
-    let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('');
+    let score = 0;
     let currentLetterIndex = 0;
+
+    function createColumn() {
+      const column = document.createElement('div');
+      column.classList.add('column');
+      column.style.top = `${Math.random() * (window.innerHeight - 200)}px`;
+      column.style.left = '100vw';
+
+      const letter = document.createElement('span');
+      letter.classList.add('letter');
+      letter.textContent = letters[currentLetterIndex];
+      currentLetterIndex = (currentLetterIndex + 1) % letters.length;
+      column.appendChild(letter);
+
+      gameContainer.appendChild(column);
+
+      column.addEventListener('animationend', () => {
+        column.remove();
+      });
+    }
 
     function updateBirdPosition() {
       birdPosition += gravity;
       bird.style.top = `${birdPosition}px`;
 
-      if (birdPosition + bird.offsetHeight > window.innerHeight) {
+      if (birdPosition + bird.offsetHeight > window.innerHeight || birdPosition < 0) {
         resetGame();
       }
     }
 
     function resetGame() {
-      alert("Game Over!");
+      alert(`Game Over! Your score: ${score}`);
       birdPosition = window.innerHeight / 2;
-      currentLetterIndex = 0;
-      updateLetters();
+      score = 0;
+      scoreDisplay.textContent = `Score: ${score}`;
+      gameContainer.querySelectorAll('.column').forEach(col => col.remove());
     }
 
     function flapBird() {
-      birdPosition -= 50; // ارتفاع الطائر عند الضغط
+      birdPosition -= 50;
     }
 
-    function updateColumns() {
-      columns.forEach((column) => {
-        const randomGap = Math.random() * 200 - 100;
-        column.style.top = `${randomGap}px`;
-      });
-    }
+    function checkCollision() {
+      const columns = document.querySelectorAll('.column');
+      columns.forEach(column => {
+        const columnRect = column.getBoundingClientRect();
+        const birdRect = bird.getBoundingClientRect();
 
-    function updateLetters() {
-      columns.forEach((column, index) => {
-        const letter = column.querySelector('.letter');
-        letter.textContent = letters[(currentLetterIndex + index) % letters.length];
+        if (
+          birdRect.right > columnRect.left &&
+          birdRect.left < columnRect.right &&
+          birdRect.bottom > columnRect.top &&
+          birdRect.top < columnRect.bottom
+        ) {
+          const letter = column.querySelector('.letter').textContent;
+          if (letter === letters[(currentLetterIndex - 1 + letters.length) % letters.length]) {
+            score++;
+            scoreDisplay.textContent = `Score: ${score}`;
+            column.remove();
+          } else {
+            resetGame();
+          }
+        }
       });
-      currentLetterIndex++;
     }
 
     function gameLoop() {
       updateBirdPosition();
+      checkCollision();
       requestAnimationFrame(gameLoop);
     }
 
     document.addEventListener('keydown', flapBird);
     document.addEventListener('click', flapBird);
 
-    updateLetters();
-    updateColumns();
+    setInterval(createColumn, 2000);
     gameLoop();
   </script>
 </body>
