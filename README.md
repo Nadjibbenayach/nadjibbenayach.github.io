@@ -3,65 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cozy Corner Cafe</title>
+    <title>Cafe Layaycha</title>
     <style>
         body {
-            font-family: sans-serif;
+            font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
+            background-color: #fcf9f4; /* Creamy background */
             color: #333;
         }
         header {
-            background-color: #a0522d; /* Sienna */
+            background-color: #6b4226; /* Rich Coffee Brown */
             color: #fff;
-            padding: 20px;
+            padding: 30px 20px;
             text-align: center;
+            border-bottom: 5px solid #e6be8a; /* Light Gold Accent */
         }
         nav {
-            background-color: #deb887; /* BurlyWood */
-            padding: 10px;
+            background-color: #e6be8a; /* Light Gold */
+            padding: 15px;
             text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
         nav a {
-            color: #333;
+            color: #6b4226; /* Coffee Brown */
             text-decoration: none;
-            margin: 0 15px;
+            margin: 0 20px;
+            font-weight: bold;
+        }
+        nav a:hover {
+            color: #fff;
+            background-color: #6b4226;
+            padding: 5px 10px;
+            border-radius: 5px;
         }
         section {
             padding: 20px;
-            margin: 20px;
+            margin: 20px auto;
+            max-width: 900px;
             background-color: #fff;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         .menu-item {
-            margin-bottom: 10px;
-            border-bottom: 1px dotted #ccc;
-            padding-bottom: 5px;
+            margin-bottom: 15px;
+            border-bottom: 1px dashed #ccc;
+            padding-bottom: 10px;
         }
         footer {
-            background-color: #a0522d;
+            background-color: #6b4226;
             color: #fff;
             text-align: center;
-            padding: 10px;
-            position: fixed; /* or relative, depending on desired behavior */
-            bottom: 0;
-            width: 100%;
+            padding: 15px;
+            border-top: 5px solid #e6be8a;
         }
         img {
             max-width: 100%;
             height: auto;
             display: block;
-            margin-left: auto;
-            margin-right: auto;
+            margin: 20px auto;
+            border-radius: 10px;
+        }
+        h1, h2 {
+            font-family: 'Georgia', serif;
+        }
+        h2 {
+            color: #6b4226;
+            border-bottom: 2px solid #e6be8a;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+        a.map-link {
+            color: #6b4226;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a.map-link:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>Cozy Corner Cafe</h1>
-        <p>Your Neighborhood Coffee Haven</p>
+        <h1>Cafe Layaycha</h1>
+        <p>Your Local Taste of Elegance</p>
     </header>
 
     <nav>
@@ -73,43 +101,49 @@
 
     <section id="home">
         <h2>Welcome</h2>
-        <img src="placeholder-cafe.jpg" alt="Cafe Image" width = "500">
-        <p>Welcome to Cozy Corner Cafe, where the aroma of freshly brewed coffee and the warmth of a friendly atmosphere await you. We're passionate about serving high-quality coffee, delicious pastries, and light bites in a comfortable and inviting space. Whether you're looking for a quick caffeine fix, a place to catch up with friends, or a quiet corner to work, we've got you covered.</p>
+        <img src="placeholder-cafe.jpg" alt="Cozy Cafe" width="500">
+        <p>Welcome to <strong>Cafe Layaycha</strong>, your go-to destination for rich coffee flavors and a touch of elegance. Whether you’re here for a quick espresso, a leisurely pastry break, or just some quiet time, our warm and inviting space is perfect for every moment.</p>
     </section>
 
     <section id="menu">
         <h2>Our Menu</h2>
         <h3>Beverages</h3>
         <div class="menu-item">
-            <strong>Espresso</strong> - $3.00
+            <strong>Espresso</strong> - $3.50
         </div>
         <div class="menu-item">
-            <strong>Latte</strong> - $4.00
+            <strong>Latte</strong> - $4.50
         </div>
         <div class="menu-item">
-            <strong>Cappuccino</strong> - $4.50
+            <strong>Moroccan Mint Tea</strong> - $3.00
         </div>
         <h3>Pastries</h3>
         <div class="menu-item">
             <strong>Croissant</strong> - $2.50
         </div>
         <div class="menu-item">
-            <strong>Muffin</strong> - $3.00
+            <strong>Baklava</strong> - $3.50
         </div>
     </section>
 
     <section id="about">
         <h2>About Us</h2>
-        <p>Cozy Corner Cafe was founded in 2024 with a simple goal: to create a welcoming space where the community could gather and enjoy exceptional coffee. We source our beans from local roasters and bake our pastries fresh daily. We believe in creating a positive impact on our community and providing a cozy and inviting atmosphere for everyone.</p>
+        <p><strong>Cafe Layaycha</strong> was born out of a passion for authentic coffee experiences and a love for bringing people together. Established in 2024, we take pride in serving fresh, locally sourced beans and offering a menu that blends tradition with a modern twist.</p>
     </section>
 
     <section id="contact">
         <h2>Contact Us</h2>
-        <p>123 Main Street<br>Anytown, CA 12345<br>Phone: (555) 555-5555<br>Email: info@cozycornercafe.com</p>
+        <p>456 Serenity Lane<br>Marrakech, Morocco<br>Phone: +212 555-555-555<br>Email: hello@layaycha.com</p>
+        <p>
+            <strong>Find us here:</strong> 
+            <a class="map-link" href="https://goo.gl/maps/Mt5vwoAhsTgwgMQr8" target="_blank">
+                Cafe Layaycha Location
+            </a>
+        </p>
     </section>
 
     <footer>
-        <p>&copy; 2024 Cozy Corner Cafe</p>
+        <p>&copy; 2024 Cafe Layaycha | Crafted with love and care.</p>
     </footer>
 
 </body>
