@@ -102,38 +102,34 @@
     <section id="home">
         <h2>Welcome</h2>
         <img src="placeholder-cafe.jpg" alt="Cozy Cafe" width="500">
-        <p>Welcome to <strong>Cafe Layaycha</strong>, your go-to destination for rich coffee flavors and a touch of elegance. Whether you’re here for a quick espresso, a leisurely pastry break, or just some quiet time, our warm and inviting space is perfect for every moment.</p>
+        <p>Welcome to <strong>Cafe Layaycha</strong>, your go-to destination for rich coffee flavors and a touch of elegance. Now, you can also order from our website and enjoy your favorite drinks and snacks at home!</p>
     </section>
 
     <section id="menu">
         <h2>Our Menu</h2>
         <h3>Beverages</h3>
         <div class="menu-item">
-            <strong>Espresso</strong> - $3.50
+            <strong>Cafe</strong> - 50 DNA
         </div>
         <div class="menu-item">
-            <strong>Latte</strong> - $4.50
+            <strong>Tea</strong> - 40 DNA
         </div>
         <div class="menu-item">
-            <strong>Moroccan Mint Tea</strong> - $3.00
-        </div>
-        <h3>Pastries</h3>
-        <div class="menu-item">
-            <strong>Croissant</strong> - $2.50
+            <strong>Cola</strong> - 70 DNA
         </div>
         <div class="menu-item">
-            <strong>Baklava</strong> - $3.50
+            <strong>Fresh Juice</strong> - 60 DNA
         </div>
     </section>
 
     <section id="about">
         <h2>About Us</h2>
-        <p><strong>Cafe Layaycha</strong> was born out of a passion for authentic coffee experiences and a love for bringing people together. Established in 2024, we take pride in serving fresh, locally sourced beans and offering a menu that blends tradition with a modern twist.</p>
+        <p><strong>Cafe Layaycha</strong> was born out of a passion for authentic coffee experiences and a love for bringing people together. Established in 2024, we take pride in serving fresh, locally sourced beans and offering a menu that blends tradition with a modern twist. Managed by <strong>Nadjib Benayach</strong>, we are committed to delivering the best experience for our customers.</p>
     </section>
 
     <section id="contact">
         <h2>Contact Us</h2>
-        <p>456 Serenity Lane<br>Marrakech, Morocco<br>Phone: +212 555-555-555<br>Email: hello@layaycha.com</p>
+        <p>Location: Algeria<br>Phone: +213 555-555-555<br>Email: <a href="mailto:nnadjib045@gmail.com">nnadjib045@gmail.com</a></p>
         <p>
             <strong>Find us here:</strong> 
             <a class="map-link" href="https://goo.gl/maps/Mt5vwoAhsTgwgMQr8" target="_blank">
