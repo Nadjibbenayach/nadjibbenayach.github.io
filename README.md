@@ -77,6 +77,21 @@
         .dark-mode .btn:hover {
             background-color: #00496e;
         }
+
+        .challenges {
+            margin-top: 20px;
+            text-align: left;
+            color: #FFD700;
+        }
+
+        .challenge-item {
+            margin-bottom: 10px;
+        }
+
+        .challenge-result {
+            color: #00FF00;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -101,12 +116,6 @@
         <label for="defense">🛡️ الدفاع: <span id="defenseValue">50</span></label>
         <input type="range" id="defense" min="0" max="99" value="50" oninput="updateValue('defense')">
 
-        <label for="height">📏 الطول (سم):</label>
-        <input type="number" id="height" min="100" max="250" value="180">
-
-        <label for="weight">⚖️ الوزن (كجم):</label>
-        <input type="number" id="weight" min="40" max="150" value="70">
-
         <!-- أزرار التحكم -->
         <button class="btn" onclick="calculateOverall()">تحليل شامل</button>
         <button class="btn" onclick="toggleDarkMode()">وضع داكن/فاتح</button>
@@ -117,11 +126,30 @@
         </div>
     </div>
 
+    <!-- تحديات -->
+    <div class="container challenges">
+        <h2>تحديات:</h2>
+        <div class="challenge-item">
+            <label for="speedChallenge">تحدي السرعة (زمن الركض لـ 30 متر):</label>
+            <input type="number" id="speedChallenge" placeholder="أدخل الزمن (ثانية)">
+            <button class="btn" onclick="evaluateSpeedChallenge()">تحليل</button>
+            <div id="speedChallengeResult" class="challenge-result"></div>
+        </div>
+    </div>
+
     <script>
         // تحديث القيم المعروضة عند تحريك الشرائح
         function updateValue(stat) {
             const value = document.getElementById(stat).value;
             document.getElementById(stat + "Value").textContent = value;
+        }
+
+        // تحديد المركز بناءً على القيم
+        function determinePosition(speed, shooting, passing, defense, physical, dribbling) {
+            if (speed > 80 && shooting > 70) return "مهاجم";
+            if (passing > 70 && defense > 60) return "وسط ميدان";
+            if (defense > 80 && physical > 70) return "مدافع";
+            return "لاعب متعدد";
         }
 
         // حساب النتيجة الإجمالية
@@ -132,17 +160,28 @@
             const dribbling = parseInt(document.getElementById('dribbling').value);
             const physical = parseInt(document.getElementById('physical').value);
             const defense = parseInt(document.getElementById('defense').value);
-            const height = parseInt(document.getElementById('height').value);
-            const weight = parseInt(document.getElementById('weight').value);
 
             // حساب التقييم العام (متوسط المهارات الأساسية)
             const overall = Math.round((speed + shooting + passing + dribbling + physical + defense) / 6);
+            const position = determinePosition(speed, shooting, passing, defense, physical, dribbling);
 
             // عرض النتيجة
             document.getElementById('result').innerHTML = `
                 <h2>التقييم الإجمالي: ${overall} ⭐</h2>
-                <p>📏 الطول: ${height} سم | ⚖️ الوزن: ${weight} كجم</p>
+                <p>المركز المتوقع: ${position}</p>
             `;
+        }
+
+        // تحدي السرعة
+        function evaluateSpeedChallenge() {
+            const time = parseFloat(document.getElementById('speedChallenge').value);
+            if (time > 0 && time <= 10) {
+                document.getElementById('speedChallengeResult').textContent = `نتيجة ممتازة!`;
+            } else if (time > 10) {
+                document.getElementById('speedChallengeResult').textContent = `حاول تحسين الزمن.`;
+            } else {
+                document.getElementById('speedChallengeResult').textContent = `الرجاء إدخال زمن صالح.`;
+            }
         }
 
         // تبديل الوضع الداكن/الفاتح
