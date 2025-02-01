@@ -84,36 +84,36 @@
         <!-- إدخالات التحديات -->
         <div class="challenge-box">
             <h3>تحدي السرعة</h3>
-            <label>أدخل الزمن المستغرق (ثوانٍ):</label>
-            <input type="number" id="pace-time" min="1" max="30" value="10">
+            <label>الزمن المستغرق (ثوانٍ) لركض 30 مترًا:</label>
+            <input type="number" id="pace-time" min="3" max="15" value="10">
             <button class="btn" onclick="calculatePace()">حساب السرعة</button>
         </div>
 
         <div class="challenge-box">
             <h3>تحدي البدنية</h3>
-            <label>عدد التمرينات الناجحة (تمارين الضغط):</label>
-            <input type="number" id="physical-score" min="0" max="100" value="20">
+            <label>عدد تمارين الضغط خلال دقيقة:</label>
+            <input type="number" id="physical-score" min="0" max="100" value="30">
             <button class="btn" onclick="calculatePhysical()">حساب البدنية</button>
         </div>
 
         <div class="challenge-box">
             <h3>تحدي المراوغة</h3>
-            <label>عدد المراوغات الناجحة:</label>
-            <input type="number" id="dribbling-score" min="0" max="50" value="10">
+            <label>الزمن المستغرق (ثوانٍ) للمراوغة حول 10 مخاريط:</label>
+            <input type="number" id="dribbling-score" min="10" max="30" value="15">
             <button class="btn" onclick="calculateDribbling()">حساب المراوغة</button>
         </div>
 
         <div class="challenge-box">
             <h3>تحدي التمرير</h3>
-            <label>عدد التمريرات الناجحة:</label>
-            <input type="number" id="passing-score" min="0" max="50" value="15">
+            <label>عدد التمريرات الناجحة نحو هدف على بعد 20 مترًا من أصل 10:</label>
+            <input type="number" id="passing-score" min="0" max="10" value="5">
             <button class="btn" onclick="calculatePassing()">حساب التمرير</button>
         </div>
 
         <div class="challenge-box">
             <h3>تحدي التسديد</h3>
-            <label>عدد التسديدات الناجحة:</label>
-            <input type="number" id="shooting-score" min="0" max="20" value="5">
+            <label>عدد التسديدات الناجحة نحو المرمى من مسافة 16 مترًا من أصل 10:</label>
+            <input type="number" id="shooting-score" min="0" max="10" value="3">
             <button class="btn" onclick="calculateShooting()">حساب التسديد</button>
         </div>
 
@@ -128,35 +128,34 @@
         // حسابات التحديات
         function calculatePace() {
             const time = parseFloat(document.getElementById('pace-time').value);
-            const pace = Math.max(0, Math.min(99, Math.round(30 / time * 99 / 3))); // معادلة تقديرية
+            const pace = Math.max(0, Math.min(99, Math.round(99 - (time * 3))));
             document.getElementById('pace-time').value = pace;
         }
 
         function calculatePhysical() {
             const score = parseInt(document.getElementById('physical-score').value);
-            const physical = Math.max(0, Math.min(99, Math.round(score * 99 / 100))); // معادلة تقديرية
+            const physical = Math.max(0, Math.min(99, Math.round(score * 1.1)));
             document.getElementById('physical-score').value = physical;
         }
 
         function calculateDribbling() {
-            const score = parseInt(document.getElementById('dribbling-score').value);
-            const dribbling = Math.max(0, Math.min(99, Math.round(score * 99 / 50))); // معادلة تقديرية
+            const time = parseFloat(document.getElementById('dribbling-score').value);
+            const dribbling = Math.max(0, Math.min(99, Math.round(99 - (time * 2))));
             document.getElementById('dribbling-score').value = dribbling;
         }
 
         function calculatePassing() {
             const score = parseInt(document.getElementById('passing-score').value);
-            const passing = Math.max(0, Math.min(99, Math.round(score * 99 / 50))); // معادلة تقديرية
+            const passing = Math.max(0, Math.min(99, Math.round(score * 10)));
             document.getElementById('passing-score').value = passing;
         }
 
         function calculateShooting() {
             const score = parseInt(document.getElementById('shooting-score').value);
-            const shooting = Math.max(0, Math.min(99, Math.round(score * 99 / 20))); // معادلة تقديرية
+            const shooting = Math.max(0, Math.min(99, Math.round(score * 10)));
             document.getElementById('shooting-score').value = shooting;
         }
 
-        // تحليل شامل
         function analyzePlayer() {
             const pace = parseInt(document.getElementById('pace-time').value);
             const physical = parseInt(document.getElementById('physical-score').value);
@@ -167,14 +166,16 @@
             const overall = Math.round((pace + physical + dribbling + passing + shooting) / 5);
 
             let position = '';
-            if (pace >= 80 && shooting >= 75) {
-                position = 'ST'; // مهاجم
-            } else if (pace >= 80 && dribbling >= 75) {
-                position = 'LW / RW'; // جناح
-            } else if (physical >= 80 && passing >= 70) {
-                position = 'CM / CDM'; // لاعب وسط
-            } else if (physical >= 80 && pace >= 70) {
-                position = 'CB / LB / RB'; // مدافع
+            if (pace >= 85 && shooting >= 80) {
+                position = 'ST';
+            } else if (pace >= 80 && dribbling >= 80) {
+                position = 'LW / RW';
+            } else if (passing >= 80 && shooting >= 75) {
+                position = 'CAM';
+            } else if (physical >= 85 && passing >= 70) {
+                position = 'CDM / CM';
+            } else if (physical >= 90 && pace >= 75) {
+                position = 'CB / LB / RB';
             } else {
                 position = 'متعدد الاستخدامات';
             }
