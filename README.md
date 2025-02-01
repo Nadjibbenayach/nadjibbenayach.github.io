@@ -34,7 +34,7 @@
             font-size: 18px;
         }
 
-        input[type="range"] {
+        input[type="range"], input[type="number"] {
             width: 100%;
         }
 
@@ -89,8 +89,23 @@
         <label for="shooting">🎯 التسديد: <span id="shootingValue">50</span></label>
         <input type="range" id="shooting" min="0" max="99" value="50" oninput="updateValue('shooting')">
 
+        <label for="passing">📤 التمرير: <span id="passingValue">50</span></label>
+        <input type="range" id="passing" min="0" max="99" value="50" oninput="updateValue('passing')">
+
+        <label for="dribbling">⚙️ المراوغة: <span id="dribblingValue">50</span></label>
+        <input type="range" id="dribbling" min="0" max="99" value="50" oninput="updateValue('dribbling')">
+
+        <label for="physical">💪 البدنية: <span id="physicalValue">50</span></label>
+        <input type="range" id="physical" min="0" max="99" value="50" oninput="updateValue('physical')">
+
         <label for="defense">🛡️ الدفاع: <span id="defenseValue">50</span></label>
         <input type="range" id="defense" min="0" max="99" value="50" oninput="updateValue('defense')">
+
+        <label for="height">📏 الطول (سم):</label>
+        <input type="number" id="height" min="100" max="250" value="180">
+
+        <label for="weight">⚖️ الوزن (كجم):</label>
+        <input type="number" id="weight" min="40" max="150" value="70">
 
         <!-- أزرار التحكم -->
         <button class="btn" onclick="calculateOverall()">تحليل شامل</button>
@@ -113,10 +128,21 @@
         function calculateOverall() {
             const speed = parseInt(document.getElementById('speed').value);
             const shooting = parseInt(document.getElementById('shooting').value);
+            const passing = parseInt(document.getElementById('passing').value);
+            const dribbling = parseInt(document.getElementById('dribbling').value);
+            const physical = parseInt(document.getElementById('physical').value);
             const defense = parseInt(document.getElementById('defense').value);
+            const height = parseInt(document.getElementById('height').value);
+            const weight = parseInt(document.getElementById('weight').value);
 
-            const overall = Math.round((speed + shooting + defense) / 3);
-            document.getElementById('result').innerHTML = `<h2>التقييم الإجمالي: ${overall} ⭐</h2>`;
+            // حساب التقييم العام (متوسط المهارات الأساسية)
+            const overall = Math.round((speed + shooting + passing + dribbling + physical + defense) / 6);
+
+            // عرض النتيجة
+            document.getElementById('result').innerHTML = `
+                <h2>التقييم الإجمالي: ${overall} ⭐</h2>
+                <p>📏 الطول: ${height} سم | ⚖️ الوزن: ${weight} كجم</p>
+            `;
         }
 
         // تبديل الوضع الداكن/الفاتح
