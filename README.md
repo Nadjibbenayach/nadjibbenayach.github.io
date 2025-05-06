@@ -65,6 +65,7 @@
       justify-content: space-between;
       align-items: center;
       margin-top: 10px;
+      flex-wrap: wrap;
     }
 
     .btn {
@@ -73,6 +74,7 @@
       border-radius: 8px;
       cursor: pointer;
       font-size: 14px;
+      margin: 5px 0;
     }
 
     .like-btn {
@@ -109,27 +111,63 @@
   <div class="container">
 
     <!-- بطاقة فيديو -->
-    <div class="video-card">
+    <div class="video-card" id="video1-card">
       <iframe src="https://drive.google.com/file/d/1-5zBa2R1p6MW9jf_nrpDbbO-vuqZ7xyo/preview" allow="autoplay"></iframe>
       <div class="video-info">
         <div class="video-title">فيديو توضيحي من Google Drive</div>
         <div class="video-actions">
-          <button class="btn like-btn" onclick="alert('أعجبك الفيديو!')">إعجاب</button>
-          <button class="btn share-btn" onclick="copyLink()">مشاركة</button>
+          <div>
+            <span id="views-count-video1">0</span> مشاهدة |
+            <span id="likes-count-video1">0</span> إعجاب
+          </div>
+          <div>
+            <button class="btn like-btn" onclick="likeVideo('video1')">إعجاب</button>
+            <button class="btn share-btn" onclick="copyLink()">مشاركة</button>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- أضف المزيد من الفيديوهات هنا بنفس الشكل -->
+    <!-- أضف المزيد من الفيديوهات بنفس الطريقة مع تغيير ID -->
 
   </div>
 
   <script>
+    const videoId = "video1";
+
+    function loadCounts(id) {
+      let views = localStorage.getItem(`${id}-views`) || 0;
+      let likes = localStorage.getItem(`${id}-likes`) || 0;
+      document.getElementById(`views-count-${id}`).textContent = views;
+      document.getElementById(`likes-count-${id}`).textContent = likes;
+    }
+
+    function incrementView(id) {
+      let views = parseInt(localStorage.getItem(`${id}-views`) || 0);
+      views++;
+      localStorage.setItem(`${id}-views`, views);
+      document.getElementById(`views-count-${id}`).textContent = views;
+    }
+
+    function likeVideo(id) {
+      let likes = parseInt(localStorage.getItem(`${id}-likes`) || 0);
+      likes++;
+      localStorage.setItem(`${id}-likes`, likes);
+      document.getElementById(`likes-count-${id}`).textContent = likes;
+      alert("أعجبك الفيديو!");
+    }
+
     function copyLink() {
       navigator.clipboard.writeText("https://drive.google.com/file/d/1-5zBa2R1p6MW9jf_nrpDbbO-vuqZ7xyo/view")
         .then(() => alert("تم نسخ رابط الفيديو!"))
         .catch(() => alert("حدث خطأ أثناء النسخ."));
     }
+
+    // تحميل العدادات عند فتح الصفحة
+    document.addEventListener("DOMContentLoaded", function () {
+      loadCounts(videoId);
+      incrementView(videoId);
+    });
   </script>
 
 </body>
