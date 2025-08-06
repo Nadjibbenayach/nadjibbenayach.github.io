@@ -1,162 +1,65 @@
-<!DOCTYPE html><html lang="ar">
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>متابعة جمع المال - 30 يوم</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>خط العيايشة - جيجل</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      direction: rtl;
-      text-align: center;
-      padding: 20px;
-    }
-    .day-inputs {
-      display: flex;
-      overflow-x: auto;
-      gap: 5px;
-      margin-bottom: 20px;
-    }
-    .day-inputs input {
-      width: 60px;
-      padding: 5px;
-      text-align: center;
-    }
-    .stats {
-      margin-top: 20px;
-      font-size: 18px;
-    }
-    canvas {
-      max-width: 100%;
-      margin-top: 30px;
-    }
-    .progress-bar {
-      width: 100%;
-      height: 25px;
-      background: #e0e0e0;
-      border-radius: 12px;
-      overflow: hidden;
-      margin-top: 20px;
-    }
-    .progress {
-      height: 100%;
-      background-color: #4caf50;
-      text-align: center;
+    body { margin: 0; font-family: sans-serif; background: #f5f5f5; }
+    #map { height: 90vh; width: 100vw; }
+    header {
+      background: #2c3e50;
       color: white;
-      line-height: 25px;
-    }
-    .reset-btn {
-      margin-top: 10px;
-      background-color: #f44336;
-      color: white;
-      padding: 5px 10px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    @media print {
-      button, canvas, .reset-btn { display: none; }
+      padding: 10px;
+      text-align: center;
+      font-size: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>موقع متابعة جمع المال - 30 يوم</h1>  <div class="day-inputs" id="inputsContainer"></div><button onclick="calculate()">احسب الآن</button> <button onclick="window.print()">🖨️ طباعة</button> <button class="reset-btn" onclick="resetData()">🔄 إعادة تعيين</button>
+  <header>🚌 خط العيايشة - جيجل</header>
+  <div id="map"></div>  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>  <script>
+    const map = L.map('map').setView([36.7833, 5.812], 13);
 
-  <div class="progress-bar">
-    <div class="progress" id="progressBar">0%</div>
-  </div>  <div class="stats">
-    <p>💰 المبلغ المجموع حتى الآن: <span id="collected">0</span> دج</p>
-    <p>🎯 المبلغ المتبقي للوصول إلى 50,000 دج: <span id="remaining">50000</span> دج</p>
-    <p>📆 المبلغ اليومي المطلوب (بناءً على الأيام المتبقية): <span id="dailyNeeded">0</span> دج</p>
-    <p>📈 أعلى مبلغ تم جمعه في يوم واحد: <span id="maxDay">0</span> دج</p>
-    <p>📉 أقل مبلغ تم جمعه في يوم (≠0): <span id="minDay">0</span> دج</p>
-  </div><canvas id="progressChart"></canvas>
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>  <script>
-    const target = 50000;
-    const container = document.getElementById('inputsContainer');
+    const stations = [
+      { name: "المحطة 1", coords: [36.768373, 5.811485] },
+      { name: "المحطة 2", coords: [36.770047, 5.811220] },
+      { name: "المحطة 3", coords: [36.771112, 5.810657] },
+      { name: "المحطة 4", coords: [36.771885, 5.810428] },
+      { name: "المحطة 5", coords: [36.772993, 5.810103] },
+      { name: "المحطة 6", coords: [36.774264, 5.810233] },
+      { name: "المحطة 7", coords: [36.775124, 5.810600] },
+      { name: "المحطة 8", coords: [36.775899, 5.811032] },
+      { name: "المحطة 9", coords: [36.777276, 5.811416] },
+      { name: "المحطة 10", coords: [36.778093, 5.811682] },
+      { name: "المحطة 11", coords: [36.778730, 5.811779] },
+      { name: "المحطة 12", coords: [36.779324, 5.812103] },
+      { name: "المحطة 13", coords: [36.779951, 5.812479] },
+      { name: "المحطة 14", coords: [36.780611, 5.811771] },
+      { name: "المحطة 15", coords: [36.774994, 5.812891] },
+      { name: "المحطة 16", coords: [36.775594, 5.813121] },
+      { name: "المحطة 17", coords: [36.782789, 5.814356] },
+      { name: "المحطة 18", coords: [36.793008, 5.809060] },
+      { name: "المحطة 19", coords: [36.795659, 5.806782] },
+      { name: "المحطة 20", coords: [36.797845, 5.806572] },
+      { name: "المحطة 21", coords: [36.800297, 5.801676] },
+      { name: "المحطة 22", coords: [36.803634, 5.795354] },
+      { name: "المحطة 23", coords: [36.807203, 5.785660] },
+      { name: "المحطة 24", coords: [36.808054, 5.779776] },
+      { name: "نقطة الوصول", coords: [36.809134, 5.773293] }
+    ];
 
-    for (let i = 1; i <= 30; i++) {
-      const input = document.createElement('input');
-      input.type = 'number';
-      input.min = 0;
-      input.placeholder = `يوم ${i}`;
-      input.className = 'day';
-      input.value = localStorage.getItem(`day${i}`) || '';
-      input.addEventListener('input', () => {
-        localStorage.setItem(`day${i}`, input.value);
-      });
-      container.appendChild(input);
-    }
+    const routeCoords = stations.map(s => s.coords);
+    const route = L.polyline(routeCoords, { color: 'blue' }).addTo(map);
+    map.fitBounds(route.getBounds());
 
-    function calculate() {
-      const inputs = document.querySelectorAll('.day');
-      let total = 0;
-      let filledDays = 0;
-      let values = [];
-      let min = Infinity;
-      let max = -Infinity;
-
-      inputs.forEach((input, index) => {
-        const val = parseFloat(input.value);
-        if (!isNaN(val)) {
-          total += val;
-          filledDays++;
-          if (val > max) max = val;
-          if (val < min && val > 0) min = val;
-        }
-        values[index] = isNaN(val) ? 0 : val;
-      });
-
-      const remaining = Math.max(0, target - total);
-      const daysLeft = 30 - filledDays;
-      const dailyNeeded = daysLeft > 0 ? Math.ceil(remaining / daysLeft) : 0;
-      const percentage = Math.min(100, Math.floor((total / target) * 100));
-
-      document.getElementById('collected').innerText = total;
-      document.getElementById('remaining').innerText = remaining;
-      document.getElementById('dailyNeeded').innerText = dailyNeeded;
-      document.getElementById('maxDay').innerText = max > 0 ? max : 0;
-      document.getElementById('minDay').innerText = min !== Infinity ? min : 0;
-      document.getElementById('progressBar').style.width = percentage + '%';
-      document.getElementById('progressBar').innerText = percentage + '%';
-
-      updateChart(values);
-    }
-
-    let chart;
-    function updateChart(data) {
-      const ctx = document.getElementById('progressChart').getContext('2d');
-      if (chart) chart.destroy();
-      chart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: Array.from({ length: 30 }, (_, i) => `يوم ${i + 1}`),
-          datasets: [{
-            label: 'الدخل اليومي',
-            data: data,
-            backgroundColor: 'rgba(54, 162, 235, 0.6)',
-          }]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
-      });
-    }
-
-    function resetData() {
-      if (confirm("هل أنت متأكد أنك تريد إعادة تعيين كل البيانات؟")) {
-        for (let i = 1; i <= 30; i++) {
-          localStorage.removeItem(`day${i}`);
-        }
-        location.reload();
-      }
-    }
-
-    window.addEventListener('load', calculate);
+    stations.forEach((station, index) => {
+      L.marker(station.coords).addTo(map)
+        .bindPopup(`<b>${station.name}</b><br>ترتيب: ${index + 1}`);
+    });
   </script></body>
 </html>
