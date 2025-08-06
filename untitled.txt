@@ -1,231 +1,65 @@
-<!DOCTYPE html>
-<html lang="ar">
+<!DOCTYPE html><html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>موقع بيع التذاكر</title>
-    <style>
-        /* تنسيق عام */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f8f9fa;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* شاشة الترحيب */
-        .welcome-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #007BFF;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-size: 100px;
-            z-index: 1000;
-            opacity: 1;
-            transition: opacity 3s ease;
-        }
-
-        /* اختفاء شاشة الترحيب */
-        .welcome-screen.hide {
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        /* زر القائمة الجانبية */
-        .menu-button {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            padding: 10px;
-            background-color: #007BFF;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 18px;
-            z-index: 1100;
-        }
-
-        /* تنسيق القائمة الجانبية */
-        .sidebar {
-            width: 250px;
-            position: fixed;
-            left: -250px;
-            top: 0;
-            height: 100%;
-            background-color: #333;
-            color: #fff;
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
-            overflow-y: auto;
-            transition: left 0.3s ease;
-            z-index: 1050;
-        }
-
-        .sidebar.open {
-            left: 0;
-        }
-
-        .sidebar h3 {
-            font-size: 20px;
-            color: #f2f2f2;
-            margin-bottom: 20px;
-            text-align: center;
-            border-bottom: 1px solid #555;
-            padding-bottom: 10px;
-        }
-
-        .sidebar ul {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        .sidebar ul li {
-            margin: 15px 0;
-        }
-
-        .sidebar ul li a {
-            color: #f2f2f2;
-            text-decoration: none;
-            display: block;
-            padding: 10px;
-            border-radius: 5px;
-            background-color: #444;
-            transition: background-color 0.3s, transform 0.2s;
-            font-size: 16px;
-            text-align: center;
-        }
-
-        .sidebar ul li a:hover {
-            background-color: #555;
-            transform: scale(1.05);
-        }
-
-        /* تنسيق الجزء العلوي */
-        .header-image {
-            width: 100%;
-            max-height: 200px;
-            object-fit: cover;
-            display: block;
-        }
-
-        /* تنسيق المحتوى الرئيسي */
-        .content {
-            padding: 20px;
-            width: 100%;
-            display: none;
-        }
-
-        .container {
-            max-width: 700px;
-            margin: auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        /* تنسيق رسالة حول الموقع */
-        .about-message {
-            text-align: justify;
-            font-size: 16px;
-            color: #333;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>خط العيايشة - جيجل</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body { margin: 0; font-family: sans-serif; background: #f5f5f5; }
+    #map { height: 90vh; width: 100vw; }
+    header {
+      background: #2c3e50;
+      color: white;
+      padding: 10px;
+      text-align: center;
+      font-size: 20px;
+    }
+  </style>
 </head>
 <body>
+  <header>🚌 خط العيايشة - جيجل</header>
+  <div id="map"></div>  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>  <script>
+    const map = L.map('map').setView([36.7833, 5.812], 13);
 
-    <!-- شاشة الترحيب -->
-    <div class="welcome-screen" id="welcomeScreen">
-        <div id="logo">N</div>
-    </div>
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
 
-    <!-- زر القائمة الجانبية -->
-    <button class="menu-button" onclick="toggleSidebar()">☰ القائمة</button>
+    const stations = [
+      { name: "المحطة 1", coords: [36.768373, 5.811485] },
+      { name: "المحطة 2", coords: [36.770047, 5.811220] },
+      { name: "المحطة 3", coords: [36.771112, 5.810657] },
+      { name: "المحطة 4", coords: [36.771885, 5.810428] },
+      { name: "المحطة 5", coords: [36.772993, 5.810103] },
+      { name: "المحطة 6", coords: [36.774264, 5.810233] },
+      { name: "المحطة 7", coords: [36.775124, 5.810600] },
+      { name: "المحطة 8", coords: [36.775899, 5.811032] },
+      { name: "المحطة 9", coords: [36.777276, 5.811416] },
+      { name: "المحطة 10", coords: [36.778093, 5.811682] },
+      { name: "المحطة 11", coords: [36.778730, 5.811779] },
+      { name: "المحطة 12", coords: [36.779324, 5.812103] },
+      { name: "المحطة 13", coords: [36.779951, 5.812479] },
+      { name: "المحطة 14", coords: [36.780611, 5.811771] },
+      { name: "المحطة 15", coords: [36.774994, 5.812891] },
+      { name: "المحطة 16", coords: [36.775594, 5.813121] },
+      { name: "المحطة 17", coords: [36.782789, 5.814356] },
+      { name: "المحطة 18", coords: [36.793008, 5.809060] },
+      { name: "المحطة 19", coords: [36.795659, 5.806782] },
+      { name: "المحطة 20", coords: [36.797845, 5.806572] },
+      { name: "المحطة 21", coords: [36.800297, 5.801676] },
+      { name: "المحطة 22", coords: [36.803634, 5.795354] },
+      { name: "المحطة 23", coords: [36.807203, 5.785660] },
+      { name: "المحطة 24", coords: [36.808054, 5.779776] },
+      { name: "نقطة الوصول", coords: [36.809134, 5.773293] }
+    ];
 
-    <!-- القائمة الجانبية -->
-    <div class="sidebar" id="sidebar">
-        <h3>القائمة الجانبية</h3>
-        <ul>
-            <li><a href="#" onclick="showContent('home')">الصفحة الرئيسية</a></li>
-            <li><a href="#" onclick="showContent('about')">حول الموقع</a></li>
-            <li><a href="#" onclick="showContent('tickets')">تذاكر البيع</a></li>
-            <li><a href="#">التواصل معنا</a></li>
-        </ul>
-    </div>
+    const routeCoords = stations.map(s => s.coords);
+    const route = L.polyline(routeCoords, { color: 'blue' }).addTo(map);
+    map.fitBounds(route.getBounds());
 
-    <!-- إضافة صورة في أعلى الصفحة -->
-    <img src="https://i.pinimg.com/564x/2c/3f/3d/2c3f3d37ebfbc29c.jpg" alt="صورة علوية" class="header-image">
-
-    <!-- المحتوى الرئيسي -->
-    <div class="content" id="homeContent">
-        <div class="container">
-            <h2>الصفحة الرئيسية</h2>
-            <p>مرحبًا بكم في موقع بيع التذاكر!</p>
-        </div>
-    </div>
-
-    <!-- رسالة حول الموقع -->
-    <div class="content" id="aboutContent">
-        <div class="container">
-            <h2>حول الموقع</h2>
-            <p class="about-message">
-                مرحبًا بكم في موقع بيع التذاكر، حيث أسعى جاهدًا لتقديم تجربة مميزة لجميع المستخدمين. من خلال هذا الموقع، أبذل قصارى جهدي لتوفير واجهة سهلة الاستخدام وخدمة سريعة وآمنة. إن الهدف الأساسي من تطوير هذا الموقع هو تمكين الجميع من الحصول على التذاكر بسهولة وراحة، سواء كان ذلك لحضور فعالية معينة أو للاستفادة من وسائل النقل المختلفة.<br><br>
-                
-                كوني مطورًا لهذا الموقع، أنا ملتزم بتقديم تجربة سلسة ومبسطة، وأعمل باستمرار على تحسينه وإضافة المزيد من الميزات التي تخدمكم. أعلم أن تجربة المستخدم هي العامل الأهم، ولذا أحرص على الاستماع إلى ملاحظاتكم ومقترحاتكم لتحسين كل جانب من جوانب الموقع. أتمنى أن تجدوا في هذا الموقع كل ما تحتاجونه، وأعدكم بمواصلة التطوير والسعي للأفضل.<br><br>
-                
-                شكرًا لكم على ثقتكم ودعمكم المتواصل، وأتطلع إلى تقديم المزيد من الخدمات والميزات التي ترتقي بتجربتكم. أتمنى أن تكونوا دائمًا جزءًا من رحلتي في تحسين وتطوير هذا الموقع.
-            </p>
-        </div>
-    </div>
-
-    <script>
-        // دالة لإخفاء شاشة الترحيب
-        function fadeOutLogo() {
-            var welcomeScreen = document.getElementById("welcomeScreen");
-            welcomeScreen.classList.add("hide");
-            setTimeout(function() {
-                welcomeScreen.style.display = "none";
-            }, 3000); // 3 ثوانٍ للتحول التدريجي
-        }
-
-        // دالة لفتح وإغلاق القائمة الجانبية
-        function toggleSidebar() {
-            var sidebar = document.getElementById("sidebar");
-            sidebar.classList.toggle("open");
-        }
-
-        // دالة لعرض المحتوى المناسب
-        function showContent(section) {
-            // إخفاء جميع المحتويات
-            document.querySelectorAll(".content").forEach(function(content) {
-                content.style.display = "none";
-            });
-            
-            // إظهار المحتوى المطلوب
-            if (section === 'home') {
-                document.getElementById("homeContent").style.display = "block";
-            } else if (section === 'about') {
-                document.getElementById("aboutContent").style.display = "block";
-            } else if (section === 'tickets') {
-                document.getElementById("ticketContent").style.display = "block";
-            }
-            
-            // إغلاق القائمة الجانبية بعد الاختيار
-            toggleSidebar();
-        }
-
-        // بدء التأثير عند تحميل الصفحة
-        window.onload = fadeOutLogo;
-    </script>
-</body>
+    stations.forEach((station, index) => {
+      L.marker(station.coords).addTo(map)
+        .bindPopup(`<b>${station.name}</b><br>ترتيب: ${index + 1}`);
+    });
+  </script></body>
 </html>
