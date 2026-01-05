@@ -39,7 +39,7 @@
         .screen.active { display: flex; opacity: 1; z-index: 20; }
 
         /* UI ELEMENTS */
-        h1 { font-size: 2.2rem; margin-bottom: 10px; text-shadow: 0 0 15px var(--primary); }
+        h1 { font-size: 2.2rem; margin-bottom: 10px; text-shadow: 0 0 15px var(--primary); text-align: center; }
         
         .card {
             width: 100%; background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1);
@@ -68,7 +68,7 @@
         .tag { background: #333; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; }
 
         .timer-box {
-            width: 80px; height: 80px; margin: 70px 0 20px 0; position: relative;
+            width: 80px; height: 80px; margin: 80px 0 30px 0; position: relative;
             display: flex; justify-content: center; align-items: center;
         }
         .timer-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
@@ -79,14 +79,16 @@
         }
 
         .q-box {
-            font-size: 1.2rem; text-align: center; margin-bottom: 25px; line-height: 1.5;
+            font-size: 1.1rem; text-align: center; margin-bottom: 25px; line-height: 1.5;
             min-height: 70px; display: flex; align-items: center; justify-content: center;
+            font-weight: bold; padding: 0 10px;
         }
 
         .opt-list { width: 100%; display: grid; gap: 10px; }
         .opt {
             background: rgba(255,255,255,0.08); padding: 16px; border-radius: 12px;
             text-align: center; border: 1px solid transparent; cursor: pointer;
+            font-size: 0.95rem;
         }
         .opt.correct { background: rgba(0, 255, 157, 0.2); border-color: var(--primary); color: var(--primary); }
         .opt.wrong { background: rgba(255, 0, 85, 0.2); border-color: var(--danger); color: var(--danger); }
@@ -100,7 +102,7 @@
 
     <div id="scr-home" class="screen active">
         <h1>MASTERMIND</h1>
-        <p style="color:#aaa; margin-bottom:30px;">بنك معلومات: 260 سؤال</p>
+        <p style="color:#aaa; margin-bottom:30px;">بنك معلومات: 260+ سؤال</p>
 
         <div class="card" onclick="Game.init('football')">
             <h2>⚽ تحدي الأساطير</h2>
@@ -156,7 +158,7 @@
     
     // FOOTBALL DB (260 Questions)
     const DB_FOOT = [
-        // LEVEL 1: EASY (1-75)
+        // LEVEL 1: EASY
         [1,"كم عدد اللاعبين في فريق كرة القدم؟","9","10","11","12",2],
         [1,"مدة مباراة كرة القدم الرسمية؟","80 دقيقة","85 دقيقة","90 دقيقة","100 دقيقة",2],
         [1,"لون بطاقة الطرد هو؟","أصفر","أزرق","أخضر","أحمر",3],
@@ -233,7 +235,7 @@
         [1,"من فاز بالبريميرليغ 2024؟","أرسنال","ليفربول","مان يونايتد","مانشستر سيتي",3],
         [1,"حكم نهائي كأس العالم 2022؟","أورساتو","كولينا","مارسينياك","ويب",2],
 
-        // LEVEL 2: MEDIUM (76-130)
+        // LEVEL 2: MEDIUM
         [2,"من هو أكثر لاعب فاز بالكرة الذهبية؟","كريستيانو رونالدو","ميسي","زيدان","رونالدينيو",1],
         [2,"عدد كرات ميسي الذهبية حتى 2023؟","6","7","8","9",2],
         [2,"من هو الهداف التاريخي لدوري أبطال أوروبا؟","ميسي","ليفاندوفسكي","بنزيمة","كريستيانو رونالدو",3],
@@ -290,7 +292,7 @@
         [2,"من هو أكثر لاعب مشاركة في مباريات دوري الأبطال؟","بوفون","تشافي","رونالدو","كاسياس",3],
         [2,"من هو أول لاعب فاز بالكرة الذهبية مرتين متتاليتين؟","بيليه","كرويف","دي ستيفانو","بلاتيني",2],
 
-        // LEVEL 3: HARD (131-190)
+        // LEVEL 3: HARD
         [3,"أول منتخب فاز بكأس العالم وأحرز لقب البطولة دون أن تهتز شباكه؟","البرازيل 1970","إيطاليا 1938","إيطاليا 1934","ألمانيا 1954",2],
         [3,"أكثر لاعب سجل أهداف في موسم واحد بالدوري الإسباني؟","رونالدو","ميسي","هالاند","سواريز",1],
         [3,"أول نادي فاز بدوري أبطال أوروبا 5 مرات متتالية؟","ريال مدريد","ميلان","برشلونة","بايرن ميونخ",0],
@@ -310,5 +312,4 @@
         [3,"أكثر لاعب تسجيلاً للأهداف في تاريخ كأس أمم إفريقيا؟","أبو تريكة","خالد بيبو","محمد صلاح","أحمد حسن",0],
         [3,"أي منتخب فاز بكأس العالم على أرضه أكثر من مرة؟","إيطاليا","البرازيل","ألمانيا","الأرجنتين",0],
         [3,"أول مدرب فاز بدوري أبطال أوروبا مع 3 فرق مختلفة؟","أنشيلوتي","غوارديولا","مورينيو","زيدان",0],
-        [3,"أول لاعب سجل هدفًا في كأس العالم 1930؟","غينس","إيغور سترايف","بيليه","روماريو",1],
-        [3,"أكثر منتخب سجل أهداف في نسخة واحدة من كأس ا
+        [3,"أول لاعب سجل هدفًا في كأس العالم 1930؟","غينس","إيغور سترايف","ب
