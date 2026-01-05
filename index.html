@@ -3,337 +3,426 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Master Challenge | منصة التحدي</title>
+    <title>تحدي العباقرة | IQ & Football</title>
     <style>
-        /* --- 1. CSS & Design System --- */
         :root {
             --primary: #00f3ff;
             --secondary: #bc13fe;
-            --football-main: #00ff88;
-            --football-accent: #ffaa00;
-            --bg-dark: #050508;
-            --glass: rgba(20, 20, 35, 0.95);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --text-main: #ffffff;
+            --football: #00ff88;
+            --bg: #050508;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+            --text: #ffffff;
             --danger: #ff0055;
             --success: #00ff9d;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Segoe UI', Tahoma, sans-serif; user-select: none; }
 
         body {
-            background-color: var(--bg-dark);
-            background-image: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #000 100%);
-            color: var(--text-main);
+            background-color: var(--bg);
+            background-image: radial-gradient(circle at 50% 0%, #1a1a2e 0%, #000 80%);
+            color: var(--text);
             margin: 0; min-height: 100vh;
-            display: flex; justify-content: center; align-items: center; overflow-x: hidden;
+            display: flex; justify-content: center; align-items: center; overflow: hidden;
         }
 
-        .glass-container {
-            width: 95%; max-width: 600px; min-height: 85vh;
-            background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border); border-radius: 24px;
-            padding: 1.5rem; position: relative;
-            box-shadow: 0 0 50px rgba(0,0,0,0.7);
-            display: flex; flex-direction: column; align-items: center;
+        .app-container {
+            width: 100%; max-width: 500px; height: 100vh;
+            display: flex; flex-direction: column;
+            background: rgba(0,0,0,0.2);
+            position: relative;
         }
 
-        /* القائمة الرئيسية */
-        .home-grid {
-            display: grid; grid-template-columns: 1fr; gap: 20px; width: 100%; margin-top: 40px;
+        /* --- Screens --- */
+        .screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            padding: 20px; display: none; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s ease;
+            background: var(--bg);
+            z-index: 10;
+        }
+        .screen.active { display: flex; opacity: 1; z-index: 20; }
+
+        /* --- Components --- */
+        .card {
+            background: var(--glass); border: 1px solid var(--border);
+            border-radius: 20px; padding: 25px; margin: 10px 0;
+            width: 100%; text-align: center; cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .card:active { transform: scale(0.98); }
+        .card-iq:hover { border-color: var(--secondary); }
+        .card-foot:hover { border-color: var(--football); }
+
+        .btn {
+            background: linear-gradient(90deg, var(--secondary), var(--primary));
+            border: none; color: #000; padding: 15px 40px; border-radius: 50px;
+            font-size: 1.2rem; font-weight: bold; margin-top: 20px; cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0, 243, 255, 0.3);
         }
 
-        .game-card {
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
-            padding: 30px; border-radius: 20px; text-align: center; cursor: pointer;
-            transition: all 0.3s; position: relative; overflow: hidden;
-        }
-
-        .game-card:active { transform: scale(0.98); }
-        .game-card h2 { margin: 10px 0; font-size: 1.4rem; }
-        .game-card p { font-size: 0.85rem; color: #aaa; margin: 0; }
-        .icon { font-size: 3.5rem; margin-bottom: 15px; display: block; }
-
-        .card-football:hover { border-color: var(--football-main); box-shadow: 0 0 25px rgba(0, 255, 136, 0.15); }
-        .card-iq:hover { border-color: var(--secondary); box-shadow: 0 0 25px rgba(188, 19, 254, 0.15); }
-
-        /* المؤقت الدائري */
-        .timer-container { position: relative; width: 75px; height: 75px; margin: 15px auto; }
-        .timer-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
-        .timer-circle-bg { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 6; }
-        .timer-circle-progress {
-            fill: none; stroke: var(--primary); stroke-width: 6; stroke-linecap: round;
-            stroke-dasharray: 200; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear;
-        }
-        .timer-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold; font-size: 1.2rem; }
-
-        /* الخيارات */
-        .options-grid { display: grid; grid-template-columns: 1fr; gap: 12px; width: 100%; margin-top: 25px; }
-        .option-card {
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            padding: 18px; border-radius: 12px; cursor: pointer; transition: 0.2s;
-            display: flex; justify-content: space-between; align-items: center; font-size: 1rem;
-        }
-        .option-card.correct { background: rgba(0, 255, 157, 0.2) !important; border-color: var(--success) !important; color: var(--success); font-weight: bold; }
-        .option-card.wrong { background: rgba(255, 0, 85, 0.2) !important; border-color: var(--danger) !important; color: var(--danger); opacity: 0.8; }
-        .option-card.disabled { pointer-events: none; }
-
-        /* شاشات */
-        .screen { display: none; width: 100%; animation: fadeIn 0.4s forwards; }
-        .screen.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* هيدر اللعبة */
-        .game-header { 
+        /* --- Game UI --- */
+        .top-bar {
             width: 100%; display: flex; justify-content: space-between; align-items: center;
-            padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 20px; 
-            font-size: 0.9rem; color: #ccc;
-        }
-        
-        .level-badge {
-            background: var(--football-accent); color: #000; padding: 4px 12px; border-radius: 15px; font-weight: bold; font-size: 0.8rem;
+            margin-bottom: 20px; padding: 10px; border-bottom: 1px solid var(--border);
+            position: absolute; top: 0; left: 0; height: 60px; background: rgba(0,0,0,0.5);
         }
 
-        .btn-main {
-            background: linear-gradient(90deg, var(--secondary), var(--primary)); border: none;
-            color: #000; padding: 15px 40px; border-radius: 30px; font-weight: bold; cursor: pointer; 
-            margin-top: 25px; width: 100%; font-size: 1.1rem; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        .timer-circle {
+            width: 60px; height: 60px; position: relative;
+            display: flex; justify-content: center; align-items: center;
+            margin: 40px 0 20px 0;
         }
+        .timer-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+        .timer-path { fill: none; stroke-width: 5; stroke: var(--border); }
+        .timer-fill { 
+            fill: none; stroke-width: 5; stroke: var(--primary); stroke-linecap: round;
+            stroke-dasharray: 176; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear;
+        }
+        .timer-num { position: absolute; font-weight: bold; font-size: 1.2rem; }
+
+        .question-box {
+            font-size: 1.2rem; text-align: center; margin: 10px 0 30px 0;
+            line-height: 1.5; min-height: 80px; display: flex; align-items: center; justify-content: center;
+        }
+
+        .options-list { width: 100%; display: grid; gap: 12px; }
+        .opt {
+            background: rgba(255,255,255,0.08); padding: 18px; border-radius: 12px;
+            text-align: right; border: 1px solid transparent; transition: 0.2s;
+        }
+        .opt.correct { background: rgba(0, 255, 157, 0.2); border-color: var(--success); color: var(--success); }
+        .opt.wrong { background: rgba(255, 0, 85, 0.2); border-color: var(--danger); color: var(--danger); }
+        .opt.disabled { pointer-events: none; opacity: 0.7; }
+
+        /* --- Animations --- */
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .pop { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     </style>
 </head>
 <body>
 
-    <div class="glass-container">
+    <div class="app-container">
         
-        <div id="home-screen" class="screen active">
-            <h1 style="text-align: center; font-size: 2rem; margin-bottom: 10px;">🎮 اختر التحدي</h1>
-            <p style="text-align: center; color: #888; margin-top: 0;">نظام الذكاء الاصطناعي جاهز</p>
-            
-            <div class="home-grid">
-                <div class="game-card card-football" onclick="app.initGame('football')">
-                    <span class="icon">⚽</span>
-                    <h2>تحدي الأساطير</h2>
-                    <div style="margin-top: 10px; font-size: 0.8rem; color: var(--football-main);">
-                        4 مستويات صعوبة<br>
-                        الهدف: الوصول للنهائي
-                    </div>
-                </div>
+        <div id="screen-home" class="screen active">
+            <h1 style="font-size: 2.5rem; margin-bottom: 5px;">GAME HUB</h1>
+            <p style="color: #888; margin-bottom: 40px;">اختر نوع التحدي</p>
 
-                <div class="game-card card-iq" onclick="app.initGame('iq')">
-                    <span class="icon">🧠</span>
-                    <h2>اختبار IQ Pro</h2>
-                    <div style="margin-top: 10px; font-size: 0.8rem; color: var(--secondary);">
-                        25 سؤال تحليلي<br>
-                        تقييم الدماغ الشامل
-                    </div>
-                </div>
+            <div class="card card-foot pop" onclick="App.init('football')">
+                <div style="font-size: 3rem;">⚽</div>
+                <h2>تحدي الكرة</h2>
+                <p style="color:#aaa; font-size:0.8rem">4 مراحل | 15 ثانية</p>
+            </div>
+
+            <div class="card card-iq pop" onclick="App.init('iq')" style="animation-delay: 0.1s;">
+                <div style="font-size: 3rem;">🧠</div>
+                <h2>اختبار IQ</h2>
+                <p style="color:#aaa; font-size:0.8rem">25 سؤال | 30 ثانية</p>
             </div>
         </div>
 
-        <div id="game-screen" class="screen">
-            <div class="game-header">
-                <span id="header-left" style="font-weight: bold;">...</span>
-                <span id="header-right">...</span>
+        <div id="screen-game" class="screen">
+            <div class="top-bar">
+                <span id="game-info-left" style="font-weight: bold; color: var(--primary);">مرحلة 1</span>
+                <span id="game-info-right" style="color: #ccc;">1 / 10</span>
             </div>
 
-            <div class="timer-container">
-                <svg class="timer-svg" viewBox="0 0 70 70">
-                    <circle class="timer-circle-bg" cx="35" cy="35" r="32"></circle>
-                    <circle id="timer-progress" class="timer-circle-progress" cx="35" cy="35" r="32"></circle>
+            <div class="timer-circle">
+                <svg class="timer-svg" viewBox="0 0 60 60">
+                    <circle class="timer-path" cx="30" cy="30" r="28"></circle>
+                    <circle id="timer-bar" class="timer-fill" cx="30" cy="30" r="28"></circle>
                 </svg>
-                <div id="timer-text" class="timer-text">00</div>
+                <div id="timer-txt" class="timer-num">00</div>
             </div>
 
-            <h3 id="question-text" style="text-align: center; min-height: 70px; margin: 15px 0; line-height: 1.5;">...</h3>
-
-            <div id="options-container" class="options-grid"></div>
+            <div id="q-text" class="question-box pop">...</div>
+            <div id="opts-area" class="options-list pop"></div>
         </div>
 
-        <div id="level-screen" class="screen" style="text-align: center; padding-top: 20px;">
-            <div style="font-size: 5rem; margin-bottom: 10px;">🏆</div>
-            <h2 id="level-title" style="color: var(--football-main); margin-bottom: 10px;">مبروك!</h2>
-            <p id="level-msg" style="color: #ddd;">لقد تأهلت للمرحلة التالية</p>
-            
-            <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; margin: 30px 0;">
-                <p style="margin: 0 0 10px 0; color: #aaa; font-size: 0.9rem;">المطلوب في المرحلة القادمة</p>
-                <div id="next-req" style="font-size: 1.5rem; font-weight: bold; color: var(--football-accent);">...</div>
-            </div>
-            
-            <button class="btn-main" onclick="app.nextLevelStart()">ابدأ التحدي</button>
+        <div id="screen-level" class="screen" style="text-align: center;">
+            <div style="font-size: 4rem;">🏆</div>
+            <h2 style="color: var(--football); margin: 10px 0;">مبروك التأهل!</h2>
+            <p id="lvl-msg" style="color: #ddd; margin-bottom: 30px;">...</p>
+            <button class="btn" onclick="App.nextLevel()">المرحلة التالية</button>
         </div>
 
-        <div id="result-screen" class="screen" style="text-align: center;">
-            <div id="res-icon" style="font-size: 4rem; margin-bottom: 10px;">📊</div>
-            <h1 id="res-title" style="margin-top: 0;">النتيجة</h1>
-            
-            <div id="res-score-box" style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; margin: 25px 0;">
-                <div id="res-desc-top" style="color: #aaa; font-size: 0.9rem; margin-bottom: 5px;">التقييم النهائي</div>
-                <div id="res-big-score" style="font-size: 3.5rem; font-weight: bold; color: var(--primary);">0</div>
-            </div>
-            
-            <p id="res-detail" style="line-height: 1.6; color: #ccc; font-size: 1rem; margin-bottom: 30px;"></p>
-            <button class="btn-main" onclick="location.reload()">القائمة الرئيسية</button>
+        <div id="screen-result" class="screen" style="text-align: center;">
+            <div id="res-emoji" style="font-size: 4rem;">📊</div>
+            <h1 id="res-title">النتيجة</h1>
+            <div style="font-size: 3rem; font-weight: bold; color: var(--primary); margin: 20px 0;" id="res-score">0</div>
+            <p id="res-desc" style="color: #ccc; line-height: 1.6; max-width: 80%;">...</p>
+            <button class="btn" onclick="location.reload()">القائمة الرئيسية</button>
         </div>
 
     </div>
 
     <script>
-        // --- 1. قواعد البيانات (Data) ---
-        
-        // IQ Database (25 Questions)
-        const IQ_DB = [
-            { q: "ما هو الرقم المكمل: 2, 4, 8, 16, ...؟", opts: ["32", "24", "30", "18"], c: 0 },
-            { q: "سعر 3 أقلام 15، كم سعر 7 أقلام؟", opts: ["35", "30", "25", "40"], c: 0 },
-            { q: "الكلمة الغريبة: تفاح، موز، جزر، عنب", opts: ["تفاح", "موز", "جزر", "عنب"], c: 2 },
-            { q: "100 قسمة نصف يساوي؟", opts: ["50", "200", "25", "100"], c: 1 },
-            { q: "إذا كان أمس هو غداً، لكان اليوم السبت. ما هو اليوم؟", opts: ["الجمعة", "الأحد", "الإثنين", "الخميس"], c: 0 },
-            { q: "ما هو نصف ربع 400؟", opts: ["100", "50", "25", "10"], c: 1 },
-            { q: "أكمل: أ، ت، ج، خ، ...", opts: ["د", "ذ", "ر", "ز"], c: 0 },
-            { q: "علاقة (يد:قفاز) مثل (قدم:...)", opts: ["جورب", "حذاء", "ركبة", "إصبع"], c: 0 },
-            { q: "الشكل المختلف: مربع، مستطيل، مثلث، دائرة", opts: ["مربع", "مستطيل", "مثلث", "دائرة"], c: 3 },
-            { q: "القطة للفأر مثل العنكبوت لـ...", opts: ["الخيط", "الذبابة", "الشبكة", "السم"], c: 1 },
-            { q: "ما هو حاصل ضرب 12 في 12؟", opts: ["144", "124", "122", "142"], c: 0 },
-            { q: "الرقم الشاذ: 3, 5, 7, 9, 11", opts: ["9", "5", "7", "11"], c: 0 },
-            { q: "اللون المعاكس للأحمر؟", opts: ["أزرق", "أخضر", "أصفر", "أسود"], c: 1 },
-            { q: "كم شهراً يحتوي على 28 يوماً؟", opts: ["1", "12", "6", "0"], c: 1 },
-            { q: "إذا كانت الساعة 3:00 وتحركت 90 درجة؟", opts: ["6:00", "5:00", "4:30", "12:00"], c: 0 },
-            { q: "خمسة رجال حفروا حفرة في 5 ساعات، كم يحتاج رجل واحد؟", opts: ["ساعة", "5 ساعات", "25 ساعة", "10 ساعات"], c: 2 },
-            { q: "ما هو الحيوان الذي لا يصدر صوتاً؟", opts: ["الزرافة", "الفيل", "الحوت", "السلحفاة"], c: 0 },
-            { q: "شيء كلما زاد نقص؟", opts: ["المال", "العمر", "الماء", "الوزن"], c: 1 },
-            { q: "أيهما أثقل: كيلو حديد أم كيلو قطن؟", opts: ["الحديد", "القطن", "متساويان", "لا يمكن التحديد"], c: 2 },
-            { q: "ما هو الرقم الذي إذا ضربته في نفسه وأضفت إليه 5 أصبح 30؟", opts: ["4", "5", "6", "3"], c: 1 },
-            { q: "والد مريم لديه 5 بنات: نانا، نيني، نونو، نينو. ما اسم الخامسة؟", opts: ["نونو", "مريم", "نانا", "نوني"], c: 1 },
-            { q: "كم وجهاً للمكعب؟", opts: ["4", "6", "8", "12"], c: 1 },
-            { q: "الكلمة المعاكسة لـ 'تفاؤل'؟", opts: ["تشاؤم", "حزن", "فرح", "غضب"], c: 0 },
-            { q: "ما هو الشيء الذي له أسنان ولا يعض؟", opts: ["المشط", "المنشار", "القرش", "الأسد"], c: 0 },
-            { q: "1, 1, 2, 3, 5, ... ما التالي؟", opts: ["7", "8", "9", "10"], c: 1 }
+        // --- DATA SOURCE ---
+        const DB_IQ = [
+            {q:"2, 4, 8, 16, ...؟", o:["32","24","30","18"], c:0},
+            {q:"سعر 3 أقلام 15، سعر 7 أقلام؟", o:["35","30","25","40"], c:0},
+            {q:"الكلمة الغريبة: تفاح، موز، جزر، عنب", o:["تفاح","موز","جزر","عنب"], c:2},
+            {q:"100 قسمة نصف (0.5)؟", o:["50","200","25","100"], c:1},
+            {q:"أمس كان غداً، لكان اليوم السبت. ما اليوم؟", o:["الجمعة","الأحد","الإثنين","الخميس"], c:0},
+            {q:"نصف ربع 400؟", o:["100","50","25","10"], c:1},
+            {q:"أكمل: أ، ت، ج، خ، ...", o:["د","ذ","ر","ز"], c:0},
+            {q:"(يد:قفاز) مثل (قدم:...)", o:["جورب","حذاء","ركبة","إصبع"], c:0},
+            {q:"المختلف: مربع، مثلث، دائرة، مستطيل", o:["مربع","مثلث","دائرة","مستطيل"], c:2},
+            {q:"القطة للفأر مثل العنكبوت لـ...", o:["الخيط","الذبابة","الشبكة","السم"], c:1},
+            {q:"12 × 12 ؟", o:["144","124","122","142"], c:0},
+            {q:"الشاذ: 3, 5, 7, 9, 11", o:["9","5","7","11"], c:0},
+            {q:"عكس الأحمر؟", o:["أزرق","أخضر","أصفر","أسود"], c:1},
+            {q:"كم شهر به 28 يوم؟", o:["1","12","6","0"], c:1},
+            {q:"الساعة 3:00، تحركت 90 درجة؟", o:["6:00","5:00","4:30","12:00"], c:0},
+            {q:"5 رجال حفروا حفرة بـ5 ساعات، رجل واحد؟", o:["ساعة","5 ساعات","25 ساعة","10 ساعات"], c:2},
+            {q:"حيوان لا يصدر صوتاً؟", o:["الزرافة","الفيل","الحوت","السلحفاة"], c:0},
+            {q:"كلما زاد نقص؟", o:["المال","العمر","الماء","الوزن"], c:1},
+            {q:"أثقل: كيلو حديد أم قطن؟", o:["الحديد","القطن","متساويان","لا يمكن"], c:2},
+            {q:"رقم ضربته بنفسه وأضفت 5 صار 30؟", o:["4","5","6","3"], c:1},
+            {q:"بنات والد مريم: نانا، نيني، نونو، نينو. الخامسة؟", o:["نونو","مريم","نانا","نوني"], c:1},
+            {q:"عدد أوجه المكعب؟", o:["4","6","8","12"], c:1},
+            {q:"عكس تفاؤل؟", o:["تشاؤم","حزن","فرح","غضب"], c:0},
+            {q:"له أسنان ولا يعض؟", o:["المشط","المنشار","القرش","الأسد"], c:0},
+            {q:"1, 1, 2, 3, 5, ... التالي؟", o:["7","8","9","10"], c:1}
         ];
 
-        // Football Database (45 Questions - Sufficient for 4 levels)
-        const FOOTBALL_POOL = [
-            { q: "من هو الهداف التاريخي لريال مدريد؟", opts: ["رونالدو", "راؤول", "بنزيما", "دي ستيفانو"], c: 0 },
-            { q: "كم دقيقة في مباراة كرة القدم الرسمية؟", opts: ["45", "90", "100", "60"], c: 1 },
-            { q: "من فاز بكأس العالم 2022؟", opts: ["فرنسا", "البرازيل", "الأرجنتين", "ألمانيا"], c: 2 },
-            { q: "أي نادٍ يلقب بـ 'الروسونيري'؟", opts: ["إنتر ميلان", "ميلان", "روما", "يوفنتوس"], c: 1 },
-            { q: "في أي دولة نشأت كرة القدم الحديثة؟", opts: ["البرازيل", "إنجلترا", "إيطاليا", "ألمانيا"], c: 1 },
-            { q: "ما هو لون بطاقة الطرد؟", opts: ["أصفر", "أحمر", "أزرق", "أبيض"], c: 1 },
-            { q: "من هو اللاعب الملقب بـ 'البرغوث'؟", opts: ["رونالدو", "ميسي", "نيمار", "صلاح"], c: 1 },
-            { q: "كم عدد لاعبين الفريق داخل الملعب؟", opts: ["10", "11", "12", "9"], c: 1 },
-            { q: "أي فريق حقق دوري أبطال أوروبا 2024؟", opts: ["ريال مدريد", "دورتموند", "السيتي", "بايرن"], c: 0 },
-            { q: "من هو الحارس الملقب بالعنكبوت الأسود؟", opts: ["بوفون", "ياشين", "كاسياس", "نوير"], c: 1 },
-            { q: "ما هو النادي الأكثر تتويجاً بدوري الأبطال؟", opts: ["ميلان", "ليفربول", "ريال مدريد", "بايرن"], c: 2 },
-            { q: "أين أقيم كأس العالم 2010؟", opts: ["البرازيل", "جنوب أفريقيا", "ألمانيا", "فرنسا"], c: 1 },
-            { q: "من هو مدرب مانشستر سيتي (2024)؟", opts: ["كلوب", "غوارديولا", "أنشيلوتي", "مورينيو"], c: 1 },
-            { q: "من فاز بالكرة الذهبية عام 2007؟", opts: ["كاكا", "رونالدو", "ميسي", "زيدان"], c: 0 },
-            { q: "ما هو أقدم نادي كرة قدم في العالم؟", opts: ["شيفيلد", "نوتغهام", "أستون فيلا", "ليفربول"], c: 0 },
-            { q: "كم مرة فازت البرازيل بكأس العالم؟", opts: ["4", "5", "6", "3"], c: 1 },
-            { q: "من سجل هدف 'يد الله'؟", opts: ["بيليه", "مارادونا", "روماريو", "زيدان"], c: 1 },
-            { q: "ما هو ملعب برشلونة؟", opts: ["بيرنابيو", "كامب نو", "أنفيلد", "ويمبلي"], c: 1 },
-            { q: "لاعب حقق كأس العالم كلاعب وكمدرب؟", opts: ["مارادونا", "ديشامب", "بلاتيني", "رونالدو"], c: 1 },
-            { q: "من هو الهداف التاريخي للدوري الإنجليزي؟", opts: ["روني", "شيرر", "كين", "أغويرو"], c: 1 },
-            { q: "متى تأسس نادي ريال مدريد؟", opts: ["1899", "1902", "1905", "1910"], c: 1 },
-            { q: "أكبر نتيجة في نهائي كأس عالم؟", opts: ["5-2", "4-2", "3-0", "7-1"], c: 0 },
-            { q: "من هو اللاعب الوحيد الذي فاز بـ 3 كؤوس عالم؟", opts: ["بيليه", "رونالدو", "كافو", "مارادونا"], c: 0 },
-            { q: "أي نادي إيطالي لم يهبط للدرجة الثانية أبداً؟", opts: ["يوفنتوس", "ميلان", "إنتر", "روما"], c: 2 },
-            { q: "كم عدد أهداف رياض محرز مع ليستر في موسم المعجزة؟", opts: ["15", "17", "19", "21"], c: 1 },
-            { q: "من حقق اليورو 2004 (المعجزة)؟", opts: ["البرتغال", "اليونان", "إسبانيا", "فرنسا"], c: 1 },
-            { q: "أول منتخب عربي شارك في كأس العالم؟", opts: ["المغرب", "تونس", "مصر", "السعودية"], c: 2 },
-            { q: "من هو 'الظاهرة'؟", opts: ["كرستيانو", "رونالدو نازاريو", "رونالدينيو", "مبابي"], c: 1 },
-            { q: "نادي يلقب بـ الغواصات الصفراء؟", opts: ["قادش", "فياريال", "دورتموند", "نانت"], c: 1 },
-            { q: "من سجل الهدف الذهبي لفرنسا في يورو 2000؟", opts: ["زيدان", "تريزيغيه", "هنري", "بيريس"], c: 1 },
-            { q: "كم يبلغ وزن الكرة الذهبية تقريباً؟", opts: ["5 كغ", "7 كغ", "12 كغ", "3 كغ"], c: 1 },
-            { q: "من المدرب الذي فاز بـ 3 دوري أبطال متتالية؟", opts: ["غوارديولا", "زيدان", "فيرغسون", "مورينيو"], c: 1 },
-            { q: "الدولة التي خست 3 نهائيات كأس عالم؟", opts: ["هولندا", "ألمانيا", "الأرجنتين", "إيطاليا"], c: 0 },
-            { q: "من هو الهداف التاريخي لكأس العالم؟", opts: ["بيليه", "كلوزه", "رونالدو", "مولر"], c: 1 },
-            { q: "في أي دقيقة سجل راموس هدفه ضد أتلتيكو (العاشرة)؟", opts: ["90", "92:48", "93:20", "91:15"], c: 1 },
-            { q: "كم فريق يهبط في الدوري الإنجليزي؟", opts: ["2", "3", "4", "1"], c: 1 },
-            { q: "أول لاعب أفريقي يفوز بالكرة الذهبية؟", opts: ["دروغبا", "ويا", "إيتو", "صلاح"], c: 1 },
-            { q: "ملعب نهائي مونديال 2022؟", opts: ["البيت", "لوسيل", "خليفة", "الجنوب"], c: 1 },
-            { q: "ما هي جنسية هالاند؟", opts: ["سويدي", "نرويجي", "دنماركي", "ألماني"], c: 1 },
-            { q: "من هو النادي الملقب بالسيدة العجوز؟", opts: ["يوفنتوس", "نابولي", "تورينو", "فيورنتينا"], c: 0 },
-            { q: "كم عدد لاعبي البدلاء المسموح بهم حالياً في المباريات الدولية؟", opts: ["3", "4", "5", "6"], c: 2 },
-            { q: "أين يقع مقر الفيفا؟", opts: ["باريس", "لندن", "زيورخ", "مدريد"], c: 2 },
-            { q: "من هو الهداف التاريخي لمنتخب البرتغال؟", opts: ["أوزيبيو", "فيغو", "رونالدو", "باوليتا"], c: 2 },
-            { q: "ما هي الدولة المستضيفة لكأس العالم 2026؟", opts: ["المغرب", "أمريكا/كندا/المكسيك", "الصين", "أستراليا"], c: 1 }
+        const DB_FOOT = [
+            {q:"هداف ريال مدريد التاريخي؟", o:["رونالدو","راؤول","بنزيما","دي ستيفانو"], c:0},
+            {q:"مدة مباراة كرة القدم؟", o:["45","90","100","60"], c:1},
+            {q:"بطل كأس العالم 2022؟", o:["فرنسا","البرازيل","الأرجنتين","ألمانيا"], c:2},
+            {q:"من هو 'الروسونيري'؟", o:["إنتر","ميلان","روما","يوفي"], c:1},
+            {q:"أين نشأت كرة القدم؟", o:["البرازيل","إنجلترا","إيطاليا","ألمانيا"], c:1},
+            {q:"لون بطاقة الطرد؟", o:["أصفر","أحمر","أزرق","أبيض"], c:1},
+            {q:"من هو 'البرغوث'؟", o:["رونالدو","ميسي","نيمار","صلاح"], c:1},
+            {q:"عدد اللاعبين بالملعب؟", o:["10","11","12","9"], c:1},
+            {q:"بطل أبطال أوروبا 2024؟", o:["الريال","دورتموند","السيتي","بايرن"], c:0},
+            {q:"العنكبوت الأسود؟", o:["بوفون","ياشين","كاسياس","نوير"], c:1},
+            {q:"الأكثر تتويجاً بالأبطال؟", o:["ميلان","ليفربول","الريال","بايرن"], c:2},
+            {q:"أين أقيم مونديال 2010؟", o:["البرازيل","جنوب أفريقيا","ألمانيا","فرنسا"], c:1},
+            {q:"مدرب السيتي 2024؟", o:["كلوب","غوارديولا","أنشيلوتي","مورينيو"], c:1},
+            {q:"الكرة الذهبية 2007؟", o:["كاكا","رونالدو","ميسي","زيدان"], c:0},
+            {q:"أقدم نادي في العالم؟", o:["شيفيلد","نوتغهام","أستون فيلا","ليفربول"], c:0},
+            {q:"عدد كؤوس عالم البرازيل؟", o:["4","5","6","3"], c:1},
+            {q:"صاحب هدف 'يد الله'؟", o:["بيليه","مارادونا","روماريو","زيدان"], c:1},
+            {q:"ملعب برشلونة؟", o:["بيرنابيو","كامب نو","أنفيلد","ويمبلي"], c:1},
+            {q:"حقق المونديال لاعب ومدرب؟", o:["مارادونا","ديشامب","بلاتيني","رونالدو"], c:1},
+            {q:"هداف الدوري الإنجليزي التاريخي؟", o:["روني","شيرر","كين","أغويرو"], c:1},
+            {q:"تأسس ريال مدريد؟", o:["1899","1902","1905","1910"], c:1},
+            {q:"أكبر نتيجة بنهائي مونديال؟", o:["5-2","4-2","3-0","7-1"], c:0},
+            {q:"فاز بـ 3 كؤوس عالم؟", o:["بيليه","رونالدو","كافو","مارادونا"], c:0},
+            {q:"لم يهبط للدرجة الثانية بإيطاليا؟", o:["يوفي","ميلان","إنتر","روما"], c:2},
+            {q:"أهداف محرز في موسم المعجزة؟", o:["15","17","19","21"], c:1},
+            {q:"بطل يورو 2004؟", o:["البرتغال","اليونان","إسبانيا","فرنسا"], c:1},
+            {q:"أول منتخب عربي بالمونديال؟", o:["المغرب","تونس","مصر","السعودية"], c:2},
+            {q:"من هو 'الظاهرة'؟", o:["كرستيانو","رونالدو نازاريو","رونالدينيو","مبابي"], c:1},
+            {q:"الغواصات الصفراء؟", o:["قادش","فياريال","دورتموند","نانت"], c:1},
+            {q:"هدف فرنسا الذهبي يورو 2000؟", o:["زيدان","تريزيغيه","هنري","بيريس"], c:1},
+            {q:"وزن الكرة الذهبية؟", o:["5 كغ","7 كغ","12 كغ","3 كغ"], c:1},
+            {q:"مدرب 3 أبطال متتالية؟", o:["غوارديولا","زيدان","فيرغسون","مورينيو"], c:1},
+            {q:"خسر 3 نهائيات مونديال؟", o:["هولندا","ألمانيا","الأرجنتين","إيطاليا"], c:0},
+            {q:"هداف المونديال التاريخي؟", o:["بيليه","كلوزه","رونالدو","مولر"], c:1},
+            {q:"دقيقة هدف راموس بالعاشرة؟", o:["90","92:48","93:20","91:15"], c:1},
+            {q:"الهابطون بالدوري الإنجليزي؟", o:["2","3","4","1"], c:1},
+            {q:"أول أفريقي بالكرة الذهبية؟", o:["دروغبا","ويا","إيتو","صلاح"], c:1},
+            {q:"ملعب نهائي 2022؟", o:["البيت","لوسيل","خليفة","الجنوب"], c:1},
+            {q:"جنسية هالاند؟", o:["سويدي","نرويجي","دنماركي","ألماني"], c:1},
+            {q:"السيدة العجوز؟", o:["يوفنتوس","نابولي","تورينو","فيورنتينا"], c:0}
         ];
 
-        // --- 2. محرك اللعبة (Game Engine) ---
-        const app = {
-            state: {
-                mode: null,
-                questions: [],
-                qIndex: 0,
+        // --- APP ENGINE ---
+        const App = {
+            data: {
+                mode: '', // 'iq' or 'football'
+                qList: [],
+                idx: 0,
                 score: 0,
-                timer: null,
-                timeLeft: 0,
-                maxTime: 0,
-                isProcessing: false,
+                lvlScore: 0,
                 level: 1,
-                levelScore: 0
+                timer: null,
+                timeMax: 0,
+                timeNow: 0,
+                locked: false
             },
 
-            initGame: function(mode) {
-                this.state.mode = mode;
-                this.state.score = 0;
-                this.state.qIndex = 0;
-                
-                document.getElementById('home-screen').classList.remove('active');
-                document.getElementById('game-screen').classList.add('active');
-                document.getElementById('level-screen').classList.remove('active');
-                document.getElementById('result-screen').classList.remove('active');
+            // 1. Start Game
+            init: function(mode) {
+                this.data.mode = mode;
+                this.data.score = 0;
+                this.data.idx = 0;
+                this.data.lvlScore = 0;
+                this.data.level = 1;
 
-                if (mode === 'iq') {
-                    this.state.maxTime = 30;
-                    this.state.questions = [...IQ_DB]; 
-                    this.state.level = 0;
-                    this.renderQuestion();
+                // Setup Mode
+                if(mode === 'iq') {
+                    this.data.qList = [...DB_IQ]; // Clone
+                    this.data.timeMax = 30;
                 } else {
-                    this.state.maxTime = 15;
-                    this.state.level = 1;
-                    this.state.levelScore = 0;
-                    // خلط الأسئلة وسحب 40 على الأقل
-                    let shuffled = [...FOOTBALL_POOL].sort(() => 0.5 - Math.random());
-                    this.state.questions = shuffled;
-                    this.startLevel(1);
+                    this.data.qList = [...DB_FOOT].sort(() => Math.random() - 0.5); // Shuffle
+                    this.data.timeMax = 15;
+                }
+
+                this.showScreen('screen-game');
+                this.renderQ();
+            },
+
+            // 2. Render Question
+            renderQ: function() {
+                const d = this.data;
+                const qObj = d.qList[d.idx];
+                d.locked = false;
+
+                // Check End of Array
+                if(!qObj) { this.finishGame(true); return; }
+
+                // Update UI Header
+                if(d.mode === 'iq') {
+                    document.getElementById('game-info-left').innerText = "IQ Test";
+                    document.getElementById('game-info-right').innerText = (d.idx + 1) + " / 25";
+                    document.getElementById('timer-bar').style.stroke = "var(--primary)";
+                } else {
+                    let qInLvl = (d.idx % 10) + 1;
+                    document.getElementById('game-info-left').innerText = "المرحلة " + d.level;
+                    document.getElementById('game-info-right').innerText = qInLvl + " / 10";
+                    document.getElementById('timer-bar').style.stroke = "var(--football)";
+                }
+
+                // Inject Text
+                document.getElementById('q-text').innerText = qObj.q;
+                
+                // Inject Options
+                const area = document.getElementById('opts-area');
+                area.innerHTML = '';
+                qObj.o.forEach((txt, i) => {
+                    let btn = document.createElement('div');
+                    btn.className = 'opt';
+                    btn.innerText = txt;
+                    btn.onclick = () => this.check(i, btn);
+                    area.appendChild(btn);
+                });
+
+                this.startTimer();
+            },
+
+            // 3. Timer Logic
+            startTimer: function() {
+                clearInterval(this.data.timer);
+                this.data.timeNow = this.data.timeMax;
+                this.updateTimerUI();
+
+                this.data.timer = setInterval(() => {
+                    this.data.timeNow--;
+                    this.updateTimerUI();
+                    if(this.data.timeNow <= 0) this.timeOut();
+                }, 1000);
+            },
+
+            updateTimerUI: function() {
+                const bar = document.getElementById('timer-bar');
+                const txt = document.getElementById('timer-txt');
+                const pct = this.data.timeNow / this.data.timeMax;
+                const dash = 176 - (176 * pct); // 176 is circumference approx
+
+                bar.style.strokeDashoffset = dash;
+                txt.innerText = this.data.timeNow;
+
+                if(this.data.timeNow <= 5) bar.style.stroke = "var(--danger)";
+            },
+
+            // 4. Check Answer
+            check: function(userIdx, btnElement) {
+                if(this.data.locked) return;
+                this.data.locked = true;
+                clearInterval(this.data.timer);
+
+                const correctIdx = this.data.qList[this.data.idx].c;
+                const isCorrect = (userIdx === correctIdx);
+                const allOpts = document.querySelectorAll('.opt');
+
+                // Visuals
+                allOpts.forEach(o => o.classList.add('disabled'));
+                allOpts[correctIdx].classList.add('correct');
+                if(!isCorrect && btnElement) btnElement.classList.add('wrong');
+
+                // Logic
+                if(isCorrect) {
+                    this.data.score++;
+                    if(this.data.mode === 'football') this.data.lvlScore++;
+                }
+
+                setTimeout(() => this.next(), 1000);
+            },
+
+            timeOut: function() {
+                this.check(-1, null);
+            },
+
+            // 5. Next Logic
+            next: function() {
+                this.data.idx++;
+                const mode = this.data.mode;
+
+                if(mode === 'iq') {
+                    if(this.data.idx < 25) this.renderQ();
+                    else this.finishGame();
+                } 
+                else {
+                    // Football Level Check (Every 10 Qs)
+                    if(this.data.idx > 0 && this.data.idx % 10 === 0) {
+                        this.checkLevel();
+                    } else {
+                        this.renderQ();
+                    }
                 }
             },
 
-            startLevel: function(lvl) {
-                this.state.level = lvl;
-                this.state.levelScore = 0;
-                document.getElementById('level-screen').classList.remove('active');
-                document.getElementById('game-screen').classList.add('active');
-                this.renderQuestion();
+            // 6. Football Leveling
+            checkLevel: function() {
+                const s = this.data.lvlScore;
+                const lvl = this.data.level;
+                let pass = false;
+                let req = 0;
+
+                if(lvl===1 && s>=5) { pass=true; req="المطلوب: 6 إجابات"; } // Next req
+                else if(lvl===2 && s>=6) { pass=true; req="المطلوب: 8 إجابات"; }
+                else if(lvl===3 && s>=8) { pass=true; req="المطلوب: 9 إجابات"; }
+                else if(lvl===4 && s>=9) { this.finishGame(true); return; } // WINNER
+
+                if(pass) {
+                    // Show Level Screen
+                    this.showScreen('screen-level');
+                    document.getElementById('lvl-msg').innerText = `أجبت على ${s}/10 صحيح. \n ${req} للمرحلة القادمة.`;
+                } else {
+                    // Game Over
+                    this.finishGame(false);
+                }
             },
 
-            renderQuestion: function() {
-                this.state.isProcessing = false;
-                this.state.timeLeft = this.state.maxTime;
-                
-                let currentQObj = this.state.questions[this.state.qIndex];
-                
-                // تحديث الواجهة
-                if (this.state.mode === 'football') {
-                    let qInLevel = (this.state.qIndex % 10) + 1;
-                    document.getElementById('header-left').innerText = `🏆 المرحلة ${this.state.level}`;
-                    document.getElementById('header-right').innerText = `سؤال ${qInLevel}/10`;
-                    document.getElementById('timer-progress').style.stroke = "var(--football-main)";
-                    // إذا لم نجد سؤالاً (نهاية المصفوفة)، ننهي اللعبة فوراً
-                    if(!currentQObj) { this.endGameFootball(true); return; }
+            nextLevel: function() {
+                this.data.level++;
+                this.data.lvlScore = 0; // Reset level score
+                this.showScreen('screen-game');
+                this.renderQ();
+            },
+
+            // 7. Finish
+            finishGame: function(win) {
+                this.showScreen('screen-result');
+                const title = document.getElementById('res-title');
+                const score = document.getElementById('res-score');
+                const desc = document.getElementById('res-desc');
+                const icon = document.getElementById('res-emoji');
+
+                if(this.data.mode === 'iq') {
+                    // IQ Calc
+                    let iq = 80 + (this.data.score * 3);
+                    if(iq > 145) iq = 145;
+                    icon.innerText = "🧠";
+                    title.innerText = "IQ Result";
+                    score.innerText = iq;
+                    desc.innerText = iq >= 120 ? "عبقري! أداء استثنائي." : "نتيجة جيدة، يمكن تحسينها.";
                 } else {
-                    document.getElementById('header-left').innerText = "🧠 اختبار IQ";
-                    document.getElementById('header-right').innerText = `سؤال ${this.state.qIndex + 1}/25`;
-                    document.getElementById('timer-progress').style.stroke = "var(--primary)";
-                }
-
-                document.getElementById('question-text').innerText = currentQObj.q;
-
-                const container = document.getElementById('options-container');
-                container.innerHTML = '';
-                currentQObj.opts.forEach((opt, i) => {
-                    const div = document.createElement('div');
-                    div.className = 'option-card';
-                    div.id = `opt-${i}`;
-                    div.innerHTML = `<span>${opt}</span>`;
-                    div.onclick = () => this.checkAnswer(i);
-  
+                    // Foot Calc
+                    score.innerText = win ? "🏆" : "❌";
+                    title.innerText = win ? "الأسطورة" : "انتهت اللعبة";
+                    icon.innerTe
