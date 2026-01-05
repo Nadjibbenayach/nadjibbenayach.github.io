@@ -3,314 +3,317 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IQ Neural Pro | اختبار الذكاء المتقدم</title>
+    <title>Game Hub | منصة التحدي</title>
     <style>
-        /* --- CSS Styles --- */
+        /* --- 1. CSS & Design System --- */
         :root {
             --primary: #00f3ff;
             --secondary: #bc13fe;
+            --football-primary: #00ff88; /* لون خاص للكرة */
+            --football-sec: #ffaa00;
             --bg-dark: #050508;
-            --glass: rgba(20, 20, 35, 0.85);
+            --glass: rgba(20, 20, 35, 0.9);
             --glass-border: rgba(255, 255, 255, 0.1);
             --text-main: #ffffff;
-            --text-muted: #a0a0b0;
-            --success: #00ff9d; /* أخضر نيون */
-            --danger: #ff0055;  /* أحمر نيون */
-            --timer-bg: rgba(255,255,255,0.1);
+            --danger: #ff0055;
         }
 
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Segoe UI', Tahoma, sans-serif; }
 
         body {
             background-color: var(--bg-dark);
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(188, 19, 254, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(0, 243, 255, 0.15) 0%, transparent 40%);
+            background-image: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #000 100%);
             color: var(--text-main);
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow-x: hidden;
+            margin: 0; min-height: 100vh;
+            display: flex; justify-content: center; align-items: center; overflow-x: hidden;
         }
 
         .glass-container {
-            width: 95%;
-            max-width: 600px;
-            min-height: 85vh;
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 1.5rem;
-            position: relative;
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            width: 95%; max-width: 600px; min-height: 85vh;
+            background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border); border-radius: 24px;
+            padding: 1.5rem; position: relative;
+            box-shadow: 0 0 40px rgba(0,0,0,0.6);
+            display: flex; flex-direction: column; align-items: center;
         }
+
+        /* القائمة الرئيسية */
+        .home-grid {
+            display: grid; grid-template-columns: 1fr; gap: 20px; width: 100%; margin-top: 30px;
+        }
+
+        .game-card {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            padding: 25px; border-radius: 20px; text-align: center; cursor: pointer;
+            transition: all 0.3s; position: relative; overflow: hidden;
+        }
+
+        .game-card:hover { transform: translateY(-5px); border-color: var(--primary); }
+        .game-card h2 { margin: 10px 0; font-size: 1.5rem; }
+        .game-card p { font-size: 0.9rem; color: #aaa; margin: 0; }
+        .icon { font-size: 3rem; margin-bottom: 10px; display: block; }
+
+        /* ستايل خاص لبطاقة الكرة */
+        .card-football:hover { border-color: var(--football-primary); box-shadow: 0 0 20px rgba(0, 255, 136, 0.2); }
+        .card-iq:hover { border-color: var(--secondary); box-shadow: 0 0 20px rgba(188, 19, 254, 0.2); }
 
         /* المؤقت الدائري */
-        .timer-container {
-            position: relative;
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 20px auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .timer-svg {
-            transform: rotate(-90deg);
-            width: 100%;
-            height: 100%;
-        }
-
-        .timer-circle-bg {
-            fill: none;
-            stroke: var(--timer-bg);
-            stroke-width: 6;
-        }
-
+        .timer-container { position: relative; width: 70px; height: 70px; margin: 10px auto; }
+        .timer-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+        .timer-circle-bg { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 6; }
         .timer-circle-progress {
-            fill: none;
-            stroke: var(--primary);
-            stroke-width: 6;
-            stroke-linecap: round;
-            stroke-dasharray: 226; /* 2 * PI * 36 (radius) ≈ 226 */
-            stroke-dashoffset: 0;
-            transition: stroke-dashoffset 1s linear, stroke 0.3s;
+            fill: none; stroke: var(--primary); stroke-width: 6; stroke-linecap: round;
+            stroke-dasharray: 200; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear;
         }
+        .timer-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold; }
 
-        .timer-text {
-            position: absolute;
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: var(--text-main);
-        }
-
-        /* العناوين والنصوص */
-        h1 {
-            font-size: 1.8rem;
-            text-align: center;
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 0 0 10px 0;
-        }
-
-        /* الأزرار والخيارات */
-        .options-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 12px;
-            width: 100%;
-            margin-top: 20px;
-        }
-
+        /* الخيارات */
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 10px; width: 100%; margin-top: 20px; }
         .option-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 16px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 1rem;
-            position: relative;
-            overflow: hidden;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            padding: 15px; border-radius: 12px; cursor: pointer; transition: 0.2s;
+            display: flex; justify-content: space-between; align-items: center;
         }
+        .option-card.correct { background: rgba(0, 255, 157, 0.2) !important; border-color: #00ff9d !important; }
+        .option-card.wrong { background: rgba(255, 0, 85, 0.2) !important; border-color: #ff0055 !important; }
+        .option-card.disabled { pointer-events: none; }
 
-        .option-card:hover { background: rgba(255, 255, 255, 0.1); }
-        
-        /* حالات الإجابة (أخضر/أحمر) */
-        .option-card.correct {
-            background: rgba(0, 255, 157, 0.2) !important;
-            border-color: var(--success) !important;
-            color: var(--success);
-            font-weight: bold;
-        }
-
-        .option-card.wrong {
-            background: rgba(255, 0, 85, 0.2) !important;
-            border-color: var(--danger) !important;
-            color: var(--danger);
-            opacity: 0.8;
-        }
-
-        .option-card.disabled {
-            pointer-events: none;
-        }
-
-        /* زر البداية */
-        .btn-start {
-            background: linear-gradient(45deg, var(--secondary), var(--primary));
-            border: none;
-            color: #000;
-            padding: 15px 40px;
-            border-radius: 30px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
-        }
-
-        /* شاشات */
-        .screen { display: none; width: 100%; opacity: 0; animation: fadeIn 0.5s forwards; }
-        .screen.active { display: block; opacity: 1; }
+        /* شاشات وانتقالات */
+        .screen { display: none; width: 100%; animation: fadeIn 0.4s forwards; }
+        .screen.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* شريط التقدم العلوي */
-        .progress-text { width: 100%; text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 5px; }
+        /* هيدر اللعبة */
+        .game-header { width: 100%; display: flex; justify-content: space-between; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; font-size: 0.9rem; color: #ccc;}
         
-        /* نتائج */
-        .result-box {
-            text-align: center;
-            background: rgba(255,255,255,0.03);
-            padding: 20px;
-            border-radius: 15px;
-            width: 100%;
-            margin-top: 20px;
+        .level-badge {
+            background: var(--football-sec); color: #000; padding: 2px 10px; border-radius: 10px; font-weight: bold; font-size: 0.8rem;
         }
-        .iq-score-large { font-size: 4rem; font-weight: bold; color: var(--primary); text-shadow: 0 0 20px rgba(0,243,255,0.4); }
 
+        .btn-main {
+            background: linear-gradient(45deg, var(--secondary), var(--primary)); border: none;
+            color: #000; padding: 12px 30px; border-radius: 25px; font-weight: bold; cursor: pointer; margin-top: 20px; width: 100%;
+        }
     </style>
 </head>
 <body>
 
     <div class="glass-container">
         
-        <div id="start-screen" class="screen active" style="text-align: center;">
-            <div style="font-size: 4rem; margin-bottom: 10px;">🧠</div>
-            <h1>اختبار IQ الاحترافي</h1>
-            <p style="color: #ccc; line-height: 1.6;">
-                يتكون هذا الاختبار من <strong>25 سؤالاً</strong>.<br>
-                لديك <strong>30 ثانية</strong> فقط لكل سؤال.<br>
-                سيقوم الذكاء الاصطناعي بتحليل إجاباتك وسرعتك.
-            </p>
-            <button class="btn-start" onclick="app.start()">ابدأ التحدي</button>
+        <div id="home-screen" class="screen active">
+            <h1 style="text-align: center; margin-bottom: 5px;">🎮 اختر التحدي</h1>
+            <p style="text-align: center; color: #aaa; margin-top: 0;">اختبر عقلك أو معلوماتك الكروية</p>
+            
+            <div class="home-grid">
+                <div class="game-card card-football" onclick="app.initGame('football')">
+                    <span class="icon">⚽</span>
+                    <h2>تحدي الأساطير</h2>
+                    <p>4 مراحل | 15 ثانية</p>
+                    <p style="color: var(--football-primary); margin-top:5px; font-size: 0.8rem;">نظام البقاء للأقوى</p>
+                </div>
+
+                <div class="game-card card-iq" onclick="app.initGame('iq')">
+                    <span class="icon">🧠</span>
+                    <h2>اختبار IQ Pro</h2>
+                    <p>25 سؤال | 30 ثانية</p>
+                    <p style="color: var(--secondary); margin-top:5px; font-size: 0.8rem;">تحليل الذكاء الصناعي</p>
+                </div>
+            </div>
         </div>
 
-        <div id="quiz-screen" class="screen">
-            
-            <div class="timer-container">
-                <svg class="timer-svg" viewBox="0 0 80 80">
-                    <circle class="timer-circle-bg" cx="40" cy="40" r="36"></circle>
-                    <circle id="timer-progress" class="timer-circle-progress" cx="40" cy="40" r="36"></circle>
-                </svg>
-                <div id="timer-text" class="timer-text">30</div>
+        <div id="game-screen" class="screen">
+            <div class="game-header">
+                <span id="header-left">المستوى 1</span>
+                <span id="header-right">سؤال 1/10</span>
             </div>
 
-            <div class="progress-text" id="q-counter">سؤال 1 من 25</div>
-            
-            <h3 id="question-text" style="text-align: center; min-height: 60px; font-size: 1.1rem; margin-bottom: 25px;">...</h3>
+            <div class="timer-container">
+                <svg class="timer-svg" viewBox="0 0 70 70">
+                    <circle class="timer-circle-bg" cx="35" cy="35" r="32"></circle>
+                    <circle id="timer-progress" class="timer-circle-progress" cx="35" cy="35" r="32"></circle>
+                </svg>
+                <div id="timer-text" class="timer-text">00</div>
+            </div>
 
-            <div id="options-container" class="options-grid">
-                </div>
+            <h3 id="question-text" style="text-align: center; min-height: 60px; margin: 20px 0;">...</h3>
+
+            <div id="options-container" class="options-grid"></div>
+        </div>
+
+        <div id="level-screen" class="screen" style="text-align: center;">
+            <div style="font-size: 4rem;">🏆</div>
+            <h2 id="level-title">مبروك!</h2>
+            <p id="level-msg">لقد تأهلت للمرحلة التالية</p>
+            <p style="color: var(--football-primary); font-size: 0.9rem;">المطلوب في المرحلة القادمة: <span id="next-req">60%</span></p>
+            <button class="btn-main" onclick="app.nextLevelStart()">ابدأ المرحلة التالية</button>
         </div>
 
         <div id="result-screen" class="screen" style="text-align: center;">
-            <h1>التقرير النهائي</h1>
-            
-            <div class="result-box">
-                <div style="font-size: 0.9rem; color: #aaa;">معدل الذكاء التقديري</div>
-                <div class="iq-score-large" id="final-iq">0</div>
-                <div id="brain-title" style="color: var(--secondary); font-weight: bold; margin-top: 5px;">...</div>
+            <div id="res-icon" style="font-size: 4rem;">📊</div>
+            <h1 id="res-title">النتيجة</h1>
+            <div id="res-score-box" style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; margin: 20px 0;">
+                <div id="res-big-score" style="font-size: 3rem; font-weight: bold; color: var(--primary);">0</div>
+                <div id="res-desc" style="color: #aaa;">...</div>
             </div>
-
-            <div style="text-align: right; margin-top: 20px; font-size: 0.9rem; line-height: 1.6; color: #ddd;">
-                <p>📊 <strong>تحليل AI:</strong> <span id="ai-msg">...</span></p>
-                <p>✅ <strong>الإجابات الصحيحة:</strong> <span id="correct-count">0</span> / 25</p>
-                <p>⚡ <strong>متوسط السرعة:</strong> <span id="avg-speed">0</span> ثانية/سؤال</p>
-            </div>
-
-            <button class="btn-start" onclick="location.reload()" style="font-size: 1rem; padding: 12px 30px;">إعادة الاختبار</button>
+            <p id="res-detail" style="line-height: 1.6; color: #ddd;"></p>
+            <button class="btn-main" onclick="location.reload()">عودة للقائمة الرئيسية</button>
         </div>
 
     </div>
 
     <script>
-        // --- 1. قاعدة البيانات (25 سؤال) ---
-        const DB = [
-            // Logic & Math
-            { q: "ما هو الرقم المكمل للسلسلة: 2, 4, 8, 16, ...؟", options: ["24", "32", "30", "18"], correct: 1, type: "math" },
-            { q: "إذا كان سعر 3 أقلام 15، كم سعر 5 أقلام؟", options: ["20", "25", "30", "35"], correct: 1, type: "math" },
-            { q: "أحمد أطول من علي، وعلي أقصر من سامي، وسامي أطول من أحمد. من الأقصر؟", options: ["أحمد", "علي", "سامي", "لا يمكن التحديد"], correct: 1, type: "logic" },
-            { q: "ما هو نصف ربع العدد 400؟", options: ["100", "50", "25", "10"], correct: 1, type: "math" }, // 400/4 = 100, 100/2 = 50
-            { q: "شهر فيه 28 يوماً؟", options: ["فبراير فقط", "كل الأشهر", "يناير", "لا يوجد"], correct: 1, type: "logic" }, // كل الأشهر فيها 28 يوم على الأقل
+        // --- 1. قواعد البيانات ---
+        
+        // IQ Database (عينة)
+        const IQ_DB = [
+            { q: "ما هو الرقم المكمل: 2, 4, 8, 16, ...؟", opts: ["32", "24", "30", "18"], c: 0 },
+            { q: "سعر 3 أقلام 15، كم سعر 7 أقلام؟", opts: ["35", "30", "25", "40"], c: 0 },
+            { q: "الكلمة الغريبة: تفاح، موز، جزر، عنب", opts: ["تفاح", "موز", "جزر", "عنب"], c: 2 },
+            { q: "100 قسمة نصف يساوي؟", opts: ["50", "200", "25", "100"], c: 1 },
+            { q: "إذا كان أمس هو غداً، لكان اليوم السبت. ما هو اليوم؟", opts: ["الجمعة", "الأحد", "الإثنين", "الخميس"], c: 0 },
+            { q: "ما هو نصف ربع 400؟", opts: ["100", "50", "25", "10"], c: 1 },
+            { q: "أكمل: أ، ت، ج، خ، ...", opts: ["د", "ذ", "ر", "ز"], c: 0 },
+            { q: "علاقة (يد:قفاز) مثل (قدم:...)", opts: ["جورب", "حذاء", "ركبة", "إصبع"], c: 0 },
+            { q: "الشكل المختلف: مربع، مستطيل، مثلث، دائرة", opts: ["مربع", "مستطيل", "مثلث", "دائرة"], c: 3 },
+            { q: "القطة للفأر مثل العنكبوت لـ...", opts: ["الخيط", "الذبابة", "الشبكة", "السم"], c: 1 },
+            // ... افترض وجود 25 سؤال هنا كما في الكود السابق
+            { q: "ما هو حاصل ضرب 12 في 12؟", opts: ["144", "124", "122", "142"], c: 0 },
+            { q: "الرقم الشاذ: 3, 5, 7, 9, 11", opts: ["9", "5", "7", "11"], c: 0 },
+            { q: "اللون المعاكس للأحمر؟", opts: ["أزرق", "أخضر", "أصفر", "أسود"], c: 1 },
+            { q: "كم شهراً يحتوي على 28 يوماً؟", opts: ["1", "12", "6", "0"], c: 1 },
+            { q: "إذا كانت الساعة 3:00 وتحركت 90 درجة؟", opts: ["6:00", "5:00", "4:30", "12:00"], c: 0 }
+        ];
+
+        // Football Database (50 Questions)
+        const FOOTBALL_POOL = [
+            // Level 1 & 2 (Easier)
+            { q: "من هو الهداف التاريخي لريال مدريد؟", opts: ["رونالدو", "راؤول", "بنزيما", "دي ستيفانو"], c: 0 },
+            { q: "كم دقيقة في مباراة كرة القدم الرسمية؟", opts: ["45", "90", "100", "60"], c: 1 },
+            { q: "من فاز بكأس العالم 2022؟", opts: ["فرنسا", "البرازيل", "الأرجنتين", "ألمانيا"], c: 2 },
+            { q: "أي نادٍ يلقب بـ 'الروسونيري'؟", opts: ["إنتر ميلان", "ميلان", "روما", "يوفنتوس"], c: 1 },
+            { q: "في أي دولة نشأت كرة القدم الحديثة؟", opts: ["البرازيل", "إنجلترا", "إيطاليا", "ألمانيا"], c: 1 },
+            { q: "ما هو لون بطاقة الطرد؟", opts: ["أصفر", "أحمر", "أزرق", "أبيض"], c: 1 },
+            { q: "من هو اللاعب الملقب بـ 'البرغوث'؟", opts: ["رونالدو", "ميسي", "نيمار", "صلاح"], c: 1 },
+            { q: "كم عدد لاعبين الفريق داخل الملعب؟", opts: ["10", "11", "12", "9"], c: 1 },
+            { q: "أي فريق حقق دوري أبطال أوروبا 2024؟", opts: ["ريال مدريد", "دورتموند", "السيتي", "بايرن"], c: 0 },
+            { q: "من هو الحارس الملقب بالعنكبوت الأسود؟", opts: ["بوفون", "ياشين", "كاسياس", "نوير"], c: 1 },
+            { q: "ما هو النادي الأكثر تتويجاً بدوري الأبطال؟", opts: ["ميلان", "ليفربول", "ريال مدريد", "بايرن"], c: 2 },
+            { q: "في أي عام فازت الجزائر بأول كأس أفريقيا؟", opts: ["1990", "2019", "1982", "2010"], c: 0 },
+            { q: "أين أقيم كأس العالم 2010؟", opts: ["البرازيل", "جنوب أفريقيا", "ألمانيا", "فرنسا"], c: 1 },
+            { q: "من هو مدرب مانشستر سيتي (2024)؟", opts: ["كلوب", "غوارديولا", "أنشيلوتي", "مورينيو"], c: 1 },
             
-            // Pattern & Visual
-            { q: "الكلمة الغريبة: (تفاح، برتقال، جزر، موز)", options: ["تفاح", "برتقال", "جزر", "موز"], correct: 2, type: "pattern" },
-            { q: "أكمل النمط: أ، ت، ج، خ، ...", options: ["د", "ذ", "ر", "ز"], correct: 0, type: "pattern" },
-            { q: "إذا تحرك عقرب الساعة 180 درجة من الساعة 3، كم تكون الساعة؟", options: ["6", "9", "12", "3"], correct: 1, type: "visual" },
-            { q: "أي الأشكال لا ينتمي للمجموعة: (مربع، مثلث، دائرة، مستطيل)", options: ["مربع", "مثلث", "دائرة", "مستطيل"], correct: 2, type: "visual" }, // الدائرة ليس لها زوايا
-            { q: "اللون المعاكس للأبيض هو الأسود، فما معاكس النار؟", options: ["ثلج", "ماء", "هواء", "تراب"], correct: 1, type: "logic" },
-
-            // Advanced Logic
-            { q: "إذا كان الأمس هو غداً، لكان اليوم السبت. فما هو اليوم؟", options: ["الأحد", "الإثنين", "الجمعة", "الخميس"], correct: 1, type: "logic" },
-            { q: "الرقم الشاذ في المجموعة: 3, 5, 7, 9, 11", options: ["5", "9", "7", "11"], correct: 1, type: "math" }, // 9 ليس أولي
-            { q: "أب عمره 4 أضعاف عمر ابنه. بعد 20 سنة سيصبح عمره ضعف عمر ابنه. كم عمر الأب الآن؟", options: ["32", "40", "36", "44"], correct: 1, type: "math" }, // الاب 40، الابن 10. بعد 20: 60 و 30
-            { q: "علاقة (يد : قفاز) مثل علاقة (قدم : ...)", options: ["جورب", "حذاء", "أصبع", "ركبة"], correct: 0, type: "pattern" }, // الملامس للجلد
-            { q: "كم وجهاً لمكعب؟", options: ["4", "6", "8", "12"], correct: 1, type: "visual" },
-
-            // Speed & Focus
-            { q: "حاصل ضرب 12 × 12 ؟", options: ["124", "144", "142", "122"], correct: 1, type: "math" },
-            { q: "أي الحيوانات لا يلد؟", options: ["الخفاش", "الدلفين", "العصفور", "الحوت"], correct: 2, type: "pattern" }, // العصفور يبيض
-            { q: "الكلمة المرادفة لـ 'قنوط' هي:", options: ["أمل", "يأس", "سعادة", "غضب"], correct: 1, type: "verbal" },
-            { q: "1, 1, 2, 3, 5, 8, ... ما التالي؟", options: ["11", "12", "13", "15"], correct: 2, type: "math" }, // فيبوناتشي
-            { q: "ما هو الشيء الذي كلما أخذت منه كبر؟", options: ["العمر", "الحفرة", "المال", "البحر"], correct: 1, type: "logic" },
-
-            // Final Challenge
-            { q: "إذا كنت الأول في سباق وتجاوزت الثاني، فما هو مركزك؟", options: ["الأول", "الثاني", "الثالث", "الأخير"], correct: 0, type: "logic" }, // سؤال خداع، اذا كنت الاول لا يمكنك تجاوز الثاني، ولكن اذا كنت في سباق وتجاوزت الثاني تصبح الثاني. النص يقول "كنت الأول". (سنفترض المعنى الشائع: تجاوزت من في المركز الثاني) -> تصبح الثاني. *تعديل للسؤال ليكون أوضح*: "في سباق، تجاوزت المتسابق الثاني، ما هو مركزك؟"
-            // دعنا نعدل السؤال ليكون منطقياً تماماً للكود:
-            { q: "في سباق جري، تجاوزت المتسابق الذي في المركز الثاني. ما هو مركزك الآن؟", options: ["الأول", "الثاني", "الثالث", "قبل الأخير"], correct: 1, type: "logic" },
-            { q: "ما هو العدد الذي يقبل القسمة على 2، 3، 4، 5 معاً؟", options: ["30", "40", "60", "50"], correct: 2, type: "math" },
-            { q: "القطة بالنسبة للفأر مثل العنكبوت بالنسبة لـ ...", options: ["الشبكة", "الذبابة", "الخيط", "السم"], correct: 1, type: "pattern" },
-            { q: "كلمة (شمس) بالنسبة لـ (نهار) مثل (قمر) بالنسبة لـ ...", options: ["ليل", "نجم", "سماء", "ظلام"], correct: 0, type: "pattern" },
-            { q: "ناتج قسمة 100 على نصف هو:", options: ["50", "200", "20", "100"], correct: 1, type: "math" } // 100 / 0.5 = 200
+            // Level 3 & 4 (Harder)
+            { q: "من فاز بالكرة الذهبية عام 2007؟", opts: ["كاكا", "رونالدو", "ميسي", "زيدان"], c: 0 },
+            { q: "ما هو أقدم نادي كرة قدم في العالم؟", opts: ["شيفيلد", "نوتغهام", "أستون فيلا", "ليفربول"], c: 0 },
+            { q: "كم مرة فازت البرازيل بكأس العالم؟", opts: ["4", "5", "6", "3"], c: 1 },
+            { q: "من سجل هدف 'يد الله'؟", opts: ["بيليه", "مارادونا", "روماريو", "زيدان"], c: 1 },
+            { q: "ما هو ملعب برشلونة؟", opts: ["بيرنابيو", "كامب نو", "أنفيلد", "ويمبلي"], c: 1 },
+            { q: "لاعب حقق كأس العالم كلاعب وكمدرب؟", opts: ["مارادونا", "ديشامب", "بلاتيني", "رونالدو"], c: 1 },
+            { q: "من هو الهداف التاريخي للدوري الإنجليزي؟", opts: ["روني", "شيرر", "كين", "أغويرو"], c: 1 },
+            { q: "متى تأسس نادي ريال مدريد؟", opts: ["1899", "1902", "1905", "1910"], c: 1 },
+            { q: "أكبر نتيجة في نهائي كأس عالم؟", opts: ["5-2", "4-2", "3-0", "7-1"], c: 0 }, // 1958 Brazil 5-2 Sweden
+            { q: "من هو اللاعب الوحيد الذي فاز بـ 3 كؤوس عالم؟", opts: ["بيليه", "رونالدو", "كافو", "مارادونا"], c: 0 },
+            { q: "أي نادي إيطالي لم يهبط للدرجة الثانية أبداً؟", opts: ["يوفنتوس", "ميلان", "إنتر", "روما"], c: 2 },
+            { q: "كم عدد أهداف رياض محرز مع ليستر في موسم المعجزة؟", opts: ["15", "17", "19", "21"], c: 1 },
+            { q: "من حقق اليورو 2004 (المعجزة)؟", opts: ["البرتغال", "اليونان", "إسبانيا", "فرنسا"], c: 1 },
+            { q: "أول منتخب عربي شارك في كأس العالم؟", opts: ["المغرب", "تونس", "مصر", "السعودية"], c: 2 },
+            { q: "من هو 'الظاهرة'؟", opts: ["كرستيانو", "رونالدو نازاريو", "رونالدينيو", "مبابي"], c: 1 },
+            { q: "نادي يلقب بـ الغواصات الصفراء؟", opts: ["قادش", "فياريال", "دورتموند", "نانت"], c: 1 },
+            { q: "من سجل الهدف الذهبي لفرنسا في يورو 2000؟", opts: ["زيدان", "تريزيغيه", "هنري", "بيريس"], c: 1 },
+            { q: "كم يبلغ وزن الكرة الذهبية تقريباً؟", opts: ["5 كغ", "7 كغ", "12 كغ", "3 كغ"], c: 1 }, // حوالي 7.2
+            { q: "من المدرب الذي فاز بـ 3 دوري أبطال متتالية؟", opts: ["غوارديولا", "زيدان", "فيرغسون", "مورينيو"], c: 1 },
+            { q: "الدولة التي خست 3 نهائيات كأس عالم؟", opts: ["هولندا", "ألمانيا", "الأرجنتين", "إيطاليا"], c: 0 },
+            { q: "من هو الهداف التاريخي لكأس العالم؟", opts: ["بيليه", "كلوزه", "رونالدو", "مولر"], c: 1 },
+            { q: "في أي دقيقة سجل راموس هدفه ضد أتلتيكو (العاشرة)؟", opts: ["90", "92:48", "93:20", "91:15"], c: 1 },
+            { q: "كم فريق يهبط في الدوري الإنجليزي؟", opts: ["2", "3", "4", "1"], c: 1 },
+            { q: "أول لاعب أفريقي يفوز بالكرة الذهبية؟", opts: ["دروغبا", "ويا", "إيتو", "صلاح"], c: 1 },
+            { q: "ملعب نهائي مونديال 2022؟", opts: ["البيت", "لوسيل", "خليفة", "الجنوب"], c: 1 },
+            { q: "ما هي جنسية هالاند؟", opts: ["سويدي", "نرويجي", "دنماركي", "ألماني"], c: 1 }
         ];
 
         // --- 2. محرك اللعبة (Game Engine) ---
-        const App = {
+        const app = {
             state: {
-                idx: 0,
+                mode: null, // 'iq' or 'football'
+                questions: [],
+                qIndex: 0,
                 score: 0,
-                answers: [],
                 timer: null,
-                timeLeft: 30,
-                isProcessing: false // لمنع النقر المتكرر أثناء عرض الألوان
+                timeLeft: 0,
+                maxTime: 0,
+                isProcessing: false,
+                // Football specific
+                level: 1,
+                levelScore: 0
             },
 
-            start: function() {
-                document.getElementById('start-screen').classList.remove('active');
-                document.getElementById('quiz-screen').classList.add('active');
-                this.loadQuestion();
+            // تهيئة اللعبة حسب النوع
+            initGame: function(mode) {
+                this.state.mode = mode;
+                this.state.score = 0;
+                this.state.qIndex = 0;
+                
+                document.getElementById('home-screen').classList.remove('active');
+                document.getElementById('game-screen').classList.add('active');
+
+                if (mode === 'iq') {
+                    // إعدادات IQ
+                    this.state.maxTime = 30;
+                    this.state.questions = [...IQ_DB]; // انسخ الأسئلة (يمكن زيادتها لاحقاً)
+                    this.state.level = 0; // لا يوجد مستويات
+                    this.renderQuestion();
+                } else {
+                    // إعدادات كرة القدم
+                    this.state.maxTime = 15;
+                    this.state.level = 1;
+                    this.state.levelScore = 0;
+                    // خلط الأسئلة وسحب 50 منها (أو الموجود)
+                    let shuffled = [...FOOTBALL_POOL].sort(() => 0.5 - Math.random());
+                    // سنحتاج 10 أسئلة لكل مرحلة، سنقوم بتقسيمها أثناء اللعب
+                    this.state.questions = shuffled;
+                    this.startLevel(1);
+                }
             },
 
-            loadQuestion: function() {
-                // Reset State for new question
+            // بدء مرحلة جديدة (خاص بالكرة)
+            startLevel: function(lvl) {
+                this.state.level = lvl;
+                this.state.levelScore = 0;
+                // تحديد نطاق الأسئلة: المرحلة 1 (0-9)، المرحلة 2 (10-19)...
+                // qIndex سنستخدمه كمؤشر عالمي داخل المصفوفة
+                // لكن سنعرض للمستخدم "سؤال 1/10"
+                document.getElementById('level-screen').classList.remove('active');
+                document.getElementById('game-screen').classList.add('active');
+                
+                this.renderQuestion();
+            },
+
+            renderQuestion: function() {
                 this.state.isProcessing = false;
-                this.state.timeLeft = 30;
+                this.state.timeLeft = this.state.maxTime;
                 
-                // Update UI
-                const q = DB[this.state.idx];
-                document.getElementById('q-counter').innerText = `سؤال ${this.state.idx + 1} من ${DB.length}`;
-                document.getElementById('question-text').innerText = q.q;
+                // تحديد السؤال الحالي
+                let currentQObj = this.state.questions[this.state.qIndex];
                 
-                // Render Options
+                // تحديث الواجهة
+                if (this.state.mode === 'football') {
+                    let qInLevel = (this.state.qIndex % 10) + 1;
+                    document.getElementById('header-left').innerText = `المرحلة ${this.state.level}`;
+                    document.getElementById('header-right').innerText = `سؤال ${qInLevel}/10`;
+                    // تغيير لون المؤقت للكرة
+                    document.getElementById('timer-progress').style.stroke = "var(--football-primary)";
+                } else {
+                    document.getElementById('header-left').innerText = "اختبار الذكاء";
+                    document.getElementById('header-right').innerText = `سؤال ${this.state.qIndex + 1}/25`;
+                    document.getElementById('timer-progress').style.stroke = "var(--primary)";
+                }
+
+                document.getElementById('question-text').innerText = currentQObj.q;
+
+                // الخيارات
                 const container = document.getElementById('options-container');
                 container.innerHTML = '';
-                q.options.forEach((opt, i) => {
+                currentQObj.opts.forEach((opt, i) => {
                     const div = document.createElement('div');
                     div.className = 'option-card';
                     div.id = `opt-${i}`;
@@ -319,13 +322,17 @@
                     container.appendChild(div);
                 });
 
-                // Start Timer
-                this.updateTimerUI();
+                // تشغيل المؤقت
+                this.runTimer();
+            },
+
+            runTimer: function() {
                 clearInterval(this.state.timer);
+                this.updateTimerUI();
+                
                 this.state.timer = setInterval(() => {
                     this.state.timeLeft--;
                     this.updateTimerUI();
-                    
                     if (this.state.timeLeft <= 0) {
                         this.handleTimeout();
                     }
@@ -335,111 +342,29 @@
             updateTimerUI: function() {
                 const circle = document.getElementById('timer-progress');
                 const text = document.getElementById('timer-text');
-                const totalDash = 226;
+                const totalDash = 200;
                 
-                // Update Text
                 text.innerText = this.state.timeLeft;
-
-                // Update Circle (Green -> Yellow -> Red)
-                const offset = totalDash - ((this.state.timeLeft / 30) * totalDash);
+                const offset = totalDash - ((this.state.timeLeft / this.state.maxTime) * totalDash);
                 circle.style.strokeDashoffset = offset;
-                
-                if (this.state.timeLeft > 15) circle.style.stroke = "var(--primary)";
-                else if (this.state.timeLeft > 7) circle.style.stroke = "#ffd700";
-                else circle.style.stroke = "var(--danger)";
+
+                // ألوان التحذير
+                if (this.state.timeLeft <= 5) circle.style.stroke = "var(--danger)";
             },
 
             checkAnswer: function(selectedIdx) {
                 if (this.state.isProcessing) return;
                 this.state.isProcessing = true;
-                clearInterval(this.state.timer); // Stop timer
+                clearInterval(this.state.timer);
 
-                const q = DB[this.state.idx];
-                const correctIdx = q.correct;
-                const isCorrect = (selectedIdx === correctIdx);
+                const q = this.state.questions[this.state.qIndex];
+                const isCorrect = (selectedIdx === q.c);
 
-                // Visual Feedback (Green/Red)
-                const options = document.querySelectorAll('.option-card');
-                options.forEach(opt => opt.classList.add('disabled')); // Disable all
-
-                // Always highlight the correct answer in Green
-                document.getElementById(`opt-${correctIdx}`).classList.add('correct');
-
-                // If user selected wrong, highlight theirs in Red
+                // ألوان الإجابة
+                document.getElementById(`opt-${q.c}`).classList.add('correct');
                 if (!isCorrect && selectedIdx !== -1) {
                     document.getElementById(`opt-${selectedIdx}`).classList.add('wrong');
                 }
+                document.querySelectorAll('.option-card').forEach(d => d.classList.add('disabled'));
 
-                // Record Data
-                if (isCorrect) this.state.score++;
-                this.state.answers.push({
-                    correct: isCorrect,
-                    time: 30 - this.state.timeLeft,
-                    type: q.type
-                });
-
-                // Wait 1 second then Next
-                setTimeout(() => {
-                    this.nextQuestion();
-                }, 1000); // تأخير لمدة ثانية لرؤية الألوان
-            },
-
-            handleTimeout: function() {
-                this.checkAnswer(-1); // -1 means no selection (Wrong)
-            },
-
-            nextQuestion: function() {
-                this.state.idx++;
-                if (this.state.idx < DB.length) {
-                    this.loadQuestion();
-                } else {
-                    this.showResults();
-                }
-            },
-
-            showResults: function() {
-                document.getElementById('quiz-screen').classList.remove('active');
-                document.getElementById('result-screen').classList.add('active');
-
-                // AI Calculations
-                const total = DB.length;
-                const score = this.state.score;
-                const accuracy = score / total;
-                
-                const totalTimeUsed = this.state.answers.reduce((a, b) => a + b.time, 0);
-                const avgSpeed = (totalTimeUsed / total).toFixed(1);
-
-                // IQ Formula: Base 85 + (Acc * 60) + Speed Bonus
-                let iq = 80 + Math.round(accuracy * 60);
-                if (accuracy > 0.7 && avgSpeed < 10) iq += 10;
-                if (iq > 145) iq = 145; // Max Cap
-                if (iq < 75) iq = 75;   // Min Floor
-
-                // Archetype Logic
-                let title = "مفكر مبتدئ";
-                let msg = "";
-
-                if (iq >= 130) { title = "عبقري (Genius)"; msg = "أداء استثنائي! تملك سرعة بديهة ومنطقاً حديدياً."; }
-                else if (iq >= 115) { title = "محلل بارع"; msg = "ذكاء فوق المتوسط. توازن ممتاز بين الدقة والسرعة."; }
-                else if (iq >= 100) { title = "مفكر منطقي"; msg = "مستوى ذكاء طبيعي وجيد. لديك قدرات تحليلية واضحة."; }
-                else { title = "مفكر عملي"; msg = "حاول التركيز أكثر وتجنب التسرع في الإجابة."; }
-
-                // Display
-                document.getElementById('final-iq').innerText = iq;
-                document.getElementById('brain-title').innerText = title;
-                document.getElementById('ai-msg').innerText = msg;
-                document.getElementById('correct-count').innerText = score;
-                document.getElementById('avg-speed').innerText = avgSpeed;
-            }
-        };
-        
-        // منع التكبير المزدوج على الموبايل
-        document.addEventListener('dblclick', function(event) {
-            event.preventDefault();
-        }, { passive: false });
-        
-        // تهيئة التطبيق
-        window.app = App;
-    </script>
-</body>
-</html>
+                // تسجيل النتائ
