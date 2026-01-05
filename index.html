@@ -3,163 +3,208 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mastermind Ultimate</title>
+<title>MASTER AI QUIZ ENGINE</title>
 
 <style>
 :root{
---bg:#0a0a0a;
---primary:#00ff9d;
---danger:#ff004c;
---card:rgba(255,255,255,.06);
---text:#fff;
+--bg:#050505;--card:#101010;--accent:#00ff9d;
+--danger:#ff004c;--text:#fff;
 }
-*{box-sizing:border-box;font-family:Segoe UI;user-select:none}
+*{box-sizing:border-box;font-family:Segoe UI}
 body{
-margin:0;height:100vh;background:#000;color:var(--text);
-display:flex;justify-content:center;align-items:center;
+margin:0;height:100vh;background:var(--bg);
+display:flex;justify-content:center;align-items:center;color:var(--text)
 }
-.app{width:100%;max-width:500px;height:100%;position:relative}
-.screen{
-position:absolute;inset:0;display:none;
-flex-direction:column;align-items:center;justify-content:center;
-padding:20px;
-}
+#app{width:100%;max-width:520px;height:100%;position:relative;background:#000}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;
+justify-content:center;align-items:center;padding:20px}
 .screen.active{display:flex}
-.card{
-width:100%;background:var(--card);padding:20px;
-border-radius:14px;margin:10px 0;cursor:pointer
-}
 .btn{
-background:var(--primary);border:none;
-padding:14px 40px;border-radius:40px;
-font-size:1.1rem;font-weight:bold;cursor:pointer
+background:var(--accent);color:#000;border:none;
+padding:14px 40px;border-radius:40px;font-weight:bold
 }
-.opt{
-width:100%;padding:15px;border-radius:10px;
-background:rgba(255,255,255,.08);
-margin:6px 0;text-align:center;cursor:pointer
+.option{
+width:100%;padding:15px;border-radius:12px;
+background:rgba(255,255,255,.08);margin:6px 0;cursor:pointer
 }
-.opt.correct{background:rgba(0,255,157,.25)}
-.opt.wrong{background:rgba(255,0,76,.25)}
-.hud{
-position:absolute;top:0;width:100%;
-display:flex;justify-content:space-between;
-padding:12px;background:#0009
+.option.correct{background:rgba(0,255,157,.4)}
+.option.wrong{background:rgba(255,0,76,.4)}
+#hud{
+position:absolute;top:0;width:100%;display:flex;
+justify-content:space-between;padding:10px;background:#000c
 }
-.timer{font-size:1.4rem;margin:20px}
 </style>
 </head>
 
 <body>
-<div class="app">
+<div id="app">
 
 <!-- HOME -->
-<div id="home" class="screen active">
-<h1>MASTERMIND</h1>
-<div class="card" onclick="ENGINE.start('football')">⚽ تحدي كرة القدم</div>
-<div class="card" onclick="ENGINE.start('iq')">🧠 اختبار الذكاء</div>
+<div id="scr-home" class="screen active">
+<h1>MASTER AI</h1>
+<button class="btn" onclick="GAME.start('iq')">🧠 اختبار الذكاء</button>
+<button class="btn" onclick="GAME.start('football')">⚽ كرة القدم</button>
 </div>
 
 <!-- GAME -->
-<div id="game" class="screen">
-<div class="hud">
-<span id="lvl">LEVEL 1</span>
-<span id="prog">1/10</span>
+<div id="scr-game" class="screen">
+<div id="hud">
+<span id="lvl"></span>
+<span id="timer"></span>
 </div>
-<div class="timer" id="timer">15</div>
-<div id="question"></div>
+<h2 id="question"></h2>
 <div id="options"></div>
 </div>
 
-<!-- PASS -->
-<div id="pass" class="screen">
-<h1>🎉 مستوى مكتمل</h1>
-<button class="btn" onclick="ENGINE.next()">المستوى التالي</button>
-</div>
-
 <!-- RESULT -->
-<div id="result" class="screen">
-<h1 id="resTitle"></h1>
-<h2 id="resScore"></h2>
+<div id="scr-result" class="screen">
+<h1>النتيجة</h1>
+<h2 id="score"></h2>
 <button class="btn" onclick="location.reload()">الرئيسية</button>
 </div>
 
 </div>
 
 <script>
-// ================= DATABASE =================
-const DB = {
-football: DB_FOOT,   // ضع قاعدة كرة القدم هنا كاملة
-iq: RAW_IQ           // ضع قاعدة الذكاء هنا كاملة
+/* =====================================================
+   QUESTION GENERATOR (IQ + FOOTBALL)
+===================================================== */
+
+function generateIQ(){
+let arr=[];
+let id=0;
+for(let l=1;l<=4;l++){
+for(let i=1;i<=120;i++){
+let a=Math.floor(Math.random()*20)+1;
+let b=Math.floor(Math.random()*20)+1;
+let correct=a+b;
+arr.push({
+id:"iq_"+(id++),
+level:l,
+q:`ما ناتج ${a} + ${b} ؟`,
+o:[correct,correct+1,correct-1,correct+2].sort(()=>Math.random()-0.5),
+c:0
+});
+arr[arr.length-1].c=
+arr[arr.length-1].o.indexOf(correct);
+}}
+return arr;
+}
+
+function generateFootball(){
+const facts=[
+["كم عدد اللاعبين؟",["9","10","11","12"],2],
+["كأس العالم كل كم سنة؟",["2","3","4","5"],2],
+["أكثر منتخب فاز بالمونديال؟",["ألمانيا","إيطاليا","البرازيل","فرنسا"],2],
+["مدة المباراة؟",["80","85","90","100"],2]
+];
+let arr=[];
+let id=0;
+for(let l=1;l<=4;l++){
+for(let i=0;i<facts.length;i++){
+arr.push({
+id:"fb_"+(id++),
+level:l,
+q:facts[i][0],
+o:facts[i][1],
+c:facts[i][2]
+});
+}}
+return arr;
+}
+
+const DB={
+iq:generateIQ(),          // ≈ 480 سؤال
+football:generateFootball() // ×4 مستويات
 };
 
-// ================= ENGINE =================
-const ENGINE = {
-mode:null, level:1, idx:0, score:0, pool:[], timer:null, time:15,
+/* =====================================================
+   NO REPEAT AI
+===================================================== */
 
-start(mode){
-this.mode=mode;this.level=1;this.score=0;
-this.loadLevel();
+const USED={
+session:new Set(),
+global:()=>new Set(JSON.parse(localStorage.getItem("USED")||"[]")),
+mark(id){
+this.session.add(id);
+let g=this.global();g.add(id);
+localStorage.setItem("USED",JSON.stringify([...g]));
+},
+used(id){
+return this.session.has(id)||this.global().has(id);
+}
+};
+
+/* =====================================================
+   GAME ENGINE
+===================================================== */
+
+const GAME={
+mode:null,level:1,index:0,score:0,pool:[],time:15,timer:null,
+
+start(m){
+this.mode=m;this.level=1;this.index=0;this.score=0;
+USED.session.clear();
+this.load();
+this.show("game");
 },
 
-loadLevel(){
-this.pool = DB[this.mode].filter(q=>q[0]===this.level)
-.sort(()=>Math.random()-0.5).slice(0,10);
-this.idx=0;
-this.show('game');
+load(){
+this.pool=DB[this.mode]
+.filter(q=>q.level===this.level&&!USED.used(q.id))
+.sort(()=>Math.random()-0.5)
+.slice(0,10);
+this.index=0;
 this.render();
 },
 
 render(){
-if(!this.pool[this.idx]){ this.finish(true); return; }
-document.getElementById('lvl').innerText='LEVEL '+this.level;
-document.getElementById('prog').innerText=(this.idx+1)+'/10';
-document.getElementById('question').innerText=this.pool[this.idx][1];
-
-let opts='';
-for(let i=0;i<4;i++){
-opts+=`<div class="opt" onclick="ENGINE.answer(${i},this)">
-${this.pool[this.idx][2+i]}</div>`;
-}
-document.getElementById('options').innerHTML=opts;
+if(!this.pool[this.index]){this.end();return;}
+let q=this.pool[this.index];
+document.getElementById("lvl").innerText="LEVEL "+this.level;
+document.getElementById("question").innerText=q.q;
+document.getElementById("options").innerHTML=
+q.o.map((t,i)=>`<div class="option"
+onclick="GAME.answer(${i},this)">${t}</div>`).join("");
 this.runTimer();
-},
-
-answer(i,el){
-clearInterval(this.timer);
-let c=this.pool[this.idx][6];
-document.querySelectorAll('.opt').forEach(o=>o.classList.add('disabled'));
-if(i===c){el.classList.add('correct');this.score++}
-else{el.classList.add('wrong')}
-setTimeout(()=>{this.idx++;this.render()},800);
 },
 
 runTimer(){
 clearInterval(this.timer);
-this.time=this.mode==='iq'?30:15;
-document.getElementById('timer').innerText=this.time;
+this.time=15;
+document.getElementById("timer").innerText=this.time;
 this.timer=setInterval(()=>{
 this.time--;
-document.getElementById('timer').innerText=this.time;
-if(this.time<=0){clearInterval(this.timer);this.idx++;this.render()}
+document.getElementById("timer").innerText=this.time;
+if(this.time<=0){clearInterval(this.timer);this.next();}
 },1000);
 },
 
-next(){
-this.level++;
-if(this.level>4)this.finish(true);
-else this.loadLevel();
+answer(i,el){
+clearInterval(this.timer);
+let q=this.pool[this.index];
+USED.mark(q.id);
+if(i===q.c){el.classList.add("correct");this.score+=10}
+else{
+el.classList.add("wrong");
+document.querySelectorAll(".option")[q.c].classList.add("correct");
+}
+setTimeout(()=>this.next(),800);
 },
 
-finish(win){
-this.show('result');
-document.getElementById('resTitle').innerText=win?'🏆 فوز':'❌ خسارة';
-document.getElementById('resScore').innerText='النتيجة: '+this.score;
+next(){
+this.index++;
+this.render();
+},
+
+end(){
+this.show("result");
+document.getElementById("score").innerText="النقاط: "+this.score;
 },
 
 show(id){
-document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-document.getElementById(id).classList.add('active');
+document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+document.getElementById("scr-"+id).classList.add("active");
 }
 };
 </script>
