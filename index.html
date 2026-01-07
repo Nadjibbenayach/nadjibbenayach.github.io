@@ -1,517 +1,410 @@
-nonoo<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ألعاب الذكاء</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحدي العباقرة</title>
     <style>
-        /* نفس التنسيقات (CSS) التي قدمتها سابقاً تم الاحتفاظ بها لأنها ممتازة */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: linear-gradient(135deg, #0c2461, #1e3799); color: white; min-height: 100vh; padding: 15px; overflow-x: hidden; }
-        .container { max-width: 600px; margin: 0 auto; }
-        header { text-align: center; padding: 20px 0; margin-bottom: 20px; border-bottom: 2px solid rgba(255, 255, 255, 0.1); }
-        h1 { font-size: 28px; margin-bottom: 10px; color: #f9ca24; text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); }
-        .subtitle { font-size: 16px; color: #ddd; }
-        .game-selector { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; }
-        .game-btn { padding: 14px 20px; font-size: 18px; background: rgba(255, 255, 255, 0.1); color: white; border: none; border-radius: 12px; cursor: pointer; transition: all 0.3s; flex: 1; min-width: 150px; }
-        .game-btn:hover, .game-btn.active { background: linear-gradient(to right, #e74c3c, #e67e22); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4); }
-        .game-container { background: rgba(0, 0, 0, 0.3); border-radius: 15px; padding: 20px; margin-bottom: 20px; display: none; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); backdrop-filter: blur(10px); }
-        .game-container.active { display: block; animation: fadeIn 0.5s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
-        .game-title { font-size: 24px; color: #f9ca24; margin-bottom: 10px; }
-        .game-stats { display: flex; gap: 10px; flex-wrap: wrap; }
-        .stat-box { background: rgba(255, 255, 255, 0.1); padding: 5px 15px; border-radius: 10px; text-align: center; min-width: 80px; }
-        .stat-value { font-size: 20px; font-weight: bold; color: #2ecc71; }
-        .stat-label { font-size: 12px; color: #aaa; }
-        .timer { font-size: 32px; font-weight: bold; text-align: center; padding: 10px; background: rgba(231, 76, 60, 0.2); border-radius: 12px; margin-bottom: 20px; border: 2px solid rgba(231, 76, 60, 0.5); color: #ff7979; }
-        .question-box { background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 20px; margin-bottom: 25px; }
-        .question-number { color: #3498db; font-weight: bold; margin-bottom: 10px; font-size: 18px; }
-        .question-text { font-size: 20px; line-height: 1.5; margin-bottom: 25px; min-height: 60px; }
-        .options-container { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
-        .option-btn { padding: 15px 20px; background: rgba(255, 255, 255, 0.08); border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 12px; color: white; font-size: 18px; text-align: right; cursor: pointer; transition: all 0.2s; }
-        .option-btn:hover { background: rgba(255, 255, 255, 0.15); transform: translateX(-5px); }
-        .option-btn.selected { background: rgba(52, 152, 219, 0.3); border-color: #3498db; }
-        .option-btn.correct { background: rgba(46, 204, 113, 0.3); border-color: #2ecc71; }
-        .option-btn.incorrect { background: rgba(231, 76, 60, 0.3); border-color: #e74c3c; }
-        .option-btn.disabled { pointer-events: none; opacity: 0.7; }
-        .game-controls { display: flex; justify-content: space-between; margin-top: 20px; }
-        .control-btn { padding: 15px 25px; font-size: 18px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; transition: all 0.3s; width: 100%; }
-        .start-btn { background: linear-gradient(to right, #3498db, #2980b9); color: white; }
-        .next-btn { background: linear-gradient(to right, #2ecc71, #27ae60); color: white; display: none; }
-        .control-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .result-screen { text-align: center; padding: 30px 20px; display: none; }
-        .result-screen.active { display: block; }
-        .result-title { font-size: 28px; color: #f9ca24; margin-bottom: 20px; }
-        .result-score { font-size: 60px; font-weight: bold; color: #2ecc71; margin-bottom: 15px; }
-        .restart-btn { background: linear-gradient(to right, #e74c3c, #c0392b); color: white; padding: 15px 40px; font-size: 20px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; margin-top: 20px; width: 100%; }
-        .levels-container { display: flex; justify-content: space-between; gap: 5px; margin-bottom: 25px; }
-        .level-box { flex: 1; padding: 10px 5px; background: rgba(255, 255, 255, 0.1); border-radius: 10px; text-align: center; opacity: 0.5; transition: 0.3s; }
-        .level-box.active { opacity: 1; background: rgba(241, 196, 15, 0.3); border: 2px solid #f1c40f; transform: scale(1.05); }
-        .level-name { font-weight: bold; font-size: 14px; }
-        .level-requirement { font-size: 10px; color: #aaa; }
-        .ai-info { background: rgba(155, 89, 182, 0.2); border-radius: 10px; padding: 15px; margin-top: 25px; border-right: 4px solid #9b59b6; }
+        /* تنسيقات CSS */
+        :root { --main-color: #2c3e50; --accent-color: #e67e22; --success: #27ae60; --error: #c0392b; --text: #ecf0f1; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--main-color); color: var(--text); padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 600px; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
         
-        /* إخفاء عناصر اللعبة عند ظهور النتيجة */
-        .game-play-area.hidden { display: none; }
+        /* الرأس والأزرار */
+        header h1 { text-align: center; color: #f1c40f; margin-bottom: 20px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab-btn { flex: 1; padding: 15px; border: none; border-radius: 8px; background: #34495e; color: white; font-size: 16px; cursor: pointer; transition: 0.3s; }
+        .tab-btn.active { background: var(--accent-color); font-weight: bold; transform: scale(1.02); }
+        
+        /* مناطق اللعب */
+        .game-section { display: none; }
+        .game-section.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* احصائيات ومؤقت */
+        .stats-bar { display: flex; justify-content: space-between; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; margin-bottom: 15px; }
+        .timer-box { text-align: center; font-size: 24px; font-weight: bold; margin: 15px 0; color: #e74c3c; background: #fff; border-radius: 50%; width: 50px; height: 50px; line-height: 50px; margin: 10px auto; }
+        
+        /* السؤال والخيارات */
+        .question-text { font-size: 18px; text-align: center; margin-bottom: 20px; min-height: 50px; line-height: 1.4; }
+        .options-grid { display: flex; flex-direction: column; gap: 10px; }
+        .option-btn { padding: 15px; background: #34495e; border: 2px solid transparent; border-radius: 8px; color: white; text-align: right; cursor: pointer; font-size: 16px; transition: 0.2s; }
+        .option-btn:hover { background: #3d566e; }
+        
+        /* حالات الإجابة */
+        .option-btn.correct { background: rgba(39, 174, 96, 0.3); border-color: #2ecc71; }
+        .option-btn.wrong { background: rgba(192, 57, 43, 0.3); border-color: #e74c3c; }
+        .disabled { pointer-events: none; opacity: 0.8; }
+
+        /* التحكم */
+        .controls { margin-top: 20px; }
+        .action-btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; color: white; }
+        .btn-start { background: #2980b9; }
+        .btn-next { background: #27ae60; display: none; }
+        
+        /* شاشة النتائج */
+        .result-screen { text-align: center; display: none; padding: 20px; }
+        .final-score { font-size: 48px; color: #f1c40f; font-weight: bold; margin: 10px 0; }
+        .btn-restart { background: #c0392b; margin-top: 15px; }
+
+        /* مستويات الكرة */
+        .levels { display: flex; gap: 5px; margin-bottom: 15px; justify-content: center; }
+        .lvl-badge { font-size: 12px; padding: 5px 10px; background: #333; border-radius: 15px; opacity: 0.5; }
+        .lvl-badge.active { opacity: 1; background: #f1c40f; color: #000; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>ألعاب الذكاء والثقافة</h1>
-            <p class="subtitle">اختبر ذكاءك ومعرفتك في كرة القدم</p>
-        </header>
-        
-        <div class="game-selector">
-            <button class="game-btn active" id="btnIq">اختبار الذكاء</button>
-            <button class="game-btn" id="btnFootball">مسابقة القدم</button>
-        </div>
-        
-        <div class="game-container active" id="iqGame">
-            <div class="game-header">
-                <h2 class="game-title">اختبار الذكاء IQ</h2>
-                <div class="game-stats">
-                    <div class="stat-box">
-                        <div class="stat-value" id="iqScore">0</div>
-                        <div class="stat-label">النقاط</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-value" id="iqCurrent">0/10</div>
-                        <div class="stat-label">السؤال</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div id="iqPlayArea" class="game-play-area">
-                <div class="timer" id="iqTimer">20</div>
-                <div class="question-box">
-                    <div class="question-number" id="iqQuestionNum">اضغط بدء</div>
-                    <div class="question-text" id="iqQuestionText">
-                        يتكون الاختبار من أسئلة ذكاء وحساب ومنطق. لديك 20 ثانية لكل سؤال.
-                    </div>
-                    <div class="options-container" id="iqOptions"></div>
-                </div>
-                <div class="game-controls">
-                    <button class="control-btn start-btn" id="startIq">بدء الاختبار</button>
-                    <button class="control-btn next-btn" id="nextIq">السؤال التالي</button>
-                </div>
-            </div>
 
-            <div class="result-screen" id="iqResult">
-                <h2 class="result-title">نتيجتك النهائية</h2>
-                <div class="result-score" id="iqFinalScore">0</div>
-                <div class="result-level" id="iqLevelText">--</div>
-                <p id="iqFeedback" style="color: #ddd; margin-top: 10px;"></p>
-                <button class="restart-btn" id="restartIq">إعادة المحاولة</button>
-            </div>
-        </div>
-        
-        <div class="game-container" id="footballGame">
-            <div class="game-header">
-                <h2 class="game-title">مسابقة كرة القدم</h2>
-                <div class="game-stats">
-                    <div class="stat-box"><div class="stat-value" id="fbScore">0</div><div class="stat-label">النقاط</div></div>
-                    <div class="stat-box"><div class="stat-value" id="fbCurrent">0/5</div><div class="stat-label">السؤال</div></div>
-                </div>
-            </div>
-            
-            <div class="levels-container">
-                <div class="level-box active" id="lvl1"><div class="level-name">سهل</div><div class="level-requirement">نجاح 60%</div></div>
-                <div class="level-box" id="lvl2"><div class="level-name">متوسط</div><div class="level-requirement">نجاح 70%</div></div>
-                <div class="level-box" id="lvl3"><div class="level-name">صعب</div><div class="level-requirement">نجاح 80%</div></div>
-                <div class="level-box" id="lvl4"><div class="level-name">إسطورة</div><div class="level-requirement">نجاح 90%</div></div>
-            </div>
-            
-            <div id="fbPlayArea" class="game-play-area">
-                <div class="timer" id="fbTimer">15</div>
-                <div class="question-box">
-                    <div class="question-number" id="fbQuestionNum">المرحلة 1</div>
-                    <div class="question-text" id="fbQuestionText">
-                        أجب عن الأسئلة الكروية لتنتقل للمستوى التالي!
-                    </div>
-                    <div class="options-container" id="fbOptions"></div>
-                </div>
-                <div class="game-controls">
-                    <button class="control-btn start-btn" id="startFb">بدء المسابقة</button>
-                    <button class="control-btn next-btn" id="nextFb">السؤال التالي</button>
-                </div>
-            </div>
+<div class="container">
+    <header>
+        <h1>🎮 ألعاب الذكاء</h1>
+    </header>
 
-            <div class="result-screen" id="fbResult">
-                <h2 class="result-title" id="fbResultTitle">نتيجة المرحلة</h2>
-                <div class="result-score" id="fbFinalScore">0%</div>
-                <p id="fbFeedback" style="color: #ddd; margin: 15px 0; font-size: 18px;"></p>
-                <button class="restart-btn" id="restartFb">المحاولة مرة أخرى</button>
-                <button class="restart-btn" id="nextLevelBtn" style="display:none; background: linear-gradient(to right, #27ae60, #2ecc71);">المستوى التالي</button>
-            </div>
-        </div>
-
-        <footer>
-            <p>© 2024 - ألعاب الذكاء | تطوير خاص</p>
-        </footer>
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchGame('iq')">🧠 اختبار IQ</button>
+        <button class="tab-btn" onclick="switchGame('football')">⚽ كرة القدم</button>
     </div>
-    
-    <script>
-        // ============ تهيئة الصفحة والتبديل ============
-        const iqGame = document.getElementById('iqGame');
-        const footballGame = document.getElementById('footballGame');
-        const btnIq = document.getElementById('btnIq');
-        const btnFootball = document.getElementById('btnFootball');
 
-        btnIq.addEventListener('click', () => {
-            btnIq.classList.add('active');
-            btnFootball.classList.remove('active');
-            iqGame.classList.add('active');
-            footballGame.classList.remove('active');
+    <div id="iq-game" class="game-section active">
+        <div class="stats-bar">
+            <span>النقاط: <b id="iq-score">0</b></span>
+            <span>السؤال: <b id="iq-count">0/10</b></span>
+        </div>
+        
+        <div id="iq-play-area">
+            <div class="timer-box" id="iq-timer">20</div>
+            <div class="question-text" id="iq-question">اضغط "بدء الاختبار" للانطلاق!</div>
+            <div class="options-grid" id="iq-options"></div>
+            <div class="controls">
+                <button class="action-btn btn-start" id="btn-start-iq" onclick="startIQ()">بدء الاختبار</button>
+                <button class="action-btn btn-next" id="btn-next-iq" onclick="nextIQ()">السؤال التالي</button>
+            </div>
+        </div>
+
+        <div id="iq-result" class="result-screen">
+            <h2>انتهى الاختبار!</h2>
+            <div class="final-score" id="iq-final-score">0</div>
+            <p id="iq-msg"></p>
+            <button class="action-btn btn-restart" onclick="resetIQ()">إعادة المحاولة</button>
+        </div>
+    </div>
+
+    <div id="football-game" class="game-section">
+        <div class="levels">
+            <div class="lvl-badge active" id="lvl-1">سهل</div>
+            <div class="lvl-badge" id="lvl-2">متوسط</div>
+            <div class="lvl-badge" id="lvl-3">صعب</div>
+            <div class="lvl-badge" id="lvl-4">أسطورة</div>
+        </div>
+        <div class="stats-bar">
+            <span>النقاط: <b id="fb-score">0</b></span>
+            <span>المستوى: <b id="fb-lvl-num">1</b></span>
+        </div>
+
+        <div id="fb-play-area">
+            <div class="timer-box" id="fb-timer">15</div>
+            <div class="question-text" id="fb-question">هل أنت جاهز للتحدي الكروي؟</div>
+            <div class="options-grid" id="fb-options"></div>
+            <div class="controls">
+                <button class="action-btn btn-start" id="btn-start-fb" onclick="startFootball(1)">بدء المسابقة</button>
+                <button class="action-btn btn-next" id="btn-next-fb" onclick="nextFB()">السؤال التالي</button>
+            </div>
+        </div>
+
+        <div id="fb-result" class="result-screen">
+            <h2 id="fb-res-title">نتيجة المرحلة</h2>
+            <div class="final-score" id="fb-final-score">0/5</div>
+            <p id="fb-msg"></p>
+            <button class="action-btn btn-restart" id="fb-restart-btn" onclick="resetFootball()">إعادة</button>
+            <button class="action-btn btn-next" id="fb-levelup-btn" style="margin-top:10px; background:#27ae60;" onclick="nextLevelFB()">المستوى التالي ➡</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ================= بيانات الأسئلة =================
+    const iqQuestionsData = [
+        { t: "ما هو الرقم التالي: 2, 4, 8, 16 ... ؟", o: ["18", "20", "24", "32"], a: "32" },
+        { t: "شيء كلما أخذت منه كبر؟", o: ["المال", "الحفرة", "العمر", "الجبل"], a: "الحفرة" },
+        { t: "ما هو حاصل ضرب 7 × 8 ؟", o: ["54", "56", "48", "64"], a: "56" },
+        { t: "أخت خالك وليست خالتك؟", o: ["جدتك", "أمك", "أختك", "عمتك"], a: "أمك" },
+        { t: "شيء له أسنان ولا يعض؟", o: ["المشط", "المنشار", "التمساح", "الشوكة"], a: "المشط" },
+        { t: "10 + 10 × 0 + 10 = ؟", o: ["20", "10", "30", "0"], a: "20" },
+        { t: "ما هو الشيء الذي يكتب ولا يقرأ؟", o: ["القلم", "الكتاب", "العين", "النظارة"], a: "القلم" },
+        { t: "بيت ليس فيه أبواب ولا نوافذ؟", o: ["بيت الشعر", "بيت النمل", "بيت العنكوت", "التابوت"], a: "بيت الشعر" },
+        { t: "أكمل المتتالية: 1, 1, 2, 3, 5, ... ؟", o: ["6", "7", "8", "9"], a: "8" },
+        { t: "شهر ميلادي يحتوي على 28 يوم؟", o: ["فبراير فقط", "كل الشهور", "يناير", "لا يوجد"], a: "كل الشهور" }
+    ];
+
+    const fbQuestionsData = {
+        1: [ // سهل
+            { t: "من فاز بكأس العالم 2022؟", o: ["فرنسا", "الأرجنتين", "البرازيل"], a: "الأرجنتين" },
+            { t: "أين يقع ملعب الكامب نو؟", o: ["مدريد", "برشلونة", "فالنسيا"], a: "برشلونة" },
+            { t: "كم دقيقة مدة مباراة كرة القدم؟", o: ["45", "60", "90"], a: "90" },
+            { t: "لون قميص البرازيل الأساسي؟", o: ["أصفر", "أزرق", "أخضر"], a: "أصفر" },
+            { t: "كم عدد لاعبين الفريق؟", o: ["10", "11", "12"], a: "11" }
+        ],
+        2: [ // متوسط
+            { t: "الهداف التاريخي للبرتغال؟", o: ["فيغو", "رونالدو", "ناني"], a: "رونالدو" },
+            { t: "من هو 'السبيشل ون'؟", o: ["غوارديولا", "مورينيو", "كلوب"], a: "مورينيو" },
+            { t: "فريق فاز بدوري الأبطال 14 مرة؟", o: ["ميلان", "ليفربول", "ريال مدريد"], a: "ريال مدريد" },
+            { t: "اين أقيم كأس العالم 2010؟", o: ["البرازيل", "جنوب أفريقيا", "ألمانيا"], a: "جنوب أفريقيا" },
+            { t: "اللاعب الذي عض كيليني؟", o: ["سواريز", "بيبي", "راموس"], a: "سواريز" }
+        ],
+        3: [ // صعب
+            { t: "من فاز بالكرة الذهبية 2007؟", o: ["ميسي", "كاكا", "رونالدو"], a: "كاكا" },
+            { t: "الهداف التاريخي للمونديال؟", o: ["رونالدو", "بيليه", "كلوزه"], a: "كلوزه" },
+            { t: "تأسس نادي برشلونة عام؟", o: ["1899", "1902", "1900"], a: "1899" },
+            { t: "أكثر منتخب خسر نهائيات كأس عالم؟", o: ["هولندا", "الأرجنتين", "إيطاليا"], a: "ألمانيا" }, // ألمانيا (أو غرب ألمانيا) خسرت 4 مرات
+            { t: "اللاعب الوحيد الفائز بـ 3 مونديالات؟", o: ["بيليه", "مارادونا", "زيدان"], a: "بيليه" }
+        ],
+        4: [ // أسطورة
+            { t: "أول منتخب عربي شارك بالمونديال؟", o: ["مصر", "المغرب", "تونس"], a: "مصر" },
+            { t: "الحارس الملقب بالعنكبوت الأسود؟", o: ["بوفون", "ليف ياشين", "نوير"], a: "ليف ياشين" },
+            { t: "هداف كأس العالم 1958؟", o: ["بيليه", "فونتين", "مولر"], a: "فونتين" },
+            { t: "من سجل أسرع هدف في المونديال؟", o: ["هاكان شوكور", "كلينسمان", "رونالدو"], a: "هاكان شوكور" },
+            { t: "كم مرة فاز ميلان بدوري الأبطال؟", o: ["5", "6", "7"], a: "7" }
+        ]
+    };
+
+    // ================= متغيرات عامة =================
+    let timerInterval;
+    let currentScore = 0;
+    let qIndex = 0;
+    let currentLevel = 1;
+    let currentQuestions = [];
+    let isIQ = true;
+
+    // ================= دوال التبديل =================
+    function switchGame(type) {
+        clearInterval(timerInterval);
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.game-section').forEach(s => s.classList.remove('active'));
+        
+        if (type === 'iq') {
+            document.querySelector("button[onclick=\"switchGame('iq')\"]").classList.add('active');
+            document.getElementById('iq-game').classList.add('active');
+            resetIQ();
+            isIQ = true;
+        } else {
+            document.querySelector("button[onclick=\"switchGame('football')\"]").classList.add('active');
+            document.getElementById('football-game').classList.add('active');
+            resetFootball();
+            isIQ = false;
+        }
+    }
+
+    // ================= منطق IQ =================
+    function startIQ() {
+        currentQuestions = [...iqQuestionsData].sort(() => Math.random() - 0.5); // خلط الأسئلة
+        qIndex = 0;
+        currentScore = 0;
+        document.getElementById('iq-score').innerText = '0';
+        document.getElementById('btn-start-iq').style.display = 'none';
+        document.getElementById('iq-result').style.display = 'none';
+        document.getElementById('iq-play-area').style.display = 'block';
+        showIQQuestion();
+    }
+
+    function showIQQuestion() {
+        if (qIndex >= 10) { endIQ(); return; }
+        
+        const q = currentQuestions[qIndex];
+        document.getElementById('iq-count').innerText = `${qIndex + 1}/10`;
+        document.getElementById('iq-question').innerText = q.t;
+        document.getElementById('btn-next-iq').style.display = 'none';
+        
+        const optsDiv = document.getElementById('iq-options');
+        optsDiv.innerHTML = '';
+        
+        // خلط الخيارات
+        let options = [...q.o].sort(() => Math.random() - 0.5);
+        
+        options.forEach(opt => {
+            const btn = document.createElement('div');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(btn, opt, q.a, 'iq');
+            optsDiv.appendChild(btn);
         });
 
-        btnFootball.addEventListener('click', () => {
-            btnFootball.classList.add('active');
-            btnIq.classList.remove('active');
-            footballGame.classList.add('active');
-            iqGame.classList.remove('active');
+        startTimer(20, 'iq-timer', () => revealCorrectAnswer(q.a, 'iq-options', 'btn-next-iq'));
+    }
+
+    function nextIQ() {
+        qIndex++;
+        showIQQuestion();
+    }
+
+    function endIQ() {
+        document.getElementById('iq-play-area').style.display = 'none';
+        document.getElementById('iq-result').style.display = 'block';
+        document.getElementById('iq-final-score').innerText = currentScore;
+        
+        let msg = "";
+        if (currentScore >= 90) msg = "أنت عبقري! 🧠";
+        else if (currentScore >= 70) msg = "ذكاء ممتاز!";
+        else if (currentScore >= 50) msg = "مستوى جيد";
+        else msg = "حاول مرة أخرى!";
+        document.getElementById('iq-msg').innerText = msg;
+    }
+
+    function resetIQ() {
+        document.getElementById('btn-start-iq').style.display = 'block';
+        document.getElementById('iq-result').style.display = 'none';
+        document.getElementById('iq-question').innerText = "جاهز للاختبار؟";
+        document.getElementById('iq-options').innerHTML = '';
+        document.getElementById('iq-score').innerText = '0';
+        clearInterval(timerInterval);
+    }
+
+    // ================= منطق كرة القدم =================
+    function startFootball(lvl) {
+        currentLevel = lvl;
+        currentQuestions = fbQuestionsData[lvl]; // الأسئلة ثابتة حسب المستوى
+        qIndex = 0;
+        currentScore = 0;
+        
+        // تحديث واجهة المستويات
+        document.querySelectorAll('.lvl-badge').forEach((el, idx) => {
+            el.classList.toggle('active', (idx + 1) === lvl);
+        });
+        
+        document.getElementById('fb-lvl-num').innerText = lvl;
+        document.getElementById('fb-score').innerText = '0';
+        document.getElementById('btn-start-fb').style.display = 'none';
+        document.getElementById('fb-result').style.display = 'none';
+        document.getElementById('fb-play-area').style.display = 'block';
+        
+        showFBQuestion();
+    }
+
+    function showFBQuestion() {
+        if (qIndex >= 5) { endFBLevel(); return; }
+        
+        const q = currentQuestions[qIndex];
+        document.getElementById('fb-question').innerText = q.t;
+        document.getElementById('btn-next-fb').style.display = 'none';
+        
+        const optsDiv = document.getElementById('fb-options');
+        optsDiv.innerHTML = '';
+        
+        let options = [...q.o].sort(() => Math.random() - 0.5);
+        
+        options.forEach(opt => {
+            const btn = document.createElement('div');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(btn, opt, q.a, 'fb');
+            optsDiv.appendChild(btn);
         });
 
-        // ============ منطق لعبة الذكاء (IQ) ============
-        const iqData = {
-            questions: [],
-            current: 0,
-            score: 0,
-            timer: 20,
-            interval: null,
-            isPlaying: false
-        };
+        startTimer(15, 'fb-timer', () => revealCorrectAnswer(q.a, 'fb-options', 'btn-next-fb'));
+    }
 
-        // توليد أسئلة ذكاء عشوائية
-        function generateIqQuestions() {
-            const qs = [];
-            // 1. أسئلة رياضية
-            for(let i=0; i<4; i++) {
-                let a = Math.floor(Math.random()*20)+5;
-                let b = Math.floor(Math.random()*10)+2;
-                let ops = [
-                    {s:'+', r:a+b}, {s:'-', r:a-b}, {s:'×', r:a*b}
-                ];
-                let op = ops[Math.floor(Math.random()*ops.length)];
-                let wrong1 = op.r + Math.floor(Math.random()*5)+1;
-                let wrong2 = op.r - Math.floor(Math.random()*5)-1;
-                qs.push({
-                    t: `ما هو ناتج: ${a} ${op.s} ${b} ؟`,
-                    opts: shuffle([op.r, wrong1, wrong2, op.r+10]),
-                    ans: op.r
-                });
-            }
-            // 2. أسئلة سلاسل
-            qs.push({t: "أكمل السلسلة: 2, 4, 8, 16, ...", opts: ["18", "24", "32", "30"], ans: "32"});
-            qs.push({t: "أكمل السلسلة: 1, 1, 2, 3, 5, ...", opts: ["8", "7", "6", "9"], ans: "8"});
-            // 3. أسئلة منطق
-            qs.push({t: "ما هو الشيء الذي كلما أخذت منه كبر؟", opts: ["المال", "العمر", "الحفرة", "البحر"], ans: "الحفرة"});
-            qs.push({t: "شيء له أسنان ولكنه لا يعض؟", opts: ["المشط", "المنشار", "الطفل", "التمساح"], ans: "المشط"});
-            qs.push({t: "أخت خالك وليست خالتك، من تكون؟", opts: ["جدتك", "أمك", "أختك", "زوجة خالك"], ans: "أمك"});
-            qs.push({t: "ما هو الشيء الذي يكتب ولا يقرأ؟", opts: ["القلم", "الكتاب", "الرسالة", "الهاتف"], ans: "القلم"});
+    function nextFB() {
+        qIndex++;
+        showFBQuestion();
+    }
 
-            return shuffle(qs).slice(0, 10); // نختار 10 أسئلة عشوائية
-        }
-
-        function initIqGame() {
-            document.getElementById('startIq').addEventListener('click', startIqGame);
-            document.getElementById('nextIq').addEventListener('click', nextIqQuestion);
-            document.getElementById('restartIq').addEventListener('click', resetIqGame);
-        }
-
-        function startIqGame() {
-            iqData.questions = generateIqQuestions();
-            iqData.current = 0;
-            iqData.score = 0;
-            iqData.isPlaying = true;
-            document.getElementById('startIq').style.display = 'none';
-            document.getElementById('nextIq').style.display = 'block';
-            document.getElementById('iqPlayArea').classList.remove('hidden');
-            document.getElementById('iqResult').classList.remove('active');
-            renderIqQuestion();
-        }
-
-        function renderIqQuestion() {
-            if(iqData.current >= iqData.questions.length) {
-                endIqGame();
-                return;
-            }
-            
-            clearInterval(iqData.interval);
-            iqData.timer = 20;
-            updateTimer('iqTimer', 20);
-            
-            // بدء المؤقت
-            iqData.interval = setInterval(() => {
-                iqData.timer--;
-                updateTimer('iqTimer', iqData.timer);
-                if(iqData.timer <= 0) {
-                    clearInterval(iqData.interval);
-                    revealAnswer(null, 'iq');
-                }
-            }, 1000);
-
-            const q = iqData.questions[iqData.current];
-            document.getElementById('iqQuestionNum').innerText = `السؤال ${iqData.current + 1} من ${iqData.questions.length}`;
-            document.getElementById('iqCurrent').innerText = `${iqData.current + 1}/${iqData.questions.length}`;
-            document.getElementById('iqQuestionText').innerText = q.t;
-            
-            const optsDiv = document.getElementById('iqOptions');
-            optsDiv.innerHTML = '';
-            
-            q.opts.forEach(opt => {
-                const btn = document.createElement('div');
-                btn.className = 'option-btn';
-                btn.innerText = opt;
-                btn.onclick = () => checkIqAnswer(btn, opt, q.ans);
-                optsDiv.appendChild(btn);
-            });
-            
-            document.getElementById('nextIq').disabled = true;
-        }
-
-        function checkIqAnswer(btn, selected, correct) {
-            if(document.querySelector('#iqOptions .disabled')) return; // منع الضغط المتكرر
-            clearInterval(iqData.interval);
-            
-            const opts = document.querySelectorAll('#iqOptions .option-btn');
-            opts.forEach(o => o.classList.add('disabled'));
-
-            if(selected == correct) {
-                btn.classList.add('correct');
-                iqData.score += 10;
-                document.getElementById('iqScore').innerText = iqData.score;
-            } else {
-                btn.classList.add('incorrect');
-                // تلوين الإجابة الصحيحة
-                opts.forEach(o => { if(o.innerText == correct) o.classList.add('correct'); });
-            }
-            document.getElementById('nextIq').disabled = false;
-        }
-
-        function nextIqQuestion() {
-            iqData.current++;
-            renderIqQuestion();
-        }
-
-        function endIqGame() {
-            clearInterval(iqData.interval);
-            document.getElementById('iqPlayArea').classList.add('hidden');
-            document.getElementById('iqResult').classList.add('active');
-            
-            const score = iqData.score;
-            document.getElementById('iqFinalScore').innerText = score;
-            
-            let level = "";
-            if(score >= 90) level = "عبقري";
-            else if(score >= 70) level = "ذكي جداً";
-            else if(score >= 50) level = "متوسط";
-            else level = "يحتاج تدريب";
-            
-            document.getElementById('iqLevelText').innerText = level;
-            document.getElementById('iqFeedback').innerText = `أجبت بشكل صحيح على ${score/10} من ${iqData.questions.length} أسئلة`;
-        }
-
-        function resetIqGame() {
-            document.getElementById('iqResult').classList.remove('active');
-            document.getElementById('iqPlayArea').classList.remove('hidden');
-            document.getElementById('startIq').style.display = 'block';
-            document.getElementById('nextIq').style.display = 'none';
-            document.getElementById('iqScore').innerText = '0';
-            document.getElementById('iqQuestionText').innerText = 'اضغط بدء للاختبار الجديد';
-            document.getElementById('iqOptions').innerHTML = '';
-        }
-
-        // ============ منطق مسابقة كرة القدم (Levels) ============
-        const fbData = {
-            questions: {
-                1: [ // سهل
-                    {t: "من هو الهداف التاريخي لمنتخب البرتغال؟", opts:["رونالدو", "فيغو", "أوزيبيو"], ans:"رونالدو"},
-                    {t: "من فاز بكأس العالم 2022؟", opts:["فرنسا", "الأرجنتين", "البرازيل"], ans:"الأرجنتين"},
-                    {t: "في أي بلد يقع ملعب الكامب نو؟", opts:["إسبانيا", "إيطاليا", "إنجلترا"], ans:"إسبانيا"},
-                    {t: "ما لون قميص ريال مدريد الأساسي؟", opts:["أحمر", "أبيض", "أزرق"], ans:"أبيض"},
-                    {t: "كم عدد لاعبين الفريق داخل الملعب؟", opts:["10", "11", "12"], ans:"11"}
-                ],
-                2: [ // متوسط
-                    {t: "من هو النادي الأكثر فوزاً بدوري أبطال أوروبا؟", opts:["ميلان", "ليفربول", "ريال مدريد"], ans:"ريال مدريد"},
-                    {t: "في أي سنة فازت الجزائر بكأس أفريقيا في مصر؟", opts:["2010", "2019", "1990"], ans:"2019"},
-                    {t: "من هو المدرب الملقب بالسبيشل ون؟", opts:["غوارديولا", "مورينيو", "كلوب"], ans:"مورينيو"},
-                    {t: "أي نادي يلعب له محمد صلاح؟", opts:["تشيلسي", "ليفربول", "روما"], ans:"ليفربول"},
-                    {t: "من فاز بالكرة الذهبية 2022؟", opts:["بنزيما", "ميسي", "مبابي"], ans:"بنزيما"}
-                ],
-                3: [ // صعب
-                    {t: "من هو الهداف التاريخي لكأس العالم؟", opts:["كلوزه", "رونالدو الظاهرة", "ميسي"], ans:"كلوزه"},
-                    {t: "أي دولة استضافت أول كأس عالم 1930؟", opts:["إيطاليا", "البرازيل", "الأوروغواي"], ans:"الأوروغواي"},
-                    {t: "متى تأسس نادي برشلونة؟", opts:["1899", "1902", "1900"], ans:"1899"},
-                    {t: "من هو اللاعب الوحيد الذي فاز بـ 3 كؤوس عالم؟", opts:["مارادونا", "بيليه", "زيدان"], ans:"بيليه"},
-                    {t: "من هو أصغر لاعب شارك في كأس العالم؟", opts:["بيليه", "نورمان وايتسايد", "إيتو"], ans:"نورمان وايتسايد"}
-                ],
-                4: [ // إسطورة
-                    {t: "من سجل هدف 'يد الرب'؟", opts:["ميسي"
-  {t: "من سجل هدف 'يد الرب'؟", opts:["ميسي", "مارادونا", "بيليه"], ans:"مارادونا"},
-                    {t: "كم مرة فاز ميلان بدوري الأبطال؟", opts:["5", "7", "9"], ans:"7"},
-                    {t: "من هو الحارس الملقب بالعنكبوت الأسود؟", opts:["بوفون", "ليف ياشين", "نوير"], ans:"ليف ياشين"},
-                    {t: "أي فريق فاز بالدوري الإنجليزي بلا هزيمة 2004؟", opts:["أرسنال", "مانشستر", "تشيلسي"], ans:"أرسنال"},
-                    {t: "ما هي جنسية اللاعب هالاند؟", opts:["سويدي", "نرويجي", "دنماركي"], ans:"نرويجي"}
-                ]
-            },
-            level: 1,
-            currentQ: 0,
-            score: 0,
-            timer: 15,
-            interval: null,
-            requirements: {1: 3, 2: 3, 3: 4, 4: 4} // عدد الإجابات الصحيحة المطلوبة من أصل 5
-        };
-
-        function initFootballGame() {
-            document.getElementById('startFb').addEventListener('click', () => startFbLevel(1));
-            document.getElementById('nextFb').addEventListener('click', nextFbQuestion);
-            document.getElementById('restartFb').addEventListener('click', () => {
-                document.getElementById('fbResult').classList.remove('active');
-                document.getElementById('fbPlayArea').classList.remove('hidden');
-                startFbLevel(1);
-            });
-            document.getElementById('nextLevelBtn').addEventListener('click', () => {
-                document.getElementById('fbResult').classList.remove('active');
-                document.getElementById('fbPlayArea').classList.remove('hidden');
-                startFbLevel(fbData.level + 1);
-            });
-        }
-
-        function startFbLevel(lvl) {
-            fbData.level = lvl;
-            fbData.currentQ = 0;
-            fbData.score = 0;
-            
-            // تحديث واجهة المستويات
-            for(let i=1; i<=4; i++) {
-                const el = document.getElementById('lvl'+i);
-                el.classList.remove('active');
-                if(i == lvl) el.classList.add('active');
-            }
-
-            document.getElementById('startFb').style.display = 'none';
-            document.getElementById('nextFb').style.display = 'block';
-            renderFbQuestion();
-        }
-
-        function renderFbQuestion() {
-            const currentSet = fbData.questions[fbData.level];
-            
-            if(fbData.currentQ >= currentSet.length) {
-                endFbLevel();
-                return;
-            }
-
-            clearInterval(fbData.interval);
-            fbData.timer = 15;
-            updateTimer('fbTimer', 15);
-            
-            fbData.interval = setInterval(() => {
-                fbData.timer--;
-                updateTimer('fbTimer', fbData.timer);
-                if(fbData.timer <= 0) {
-                    clearInterval(fbData.interval);
-                    revealAnswer(null, 'fb');
-                }
-            }, 1000);
-
-            const q = currentSet[fbData.currentQ];
-            document.getElementById('fbQuestionNum').innerText = `المرحلة ${fbData.level} - السؤال ${fbData.currentQ+1}`;
-            document.getElementById('fbCurrent').innerText = `${fbData.currentQ+1}/5`;
-            document.getElementById('fbQuestionText').innerText = q.t;
-            
-            const optsDiv = document.getElementById('fbOptions');
-            optsDiv.innerHTML = '';
-            
-            shuffle(q.opts).forEach(opt => {
-                const btn = document.createElement('div');
-                btn.className = 'option-btn';
-                btn.innerText = opt;
-                btn.onclick = () => checkFbAnswer(btn, opt, q.ans);
-                optsDiv.appendChild(btn);
-            });
-            
-            document.getElementById('nextFb').disabled = true;
-        }
-
-        function checkFbAnswer(btn, selected, correct) {
-            if(document.querySelector('#fbOptions .disabled')) return;
-            clearInterval(fbData.interval);
-            
-            const opts = document.querySelectorAll('#fbOptions .option-btn');
-            opts.forEach(o => o.classList.add('disabled'));
-
-            if(selected == correct) {
-                btn.classList.add('correct');
-                fbData.score++;
-                document.getElementById('fbScore').innerText = fbData.score * 10;
-            } else {
-                btn.classList.add('incorrect');
-                opts.forEach(o => { if(o.innerText == correct) o.classList.add('correct'); });
-            }
-            document.getElementById('nextFb').disabled = false;
-        }
-
-        function nextFbQuestion() {
-            fbData.currentQ++;
-            renderFbQuestion();
-        }
-
-        function endFbLevel() {
-            document.getElementById('fbPlayArea').classList.add('hidden');
-            document.getElementById('fbResult').classList.add('active');
-            
-            const passed = fbData.score >= fbData.requirements[fbData.level];
-            const nextBtn = document.getElementById('nextLevelBtn');
-            const restartBtn = document.getElementById('restartFb');
-            const title = document.getElementById('fbResultTitle');
-            const feedback = document.getElementById('fbFeedback');
-            
-            document.getElementById('fbFinalScore').innerText = `${(fbData.score/5)*100}%`;
-            
-            if(passed) {
-                if(fbData.level === 4) {
-                    title.innerText = "مبروك! ختمت اللعبة";
-                    feedback.innerText = "أنت أسطورة كروية حقيقية!";
-                    nextBtn.style.display = 'none';
-                    restartBtn.innerText = "العودة للبداية";
-                } else {
-                    title.innerText = "مرحلة مكتملة!";
-                    feedback.innerText = "أحسنت! يمكنك الانتقال للمرحلة التالية.";
-                    nextBtn.style.display = 'block';
-                    restartBtn.style.display = 'none';
-                }
-            } else {
-                title.innerText = "فشلت المرحلة";
-                feedback.innerText = `تحتاج ${fbData.requirements[fbData.level]} إجابات صحيحة للمرور.`;
+    function endFBLevel() {
+        document.getElementById('fb-play-area').style.display = 'none';
+        document.getElementById('fb-result').style.display = 'block';
+        document.getElementById('fb-final-score').innerText = `${currentScore}/5`;
+        
+        const nextBtn = document.getElementById('fb-levelup-btn');
+        const restartBtn = document.getElementById('fb-restart-btn');
+        const title = document.getElementById('fb-res-title');
+        
+        // شرط النجاح: 3 من 5 على الأقل
+        if (currentScore >= 3) {
+            if (currentLevel === 4) {
+                title.innerText = "🏆 ختمت اللعبة!";
+                document.getElementById('fb-msg').innerText = "أنت أسطورة كروية حقيقية!";
                 nextBtn.style.display = 'none';
-                restartBtn.style.display = 'block';
-                restartBtn.innerText = "إعادة المرحلة";
+                restartBtn.innerText = "العودة للبداية";
+                restartBtn.onclick = resetFootball;
+            } else {
+                title.innerText = "مرحلة مكتملة! ✅";
+                document.getElementById('fb-msg').innerText = "أحسنت! انتقل للمستوى التالي.";
+                nextBtn.style.display = 'block';
+                restartBtn.style.display = 'none';
             }
+        } else {
+            title.innerText = "فشلت المرحلة ❌";
+            document.getElementById('fb-msg').innerText = "يجب أن تجيب على 3 أسئلة صحيحة.";
+            nextBtn.style.display = 'none';
+            restartBtn.style.display = 'block';
+            restartBtn.innerText = "إعادة المرحلة";
+            restartBtn.onclick = () => startFootball(currentLevel);
         }
+    }
 
-        // ============ دوال مساعدة ============
-        function shuffle(array) {
-            return array.sort(() => Math.random() - 0.5);
+    function nextLevelFB() {
+        startFootball(currentLevel + 1);
+    }
+
+    function resetFootball() {
+        startFootball(1); // العودة للمستوى 1 عند الضغط على زر التبديل الرئيسي
+        document.getElementById('btn-start-fb').style.display = 'block'; // إعادة زر البدء للظهور
+        document.getElementById('fb-play-area').style.display = 'block';
+        // إخفاء منطقة اللعب مؤقتاً حتى يضغط البدء
+        document.getElementById('fb-play-area').children[1].innerText = "هل أنت جاهز؟";
+        document.getElementById('fb-options').innerHTML = '';
+        clearInterval(timerInterval);
+    }
+
+    // ================= أدوات مشتركة =================
+    function startTimer(seconds, elemId, onFinish) {
+        clearInterval(timerInterval);
+        const timerElem = document.getElementById(elemId);
+        timerElem.innerText = seconds;
+        
+        timerInterval = setInterval(() => {
+            seconds--;
+            timerElem.innerText = seconds;
+            if (seconds <= 0) {
+                clearInterval(timerInterval);
+                onFinish();
+            }
+        }, 1000);
+    }
+
+    function checkAnswer(btn, selected, correct, type) {
+        if (document.querySelector('.options-grid .disabled')) return; // منع النقر المتكرر
+        clearInterval(timerInterval); // إيقاف الوقت
+        
+        const containerId = type === 'iq' ? 'iq-options' : 'fb-options';
+        const nextBtnId = type === 'iq' ? 'btn-next-iq' : 'btn-next-fb';
+        const scoreId = type === 'iq' ? 'iq-score' : 'fb-score';
+
+        const allOpts = document.getElementById(containerId).children;
+        Array.from(allOpts).forEach(o => o.classList.add('disabled'));
+
+        if (selected === correct) {
+            btn.classList.add('correct');
+            currentScore += (type === 'iq' ? 10 : 1);
+            document.getElementById(scoreId).innerText = currentScore;
+        } else {
+            btn.classList.add('wrong');
+            // تلوين الإجابة الصحيحة
+            Array.from(allOpts).forEach(o => {
+                if (o.innerText === correct) o.classList.add('correct');
+            });
         }
+        document.getElementById(nextBtnId).style.display = 'block';
+    }
 
-        function updateTimer(id, val) {
-            document.getElementById(id).innerText = val;
-        }
+    function revealCorrectAnswer(correct, containerId, nextBtnId) {
+        const allOpts = document.getElementById(containerId).children;
+        Array.from(allOpts).forEach(o => {
+            o.classList.add('disabled');
+            if (o.innerText === correct) o.classList.add('correct');
+        });
+        document.getElementById(nextBtnId).style.display = 'block';
+    }
+</script>
 
-        function revealAnswer(btn, type) { // في حال انتهاء الوقت
-            const prefix = type == 'iq' ? 'iq' : 'fb';
-            const opts = document.querySelectorAll(`#${prefix}Options .option-btn`);
-            opts.forEach(o => o.classList.add('disabled'));
-            document.getElementById(`next${type == 'iq' ? 'Iq' : 'Fb'}`).disabled = false;
-            // يمكن إضافة منطق لتلوين الإجابة الصحيحة هنا إذا كانت البيانات متاحة
-        }
-
-        // تشغيل التهيئة
-        initIqGame();
-        initFootballGame();
-    </script>
 </body>
 </html>
