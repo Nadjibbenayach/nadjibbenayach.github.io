@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+mo<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -349,3 +349,169 @@
                 ],
                 4: [ // إسطورة
                     {t: "من سجل هدف 'يد الرب'؟", opts:["ميسي"
+  {t: "من سجل هدف 'يد الرب'؟", opts:["ميسي", "مارادونا", "بيليه"], ans:"مارادونا"},
+                    {t: "كم مرة فاز ميلان بدوري الأبطال؟", opts:["5", "7", "9"], ans:"7"},
+                    {t: "من هو الحارس الملقب بالعنكبوت الأسود؟", opts:["بوفون", "ليف ياشين", "نوير"], ans:"ليف ياشين"},
+                    {t: "أي فريق فاز بالدوري الإنجليزي بلا هزيمة 2004؟", opts:["أرسنال", "مانشستر", "تشيلسي"], ans:"أرسنال"},
+                    {t: "ما هي جنسية اللاعب هالاند؟", opts:["سويدي", "نرويجي", "دنماركي"], ans:"نرويجي"}
+                ]
+            },
+            level: 1,
+            currentQ: 0,
+            score: 0,
+            timer: 15,
+            interval: null,
+            requirements: {1: 3, 2: 3, 3: 4, 4: 4} // عدد الإجابات الصحيحة المطلوبة من أصل 5
+        };
+
+        function initFootballGame() {
+            document.getElementById('startFb').addEventListener('click', () => startFbLevel(1));
+            document.getElementById('nextFb').addEventListener('click', nextFbQuestion);
+            document.getElementById('restartFb').addEventListener('click', () => {
+                document.getElementById('fbResult').classList.remove('active');
+                document.getElementById('fbPlayArea').classList.remove('hidden');
+                startFbLevel(1);
+            });
+            document.getElementById('nextLevelBtn').addEventListener('click', () => {
+                document.getElementById('fbResult').classList.remove('active');
+                document.getElementById('fbPlayArea').classList.remove('hidden');
+                startFbLevel(fbData.level + 1);
+            });
+        }
+
+        function startFbLevel(lvl) {
+            fbData.level = lvl;
+            fbData.currentQ = 0;
+            fbData.score = 0;
+            
+            // تحديث واجهة المستويات
+            for(let i=1; i<=4; i++) {
+                const el = document.getElementById('lvl'+i);
+                el.classList.remove('active');
+                if(i == lvl) el.classList.add('active');
+            }
+
+            document.getElementById('startFb').style.display = 'none';
+            document.getElementById('nextFb').style.display = 'block';
+            renderFbQuestion();
+        }
+
+        function renderFbQuestion() {
+            const currentSet = fbData.questions[fbData.level];
+            
+            if(fbData.currentQ >= currentSet.length) {
+                endFbLevel();
+                return;
+            }
+
+            clearInterval(fbData.interval);
+            fbData.timer = 15;
+            updateTimer('fbTimer', 15);
+            
+            fbData.interval = setInterval(() => {
+                fbData.timer--;
+                updateTimer('fbTimer', fbData.timer);
+                if(fbData.timer <= 0) {
+                    clearInterval(fbData.interval);
+                    revealAnswer(null, 'fb');
+                }
+            }, 1000);
+
+            const q = currentSet[fbData.currentQ];
+            document.getElementById('fbQuestionNum').innerText = `المرحلة ${fbData.level} - السؤال ${fbData.currentQ+1}`;
+            document.getElementById('fbCurrent').innerText = `${fbData.currentQ+1}/5`;
+            document.getElementById('fbQuestionText').innerText = q.t;
+            
+            const optsDiv = document.getElementById('fbOptions');
+            optsDiv.innerHTML = '';
+            
+            shuffle(q.opts).forEach(opt => {
+                const btn = document.createElement('div');
+                btn.className = 'option-btn';
+                btn.innerText = opt;
+                btn.onclick = () => checkFbAnswer(btn, opt, q.ans);
+                optsDiv.appendChild(btn);
+            });
+            
+            document.getElementById('nextFb').disabled = true;
+        }
+
+        function checkFbAnswer(btn, selected, correct) {
+            if(document.querySelector('#fbOptions .disabled')) return;
+            clearInterval(fbData.interval);
+            
+            const opts = document.querySelectorAll('#fbOptions .option-btn');
+            opts.forEach(o => o.classList.add('disabled'));
+
+            if(selected == correct) {
+                btn.classList.add('correct');
+                fbData.score++;
+                document.getElementById('fbScore').innerText = fbData.score * 10;
+            } else {
+                btn.classList.add('incorrect');
+                opts.forEach(o => { if(o.innerText == correct) o.classList.add('correct'); });
+            }
+            document.getElementById('nextFb').disabled = false;
+        }
+
+        function nextFbQuestion() {
+            fbData.currentQ++;
+            renderFbQuestion();
+        }
+
+        function endFbLevel() {
+            document.getElementById('fbPlayArea').classList.add('hidden');
+            document.getElementById('fbResult').classList.add('active');
+            
+            const passed = fbData.score >= fbData.requirements[fbData.level];
+            const nextBtn = document.getElementById('nextLevelBtn');
+            const restartBtn = document.getElementById('restartFb');
+            const title = document.getElementById('fbResultTitle');
+            const feedback = document.getElementById('fbFeedback');
+            
+            document.getElementById('fbFinalScore').innerText = `${(fbData.score/5)*100}%`;
+            
+            if(passed) {
+                if(fbData.level === 4) {
+                    title.innerText = "مبروك! ختمت اللعبة";
+                    feedback.innerText = "أنت أسطورة كروية حقيقية!";
+                    nextBtn.style.display = 'none';
+                    restartBtn.innerText = "العودة للبداية";
+                } else {
+                    title.innerText = "مرحلة مكتملة!";
+                    feedback.innerText = "أحسنت! يمكنك الانتقال للمرحلة التالية.";
+                    nextBtn.style.display = 'block';
+                    restartBtn.style.display = 'none';
+                }
+            } else {
+                title.innerText = "فشلت المرحلة";
+                feedback.innerText = `تحتاج ${fbData.requirements[fbData.level]} إجابات صحيحة للمرور.`;
+                nextBtn.style.display = 'none';
+                restartBtn.style.display = 'block';
+                restartBtn.innerText = "إعادة المرحلة";
+            }
+        }
+
+        // ============ دوال مساعدة ============
+        function shuffle(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        function updateTimer(id, val) {
+            document.getElementById(id).innerText = val;
+        }
+
+        function revealAnswer(btn, type) { // في حال انتهاء الوقت
+            const prefix = type == 'iq' ? 'iq' : 'fb';
+            const opts = document.querySelectorAll(`#${prefix}Options .option-btn`);
+            opts.forEach(o => o.classList.add('disabled'));
+            document.getElementById(`next${type == 'iq' ? 'Iq' : 'Fb'}`).disabled = false;
+            // يمكن إضافة منطق لتلوين الإجابة الصحيحة هنا إذا كانت البيانات متاحة
+        }
+
+        // تشغيل التهيئة
+        initIqGame();
+        initFootballGame();
+    </script>
+</body>
+</html>
