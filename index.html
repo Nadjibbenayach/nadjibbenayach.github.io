@@ -3,207 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>موقع الألعاب الذكائية</title>
+    <title>ألعاب الذكاء</title>
     <style>
+        /* إعادة الضبط الأساسية */
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
             -webkit-tap-highlight-color: transparent;
-            -webkit-user-select: none;
-            user-select: none;
         }
         
         body {
-            background: linear-gradient(135deg, #1a237e 0%, #311b92 100%);
-            color: #fff;
+            background: linear-gradient(135deg, #0c2461, #1e3799);
+            color: white;
             min-height: 100vh;
-            padding: 10px;
-            line-height: 1.6;
+            padding: 15px;
             overflow-x: hidden;
         }
         
         .container {
             max-width: 100%;
             margin: 0 auto;
-            padding: 10px;
         }
         
+        /* رأس الصفحة */
         header {
             text-align: center;
-            padding: 20px 0 15px;
+            padding: 20px 0;
             margin-bottom: 20px;
             border-bottom: 2px solid rgba(255, 255, 255, 0.1);
         }
         
         h1 {
-            font-size: 1.8rem;
-            margin-bottom: 8px;
-            background: linear-gradient(to right, #ff9800, #ffeb3b);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #f9ca24;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
         }
         
         .subtitle {
-            font-size: 0.9rem;
-            color: #bbbbbb;
-            margin-bottom: 15px;
+            font-size: 16px;
+            color: #ddd;
         }
         
+        /* أزرار التبديل بين الألعاب */
         .game-selector {
             display: flex;
             justify-content: center;
             gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             flex-wrap: wrap;
         }
         
         .game-btn {
-            padding: 12px 25px;
-            font-size: 1rem;
+            padding: 14px 20px;
+            font-size: 18px;
             background: rgba(255, 255, 255, 0.1);
             color: white;
             border: none;
-            border-radius: 30px;
+            border-radius: 12px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: bold;
-            min-width: 140px;
+            transition: all 0.3s;
+            flex: 1;
+            min-width: 150px;
+            max-width: 200px;
         }
         
-        .game-btn.active {
-            background: linear-gradient(to right, #ff9800, #ff5722);
-            box-shadow: 0 4px 8px rgba(255, 87, 34, 0.4);
+        .game-btn:hover, .game-btn.active {
+            background: linear-gradient(to right, #e74c3c, #e67e22);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
         }
         
+        /* حاوية اللعبة */
         .game-container {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(0, 0, 0, 0.3);
             border-radius: 15px;
-            padding: 20px 15px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            display: none;
+            padding: 20px;
             margin-bottom: 20px;
+            display: none;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
         }
         
         .game-container.active {
             display: block;
-            animation: fadeIn 0.5s ease;
+            animation: fadeIn 0.5s;
         }
         
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
+        /* رأس اللعبة */
         .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
-            padding-bottom: 12px;
+            padding-bottom: 15px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
         }
         
         .game-title {
-            font-size: 1.4rem;
-            color: #ffeb3b;
+            font-size: 24px;
+            color: #f9ca24;
             margin-bottom: 10px;
-            text-align: center;
         }
         
         .game-stats {
             display: flex;
-            justify-content: space-between;
             gap: 10px;
+            flex-wrap: wrap;
         }
         
         .stat-box {
             background: rgba(255, 255, 255, 0.1);
-            padding: 8px 12px;
-            border-radius: 8px;
+            padding: 10px 15px;
+            border-radius: 10px;
             text-align: center;
-            flex: 1;
+            min-width: 100px;
         }
         
         .stat-value {
-            font-size: 1.4rem;
+            font-size: 24px;
             font-weight: bold;
-            color: #4caf50;
+            color: #2ecc71;
         }
         
         .stat-label {
-            font-size: 0.8rem;
-            color: #bbbbbb;
+            font-size: 14px;
+            color: #aaa;
         }
         
+        /* المؤقت */
         .timer {
-            font-size: 1.6rem;
+            font-size: 32px;
             font-weight: bold;
-            color: #ff5252;
             text-align: center;
-            padding: 10px;
-            background: rgba(255, 82, 82, 0.1);
-            border-radius: 10px;
+            padding: 15px;
+            background: rgba(231, 76, 60, 0.2);
+            border-radius: 12px;
             margin-bottom: 20px;
-            border: 2px solid rgba(255, 82, 82, 0.3);
+            border: 2px solid rgba(231, 76, 60, 0.5);
+            color: #ff7979;
         }
         
-        .question-container {
-            background: rgba(0, 0, 0, 0.3);
+        /* حاوية السؤال */
+        .question-box {
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 12px;
-            padding: 20px 15px;
-            margin-bottom: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
         }
         
         .question-number {
-            color: #ff9800;
+            color: #3498db;
             font-weight: bold;
-            margin-bottom: 8px;
-            font-size: 0.95rem;
+            margin-bottom: 10px;
+            font-size: 18px;
         }
         
         .question-text {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
+            font-size: 20px;
             line-height: 1.5;
-            min-height: 60px;
+            margin-bottom: 25px;
+            min-height: 80px;
         }
         
+        /* الخيارات */
         .options-container {
             display: flex;
             flex-direction: column;
             gap: 12px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
         
         .option-btn {
-            padding: 16px;
+            padding: 18px 20px;
             background: rgba(255, 255, 255, 0.08);
             border: 2px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             color: white;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            font-size: 18px;
             text-align: right;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .option-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(-5px);
         }
         
         .option-btn.selected {
-            background: rgba(33, 150, 243, 0.3);
-            border-color: #2196f3;
+            background: rgba(52, 152, 219, 0.3);
+            border-color: #3498db;
         }
         
         .option-btn.correct {
-            background: rgba(76, 175, 80, 0.3);
-            border-color: #4caf50;
+            background: rgba(46, 204, 113, 0.3);
+            border-color: #2ecc71;
         }
         
         .option-btn.incorrect {
-            background: rgba(244, 67, 54, 0.3);
-            border-color: #f44336;
+            background: rgba(231, 76, 60, 0.3);
+            border-color: #e74c3c;
         }
         
+        /* أزرار التحكم */
         .game-controls {
             display: flex;
             justify-content: space-between;
@@ -211,163 +222,211 @@
         }
         
         .control-btn {
-            padding: 14px 25px;
-            font-size: 1rem;
+            padding: 15px 25px;
+            font-size: 18px;
             border: none;
-            border-radius: 30px;
+            border-radius: 12px;
             cursor: pointer;
-            transition: all 0.3s ease;
             font-weight: bold;
-            min-width: 120px;
-        }
-        
-        .next-btn {
-            background: linear-gradient(to right, #4caf50, #2e7d32);
-            color: white;
+            transition: all 0.3s;
         }
         
         .start-btn {
-            background: linear-gradient(to right, #2196f3, #0d47a1);
+            background: linear-gradient(to right, #3498db, #2980b9);
             color: white;
+            width: 100%;
         }
         
-        .start-btn:disabled {
-            opacity: 0.6;
+        .next-btn {
+            background: linear-gradient(to right, #2ecc71, #27ae60);
+            color: white;
+            display: none;
+        }
+        
+        .control-btn:disabled {
+            opacity: 0.5;
             cursor: not-allowed;
         }
         
-        .result-container {
+        .control-btn:not(:disabled):hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* شاشة النتيجة */
+        .result-screen {
             text-align: center;
-            padding: 30px 15px;
+            padding: 30px 20px;
             display: none;
         }
         
         .result-title {
-            font-size: 1.6rem;
-            margin-bottom: 15px;
-            color: #ffeb3b;
+            font-size: 28px;
+            color: #f9ca24;
+            margin-bottom: 20px;
         }
         
         .result-score {
-            font-size: 3.5rem;
+            font-size: 60px;
             font-weight: bold;
-            color: #4caf50;
+            color: #2ecc71;
             margin-bottom: 15px;
-            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
         
         .result-level {
-            font-size: 1.6rem;
-            margin-bottom: 20px;
-            color: #ff9800;
+            font-size: 24px;
+            color: #e67e22;
+            margin-bottom: 25px;
         }
         
         .result-details {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 12px;
             padding: 20px;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             text-align: right;
         }
         
         .restart-btn {
-            background: linear-gradient(to right, #ff9800, #ff5722);
+            background: linear-gradient(to right, #e74c3c, #c0392b);
             color: white;
-            padding: 15px 35px;
-            font-size: 1.1rem;
+            padding: 18px 40px;
+            font-size: 20px;
             border: none;
-            border-radius: 30px;
+            border-radius: 12px;
             cursor: pointer;
-            transition: all 0.3s ease;
             font-weight: bold;
-            margin-top: 15px;
+            margin-top: 20px;
             width: 100%;
             max-width: 300px;
         }
         
-        .football-levels {
+        /* مستويات كرة القدم */
+        .levels-container {
             display: flex;
             justify-content: space-between;
             gap: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             flex-wrap: wrap;
         }
         
-        .level-indicator {
-            padding: 10px 8px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            text-align: center;
+        .level-box {
             flex: 1;
             min-width: 70px;
+            padding: 12px 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s;
         }
         
-        .level-indicator.active {
-            background: rgba(255, 152, 0, 0.3);
-            border: 2px solid #ff9800;
+        .level-box.active {
+            background: rgba(241, 196, 15, 0.3);
+            border: 2px solid #f1c40f;
+            transform: scale(1.05);
         }
         
-        .level-indicator.completed {
-            background: rgba(76, 175, 80, 0.3);
-            border: 2px solid #4caf50;
+        .level-box.completed {
+            background: rgba(46, 204, 113, 0.3);
+            border: 2px solid #2ecc71;
         }
         
         .level-name {
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 16px;
         }
         
         .level-requirement {
-            font-size: 0.75rem;
-            color: #bbbbbb;
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 5px;
         }
         
+        /* معلومات الذكاء الاصطناعي */
         .ai-info {
-            background: rgba(0, 150, 136, 0.2);
+            background: rgba(155, 89, 182, 0.2);
             border-radius: 10px;
-            padding: 12px;
-            margin-top: 15px;
-            font-size: 0.85rem;
-            color: #80cbc4;
-            border-right: 4px solid #009688;
+            padding: 15px;
+            margin-top: 25px;
+            border-right: 4px solid #9b59b6;
         }
         
-        .ai-info h4 {
-            color: #4db6ac;
-            margin-bottom: 6px;
-            font-size: 0.95rem;
+        .ai-info h3 {
+            color: #9b59b6;
+            margin-bottom: 10px;
+            font-size: 18px;
         }
         
+        .ai-info p {
+            font-size: 15px;
+            color: #ddd;
+            line-height: 1.5;
+        }
+        
+        /* التذييل */
         footer {
             text-align: center;
-            margin-top: 20px;
-            padding-top: 15px;
+            margin-top: 30px;
+            padding-top: 20px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: #bbbbbb;
-            font-size: 0.8rem;
+            color: #aaa;
+            font-size: 14px;
         }
         
-        .loading {
-            text-align: center;
-            padding: 30px;
-            font-size: 1.2rem;
-            color: #ffeb3b;
+        /* تحسينات للهواتف */
+        @media (max-width: 480px) {
+            .game-btn {
+                font-size: 16px;
+                padding: 12px 15px;
+                min-width: 130px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .game-title {
+                font-size: 20px;
+            }
+            
+            .question-text {
+                font-size: 18px;
+            }
+            
+            .option-btn {
+                font-size: 16px;
+                padding: 16px;
+            }
+            
+            .control-btn {
+                font-size: 16px;
+                padding: 14px 20px;
+            }
+            
+            .result-score {
+                font-size: 50px;
+            }
+            
+            .timer {
+                font-size: 28px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>موقع الألعاب الذكائية</h1>
-            <p class="subtitle">اختبر ذكاءك ومعرفتك بكرة القدم</p>
+            <h1>ألعاب الذكاء والثقافة</h1>
+            <p class="subtitle">اختبر ذكاءك ومعرفتك في كرة القدم</p>
         </header>
         
         <div class="game-selector">
-            <button class="game-btn active" id="iqBtn">اختبار الذكاء</button>
-            <button class="game-btn" id="footballBtn">مسابقة القدم</button>
+            <button class="game-btn active" id="btnIq">اختبار الذكاء</button>
+            <button class="game-btn" id="btnFootball">مسابقة القدم</button>
         </div>
         
-        <!-- اختبار الذكاء -->
+        <!-- لعبة اختبار الذكاء -->
         <div class="game-container active" id="iqGame">
             <div class="game-header">
                 <h2 class="game-title">اختبار الذكاء IQ</h2>
@@ -377,221 +436,196 @@
                         <div class="stat-label">النقاط</div>
                     </div>
                     <div class="stat-box">
-                        <div class="stat-value" id="iqQuestion">0/30</div>
+                        <div class="stat-value" id="iqCurrent">0/30</div>
                         <div class="stat-label">السؤال</div>
                     </div>
                 </div>
             </div>
             
-            <div class="timer" id="iqTimer">--</div>
+            <div class="timer" id="iqTimer">20</div>
             
-            <div class="question-container">
-                <div class="question-number" id="iqQuestionNum">انقر على بدء الاختبار</div>
-                <div class="question-text" id="iqQuestionText">اختبار الذكاء IQ يتكون من 30 سؤالاً، لديك 20 ثانية للإجابة على كل سؤال. سيحدد نظام الذكاء الاصطناعي مستوى ذكائك بناءً على إجاباتك.</div>
+            <div class="question-box">
+                <div class="question-number" id="iqQuestionNum">انقر على "بدء الاختبار" للبدء</div>
+                <div class="question-text" id="iqQuestionText">
+                    اختبار الذكاء يتكون من 30 سؤالًا متنوعًا. لديك 20 ثانية للإجابة على كل سؤال. 
+                    سيحدد نظام الذكاء الاصطناعي مستوى ذكائك بناءً على إجاباتك وسرعتك.
+                </div>
                 
                 <div class="options-container" id="iqOptions">
-                    <!-- سيتم تعبئة الخيارات ديناميكيًا -->
+                    <!-- سيتم إضافة الخيارات هنا -->
                 </div>
             </div>
             
             <div class="game-controls">
-                <button class="control-btn start-btn" id="startIqBtn">بدء الاختبار</button>
-                <button class="control-btn next-btn" id="iqNextBtn" disabled>التالي</button>
+                <button class="control-btn start-btn" id="startIq">بدء الاختبار</button>
+                <button class="control-btn next-btn" id="nextIq" disabled>السؤال التالي</button>
             </div>
             
-            <div class="result-container" id="iqResult">
+            <div class="ai-info">
+                <h3>نظام الذكاء الاصطناعي</h3>
+                <p>يقوم النظام بتحليل إجاباتك من حيث الدقة والسرعة، ويقارنها بقاعدة بيانات كبيرة لتحديد مستوى ذكائك بدقة.</p>
+            </div>
+            
+            <div class="result-screen" id="iqResult">
                 <h2 class="result-title">نتيجة اختبار الذكاء</h2>
                 <div class="result-score" id="iqFinalScore">0</div>
                 <div class="result-level" id="iqLevel">--</div>
-                <div class="result-details" id="iqDetails">
-                    <!-- سيتم تعبئة النتيجة ديناميكيًا -->
+                <div class="result-details" id="iqResultDetails">
+                    <!-- تفاصيل النتيجة -->
                 </div>
-                <button class="restart-btn" id="restartIqBtn">إعادة الاختبار</button>
+                <button class="restart-btn" id="restartIq">إعادة الاختبار</button>
             </div>
         </div>
         
-        <!-- مسابقة كرة القدم -->
+        <!-- لعبة مسابقة كرة القدم -->
         <div class="game-container" id="footballGame">
             <div class="game-header">
                 <h2 class="game-title">مسابقة كرة القدم</h2>
                 <div class="game-stats">
                     <div class="stat-box">
-                        <div class="stat-value" id="footballScore">0</div>
+                        <div class="stat-value" id="fbScore">0</div>
                         <div class="stat-label">النقاط</div>
                     </div>
                     <div class="stat-box">
-                        <div class="stat-value" id="footballQuestion">0/15</div>
+                        <div class="stat-value" id="fbCurrent">0/15</div>
                         <div class="stat-label">السؤال</div>
                     </div>
                     <div class="stat-box">
-                        <div class="stat-value" id="footballStage">1</div>
+                        <div class="stat-value" id="fbStage">1</div>
                         <div class="stat-label">المرحلة</div>
                     </div>
                 </div>
             </div>
             
-            <div class="football-levels">
-                <div class="level-indicator active" id="level1">
+            <div class="levels-container">
+                <div class="level-box active" id="level1">
                     <div class="level-name">سهل</div>
                     <div class="level-requirement">60%</div>
                 </div>
-                <div class="level-indicator" id="level2">
+                <div class="level-box" id="level2">
                     <div class="level-name">متوسط</div>
                     <div class="level-requirement">70%</div>
                 </div>
-                <div class="level-indicator" id="level3">
+                <div class="level-box" id="level3">
                     <div class="level-name">صعب</div>
                     <div class="level-requirement">80%</div>
                 </div>
-                <div class="level-indicator" id="level4">
+                <div class="level-box" id="level4">
                     <div class="level-name">إسطورة</div>
                     <div class="level-requirement">90%</div>
                 </div>
             </div>
             
-            <div class="timer" id="footballTimer">--</div>
+            <div class="timer" id="fbTimer">15</div>
             
-            <div class="question-container">
-                <div class="question-number" id="footballQuestionNum">انقر على بدء المسابقة</div>
-                <div class="question-text" id="footballQuestionText">مسابقة كرة القدم تتكون من 4 مراحل، كل مرحلة 15 سؤالاً، لديك 15 ثانية لكل سؤال. يجب تحقيق النسبة المطلوبة للانتقال للمرحلة التالية.</div>
+            <div class="question-box">
+                <div class="question-number" id="fbQuestionNum">انقر على "بدء المسابقة" للبدء</div>
+                <div class="question-text" id="fbQuestionText">
+                    مسابقة كرة القدم تتكون من 4 مراحل (سهل، متوسط، صعب، إسطورة). 
+                    كل مرحلة تحتوي على 15 سؤالًا. لديك 15 ثانية لكل سؤال.
+                    يجب تحقيق النسبة المطلوبة للانتقال للمرحلة التالية.
+                </div>
                 
-                <div class="options-container" id="footballOptions">
-                    <!-- سيتم تعبئة الخيارات ديناميكيًا -->
+                <div class="options-container" id="fbOptions">
+                    <!-- سيتم إضافة الخيارات هنا -->
                 </div>
             </div>
             
             <div class="game-controls">
-                <button class="control-btn start-btn" id="startFootballBtn">بدء المسابقة</button>
-                <button class="control-btn next-btn" id="footballNextBtn" disabled>التالي</button>
+                <button class="control-btn start-btn" id="startFb">بدء المسابقة</button>
+                <button class="control-btn next-btn" id="nextFb" disabled>السؤال التالي</button>
             </div>
             
-            <div class="result-container" id="footballResult">
-                <h2 class="result-title">نتيجة المسابقة</h2>
-                <div class="result-score" id="footballFinalScore">0</div>
-                <div class="result-level" id="footballStageResult">--</div>
-                <div class="result-details" id="footballDetails">
-                    <!-- سيتم تعبئة النتيجة ديناميكيًا -->
+            <div class="ai-info">
+                <h3>نظام الذكاء الاصطناعي</h3>
+                <p>يختار النظام أسئلة عشوائية من قاعدة بيانات تحتوي على 100 سؤال لكل مستوى. 
+                عند إعادة اللعب، ستتغير الأسئلة تمامًا لضمان تجربة جديدة كل مرة.</p>
+            </div>
+            
+            <div class="result-screen" id="fbResult">
+                <h2 class="result-title">نتيجة مسابقة كرة القدم</h2>
+                <div class="result-score" id="fbFinalScore">0</div>
+                <div class="result-level" id="fbStageResult">--</div>
+                <div class="result-details" id="fbResultDetails">
+                    <!-- تفاصيل النتيجة -->
                 </div>
-                <button class="restart-btn" id="restartFootballBtn">إعادة المسابقة</button>
+                <button class="restart-btn" id="restartFb">إعادة المسابقة</button>
             </div>
         </div>
         
         <footer>
-            <p>© 2023 موقع الألعاب الذكائية</p>
-            <p>متوافق مع الهواتف الذكية</p>
+            <p>© 2023 - ألعاب الذكاء والثقافة | مصمم خصيصًا للهواتف الذكية</p>
         </footer>
     </div>
-
+    
     <script>
-        // === تهيئة العناصر الرئيسية ===
+        // ============ تهيئة الصفحة ============
         document.addEventListener('DOMContentLoaded', function() {
-            initGames();
-        });
-
-        function initGames() {
-            // العناصر الرئيسية
-            const iqBtn = document.getElementById('iqBtn');
-            const footballBtn = document.getElementById('footballBtn');
+            // تعريف العناصر
             const iqGame = document.getElementById('iqGame');
             const footballGame = document.getElementById('footballGame');
+            const btnIq = document.getElementById('btnIq');
+            const btnFootball = document.getElementById('btnFootball');
             
-            // تبديل بين اللعبتين
-            iqBtn.addEventListener('click', () => {
-                iqBtn.classList.add('active');
-                footballBtn.classList.remove('active');
+            // التبديل بين الألعاب
+            btnIq.addEventListener('click', function() {
+                btnIq.classList.add('active');
+                btnFootball.classList.remove('active');
                 iqGame.classList.add('active');
                 footballGame.classList.remove('active');
-                resetIqGame();
             });
             
-            footballBtn.addEventListener('click', () => {
-                footballBtn.classList.add('active');
-                iqBtn.classList.remove('active');
+            btnFootball.addEventListener('click', function() {
+                btnFootball.classList.add('active');
+                btnIq.classList.remove('active');
                 footballGame.classList.add('active');
                 iqGame.classList.remove('active');
-                resetFootballGame();
             });
             
             // تهيئة الألعاب
             initIqGame();
             initFootballGame();
-        }
-
-        // ==================== اختبار الذكاء ====================
-        let iqCurrentQuestion = 0;
-        let iqScore = 0;
-        let iqTimerValue = 20;
-        let iqTimerInterval = null;
-        let iqSelectedAnswer = null;
-        let iqStartTime = 0;
-        let iqTotalTime = 0;
-        let iqCorrectAnswers = 0;
-        let iqQuestions = [];
-        let iqGameActive = false;
-
+        });
+        
+        // ============ لعبة اختبار الذكاء ============
         function initIqGame() {
-            // إنشاء أسئلة اختبار الذكاء
-            createIqQuestions();
+            // بيانات اللعبة
+            let iqData = {
+                questions: [],
+                currentQuestion: 0,
+                score: 0,
+                correctAnswers: 0,
+                timer: 20,
+                timerInterval: null,
+                gameActive: false,
+                selectedAnswer: null
+            };
             
-            // عناصر اختبار الذكاء
-            const startIqBtn = document.getElementById('startIqBtn');
-            const iqNextBtn = document.getElementById('iqNextBtn');
-            const restartIqBtn = document.getElementById('restartIqBtn');
-            
-            // الأحداث
-            startIqBtn.addEventListener('click', startIqTest);
-            iqNextBtn.addEventListener('click', nextIqQuestion);
-            restartIqBtn.addEventListener('click', restartIqTest);
-            
-            // إعداد الواجهة الابتدائية
-            resetIqGame();
-        }
-
-        function createIqQuestions() {
-            iqQuestions = [];
-            
-            // 30 سؤالاً متنوعاً لاختبار الذكاء
-            const questionTemplates = [
-                {
-                    template: "ما هو الرقم التالي في التسلسل: ${a}, ${b}, ${c}, ${d}, ...؟",
-                    generate: () => {
-                        const start = Math.floor(Math.random() * 10) + 1;
-                        const pattern = Math.floor(Math.random() * 3) + 1;
-                        let a = start, b = a + pattern, c = b + pattern, d = c + pattern;
-                        const next = d + pattern;
-                        return {
-                            question: `ما هو الرقم التالي في التسلسل: ${a}, ${b}, ${c}, ${d}, ...؟`,
-                            options: [
-                                next,
-                                next + pattern,
-                                next - pattern,
-                                next * 2
-                            ],
-                            answer: 0
-                        };
-                    }
-                },
-                {
-                    template: "إذا كان ${x} + ${y} = ${sum}، فما هو ${y} + ${x}؟",
-                    generate: () => {
-                        const x = Math.floor(Math.random() * 50) + 10;
-                        const y = Math.floor(Math.random() * 50) + 10;
-                        const sum = x + y;
-                        return {
-                            question: `إذا كان ${x} + ${y} = ${sum}، فما هو ${y} + ${x}؟`,
-                            options: [sum, sum + 1, sum - 1, x + y + 2],
-                            answer: 0
-                        };
-                    }
-                },
-                {
-                    template: "ما هو العدد الذي إذا ضرب في ${a} يصبح ${b}؟",
-                    generate: () => {
-                        const a = Math.floor(Math.random() * 8) + 2;
-                        const result = Math.floor(Math.random() * 50) + 10;
-                        const answer = result / a;
-                        const wrong1 = answer + 1;
-                        const wrong2 = answer - 1;
-                        const wrong3 = answer * 2;
-                        return {
-                            question: `ما هو العد
+            // إنشاء أسئلة اختبار الذكاء (30 سؤالًا)
+            function createIqQuestions() {
+                iqData.questions = [];
+                
+                // أنواع الأسئلة
+                const questionTypes = [
+                    // أسئلة رياضية
+                    {
+                        generate: () => {
+                            const a = Math.floor(Math.random() * 50) + 10;
+                            const b = Math.floor(Math.random() * 50) + 10;
+                            const op = ['+', '-', '×'][Math.floor(Math.random() * 3)];
+                            let result, answer;
+                            
+                            if (op === '+') {
+                                result = a + b;
+                                answer = result;
+                            } else if (op === '-') {
+                                result = a - b;
+                                answer = result;
+                            } else {
+                                result = a * b;
+                                answer = result;
+                            }
+                            
+                            return {
+                                question: `ما هو ناتج ${a} ${op} ${b}؟`,
+  
