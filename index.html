@@ -3,19 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pummel Party Pro Mobile</title>
+    <title>Pummel Party Mobile - Pro</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #000; touch-action: none; font-family: sans-serif; }
-        #ui { position: absolute; bottom: 20px; width: 100%; display: flex; flex-direction: column; align-items: center; pointer-events: none; }
-        .info { background: rgba(0, 0, 0, 0.7); color: white; padding: 10px 25px; border-radius: 30px; margin-bottom: 10px; border: 1px solid #ff9d00; }
-        button { pointer-events: auto; background: #ff9d00; border: none; padding: 15px 35px; font-size: 20px; color: white; border-radius: 15px; font-weight: bold; box-shadow: 0 4px #d35400; }
-        button:active { box-shadow: 0 2px #d35400; transform: translateY(2px); }
+        body { margin: 0; overflow: hidden; background: #000; font-family: 'Arial', sans-serif; touch-action: none; }
+        #ui { position: absolute; bottom: 20px; width: 100%; display: flex; flex-direction: column; align-items: center; pointer-events: none; z-index: 10; }
+        .info { background: rgba(0, 0, 0, 0.8); color: #fff; padding: 12px 25px; border-radius: 50px; margin-bottom: 10px; border: 2px solid #f1c40f; }
+        button { pointer-events: auto; background: #f1c40f; border: none; padding: 15px 40px; font-size: 20px; border-radius: 20px; font-weight: bold; box-shadow: 0 5px #d35400; }
+        
+        /* شاشة المني جيمز */
+        #minigame-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.9); display: none; flex-direction: column; 
+            justify-content: center; align-items: center; color: white; z-index: 100;
+        }
+        .rank-card { background: #34495e; margin: 5px; padding: 15px; border-radius: 10px; width: 80%; text-align: center; }
     </style>
 </head>
 <body>
 
+    <div id="minigame-overlay">
+        <h1>🏆 انتهاء الجولة - المني جيم!</h1>
+        <p>يتم حساب النتائج العشوائية للمسابقة...</p>
+        <div id="results"></div>
+        <button onclick="closeMinigame()" style="margin-top:20px;">العودة للوحة</button>
+    </div>
+
     <div id="ui">
-        <div class="info" id="status">جهز نفسك.. دور اللاعب 1</div>
+        <div class="info" id="status">بداية اللعبة - دور اللاعب 1</div>
         <button id="rollBtn">رمي النرد 🎲</button>
     </div>
 
@@ -32,14 +46,13 @@
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-        // --- 1. الإعدادات الأساسية ---
+        // --- إعدادات العالم ---
         const scene = new THREE.Scene();
-        // إضافة سماء متدرجة
-        scene.background = new THREE.Color(0x87ceeb); // لون سماء صافيه
-        scene.fog = new THREE.Fog(0x87ceeb, 10, 50); // ضباب لإعطاء مدى واقعي
+        scene.background = new THREE.Color(0x1a1a2e);
+        scene.fog = new THREE.Fog(0x1a1a2e, 15, 45);
 
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 15, 20);
+        camera.position.set(0, 15, 15);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -49,114 +62,123 @@
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
 
-        // --- 2. الإضاءة والأرضية ---
-        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1.5);
-        scene.add(hemiLight);
+        // إضاءة وسماء
+        const light = new THREE.DirectionalLight(0xffffff, 1.5);
+        light.position.set(10, 20, 10);
+        light.castShadow = true;
+        scene.add(light);
+        scene.add(new THREE.AmbientLight(0xffffff, 0.4));
 
-        const dirLight = new THREE.DirectionalLight(0xffffff, 1);
-        dirLight.position.set(5, 10, 5);
-        dirLight.castShadow = true;
-        scene.add(dirLight);
-
-        // أرضية عشبية كبيرة
-        const groundGeo = new THREE.PlaneGeometry(100, 100);
-        const groundMat = new THREE.MeshStandardMaterial({ color: 0x27ae60 });
-        const ground = new THREE.Mesh(groundGeo, groundMat);
-        ground.rotation.x = -Math.PI / 2;
-        ground.receiveShadow = true;
-        scene.add(ground);
-
-        // --- 3. تصميم المسار (30 خطوة متشعبة) ---
+        // --- بناء المسار الدائري (30 خطوة) ---
         const pathPoints = [];
-        for (let i = 0; i < 30; i++) {
-            // خوارزمية بسيطة لإنشاء مسار متعرج
-            let x = Math.sin(i * 0.5) * 5;
-            let z = i * -2;
+        const tiles = [];
+        const numSteps = 30;
+        const radius = 12;
+
+        for (let i = 0; i < numSteps; i++) {
+            const angle = (i / numSteps) * Math.PI * 2;
+            const x = Math.cos(angle) * radius + Math.sin(i * 0.8) * 2;
+            const z = Math.sin(angle) * radius;
             pathPoints.push({ x, z });
-            
-            // رسم البلاطة
+
+            // تحديد "قدرة" البلاطة بناءً على اللون
+            let type = "normal";
+            let color = 0xffffff;
+            if (i % 7 === 0) { color = 0xe74c3c; type = "trap"; }    // فخ: عودة للخلف
+            else if (i % 5 === 0) { color = 0x2ecc71; type = "boost"; } // دفعة: تقدم للأمام
+            else if (i % 10 === 0) { color = 0xf1c40f; type = "star"; } // جائزة
+
             const tile = new THREE.Mesh(
-                new THREE.BoxGeometry(2, 0.5, 2),
-                new THREE.MeshStandardMaterial({ color: i % 5 === 0 ? 0xe74c3c : 0xf1c40f })
+                new THREE.BoxGeometry(2, 0.4, 2),
+                new THREE.MeshStandardMaterial({ color: color, roughness: 0.3 })
             );
-            tile.position.set(x, 0.25, z);
-            tile.receiveShadow = true;
+            tile.position.set(x, 0, z);
+            tile.userData = { type };
             scene.add(tile);
+            tiles.push(tile);
         }
 
-        // --- 4. إنشاء اللاعبين (شخصيات مطورة) ---
-        function createCharacter(color) {
+        // --- اللاعبين ---
+        function createPlayer(color) {
             const group = new THREE.Group();
-            
-            // الجسم (كبسولة)
-            const body = new THREE.Mesh(
-                new THREE.CapsuleGeometry(0.4, 0.6, 4, 8),
-                new THREE.MeshStandardMaterial({ color: color })
-            );
-            body.position.y = 0.7;
-            body.castShadow = true;
+            const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.4, 0.6, 4, 8), new THREE.MeshStandardMaterial({ color }));
+            body.position.y = 0.8;
             group.add(body);
-
-            // العيون (كرات صغيرة بيضاء)
-            const eyeGeo = new THREE.SphereGeometry(0.08, 8, 8);
-            const eyeMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-            
-            const eye1 = new THREE.Mesh(eyeGeo, eyeMat);
-            eye1.position.set(0.15, 1, 0.3);
-            group.add(eye1);
-
-            const eye2 = new THREE.Mesh(eyeGeo, eyeMat);
-            eye2.position.set(-0.15, 1, 0.3);
-            group.add(eye2);
-
             scene.add(group);
             return group;
         }
 
         const players = [
-            { mesh: createCharacter(0xff3e3e), posIndex: 0 },
-            { mesh: createCharacter(0x3498db), posIndex: 0 },
-            { mesh: createCharacter(0x2ecc71), posIndex: 0 }
+            { mesh: createPlayer(0xff4757), pos: 0, score: 0, id: 1 },
+            { mesh: createPlayer(0x2ed573), pos: 0, score: 0, id: 2 },
+            { mesh: createPlayer(0x1e90ff), pos: 0, score: 0, id: 3 }
         ];
 
         let turn = 0;
+        let roundCounter = 0;
 
-        function updatePositions() {
-            players.forEach((p, i) => {
-                const target = pathPoints[p.posIndex];
-                // تحريك الشخصية بسلاسة
-                p.mesh.position.set(target.x + (i * 0.5 - 0.5), 0, target.z);
-            });
-            // تحريك الكاميرا لتتبع اللاعب النشط
-            const activePlayer = players[turn].mesh.position;
-            controls.target.set(activePlayer.x, 0, activePlayer.z);
+        // --- منطق الحركة والقدرات ---
+        function movePlayer() {
+            const roll = Math.floor(Math.random() * 6) + 1;
+            const p = players[turn];
+            
+            p.pos = (p.pos + roll) % numSteps;
+            const currentTile = tiles[p.pos].userData;
+
+            // تنفيذ القدرات
+            let msg = `اللاعب ${p.id} رمى ${roll}`;
+            if (currentTile.type === "trap") { p.pos = (p.pos - 2 + numSteps) % numSteps; msg += " - وقع في فخ! (عودة -2)"; }
+            if (currentTile.type === "boost") { p.pos = (p.pos + 2) % numSteps; msg += " - دفعة سرعة! (تقدم +2)"; }
+            if (currentTile.type === "star") { p.score += 10; msg += " - حصل على 10 نقاط! ⭐"; }
+
+            updateGraphics();
+            document.getElementById('status').innerText = msg;
+
+            // تبديل الدور وفحص نهاية الجولة
+            turn++;
+            if (turn >= 3) {
+                turn = 0;
+                roundCounter++;
+                setTimeout(startMinigame, 1500); // بدء المني جيم بعد نهاية دور الجميع
+            }
         }
 
-        // --- 5. منطق اللعب ---
-        document.getElementById('rollBtn').onclick = () => {
-            const roll = Math.floor(Math.random() * 6) + 1;
-            players[turn].posIndex = Math.min(players[turn].posIndex + roll, 29);
+        function updateGraphics() {
+            players.forEach((p, i) => {
+                const target = pathPoints[p.pos];
+                p.mesh.position.set(target.x + (i*0.3), 0, target.z + (i*0.3));
+            });
+        }
+
+        // --- نظام المني جيمز ---
+        function startMinigame() {
+            const overlay = document.getElementById('minigame-overlay');
+            const resultsDiv = document.getElementById('results');
+            overlay.style.display = 'flex';
             
-            document.getElementById('status').innerText = `اللاعب ${turn + 1} تحرك ${roll} خطوات!`;
-            
-            turn = (turn + 1) % 3;
-            updatePositions();
+            // محاكاة نتائج المني جيم
+            const ranks = [...players].sort(() => Math.random() - 0.5); 
+            resultsDiv.innerHTML = ranks.map((p, i) => {
+                const prize = (3 - i) * 5;
+                p.score += prize;
+                return `<div class="rank-card">المركز ${i+1}: لاعب ${p.id} (جائزة: ${prize} نقطة)</div>`;
+            }).join('');
+        }
+
+        window.closeMinigame = () => {
+            document.getElementById('minigame-overlay').style.display = 'none';
+            document.getElementById('status').innerText = `الجولة ${roundCounter + 1} - دور اللاعب 1`;
         };
+
+        document.getElementById('rollBtn').onclick = movePlayer;
 
         function animate() {
             requestAnimationFrame(animate);
             controls.update();
             renderer.render(scene, camera);
         }
-
-        updatePositions();
+        updateGraphics();
         animate();
-
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
     </script>
 </body>
 </html>
