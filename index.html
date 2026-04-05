@@ -1,184 +1,795 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pummel Party Mobile - Pro</title>
-    <style>
-        body { margin: 0; overflow: hidden; background: #000; font-family: 'Arial', sans-serif; touch-action: none; }
-        #ui { position: absolute; bottom: 20px; width: 100%; display: flex; flex-direction: column; align-items: center; pointer-events: none; z-index: 10; }
-        .info { background: rgba(0, 0, 0, 0.8); color: #fff; padding: 12px 25px; border-radius: 50px; margin-bottom: 10px; border: 2px solid #f1c40f; }
-        button { pointer-events: auto; background: #f1c40f; border: none; padding: 15px 40px; font-size: 20px; border-radius: 20px; font-weight: bold; box-shadow: 0 5px #d35400; }
+```react
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { Bus, MapPin, Calendar, Clock, CreditCard, ChevronRight, CheckCircle2, Navigation, User, Cpu, Filter, Globe, Info, Phone, BadgeDollarSign } from 'lucide-react';
+
+const arDict = {
+  "Layaycha": "لعيايشة",
+  "Jijel": "جيجل",
+  "Firma": "فيرمة",
+  "Kaous Senter": "وسط قاوس",
+  "the_5km": "الخامسة",
+  "Live Tracker": "التتبع المباشر",
+  "Info": "معلومات",
+  "More Info": "مزيد من المعلومات",
+  "Buy Tickets": "شراء التذاكر",
+  "Seamless Travel Between": "سفر سلس بين",
+  "Layaycha & Jijel": "لعيايشة وجيجل",
+  "Experience comfortable, reliable, and punctual bus services. Track your bus in real-time or book your seat in seconds.": "استمتع بخدمات حافلات مريحة وموثوقة وفي الموعد. تتبع حافلتك في الوقت الفعلي أو احجز مقعدك في ثوانٍ.",
+  "Book a Ticket": "احجز تذكرة",
+  "Live Route Tracker": "متتبع مسار الرحلة المباشر",
+  "Monitor our active bus dynamically on the Layaycha - Jijel circuit.": "راقب حافلتنا ديناميكيًا على مسار لعيايشة - جيجل.",
+  "AI Schedule Engine": "محرك الجدول الذكي",
+  "Syncing Bus to Timetable": "مزامنة الحافلة مع الجدول الزمني",
+  "Time:": "الوقت:",
+  "Live": "مباشر",
+  "Simulate": "محاكاة",
+  "Start / End": "الانطلاق / النهاية",
+  "Turnaround": "نقطة العودة",
+  "Towards Jijel (Top Lane)": "نحو جيجل (المسار العلوي)",
+  "Towards Layaycha (Bottom Lane)": "نحو لعيايشة (المسار السفلي)",
+  "Stop Arrival Times": "أوقات وصول المحطات",
+  "Filter to see when the next bus arrives at your location.": "قم بالتصفية لمعرفة موعد وصول الحافلة التالية إلى موقعك.",
+  "Towards Jijel": "نحو جيجل",
+  "Towards Layaycha": "نحو لعيايشة",
+  "Passing through": "مروراً بـ",
+  "No more buses today": "لا توجد حافلات أخرى اليوم",
+  "Daily Bus Schedule": "الجدول اليومي للحافلات",
+  "Book Your Ticket": "احجز تذكرتك",
+  "Secure your seat on the next bus. Fast, easy, and reliable.": "احجز مقعدك في الحافلة القادمة. سريع، سهل وموثوق.",
+  "Standard Ticket": "تذكرة عادية",
+  "Valid for one-way trip": "صالحة لرحلة ذهاب فقط",
+  "Swap": "تبديل",
+  "Date": "التاريخ",
+  "Preferred Time": "الوقت المفضل",
+  "Next Available": "أقرب رحلة متاحة",
+  "Passengers": "المسافرون",
+  "Payment Method": "طريقة الدفع",
+  "Edahabia": "الذهبية",
+  "Pay on Bus": "الدفع في الحافلة",
+  "Confirm & Pay 150 DZD": "تأكيد ودفع 150 دج",
+  "Processing...": "جاري المعالجة...",
+  "Ticket Booked Successfully!": "تم حجز التذكرة بنجاح!",
+  "1 Passenger": "1 مسافر",
+  "2 Passengers": "2 مسافرين",
+  "3 Passengers": "3 مسافرين",
+  "4 Passengers": "4 مسافرين",
+  "Total": "المجموع",
+  "sitting": "جلوس",
+  "standing": "وقوف",
+  "% journey": "٪ من الرحلة",
+  "Status:": "الحالة:",
+  "Next:": "التالي:",
+  "Finished": "انتهى",
+  "Done for today": "انتهى عمل اليوم",
+  "First Departure": "أول انطلاق",
+  "Departure": "الانطلاق",
+  "Sleeping at Layaycha Station": "متوقفة في محطة لعيايشة",
+  "Shift Ended": "انتهى الدوام",
+  "About nadjib G-line": "حول nadjib G-line",
+  "Everything you need to know about our daily bus service.": "كل ما تحتاج لمعرفته حول خدمة الحافلات اليومية لدينا.",
+  "Ticket Price": "سعر التذكرة",
+  "Route Fares": "تسعيرة المسارات",
+  "Standard one-way fare": "تسعيرة الرحلة الواحدة",
+  "Operating Hours": "ساعات العمل",
+  "First bus at 6:30 AM, last arrival at 6:30 PM": "أول حافلة 6:30 صباحاً، آخر وصول 6:30 مساءً",
+  "Contact & Support": "الاتصال والدعم",
+  "For inquiries or lost items": "للاستفسارات أو المفقودات",
+  "Support": "الدعم",
+  "Terms": "الشروط",
+  "Privacy": "الخصوصية",
+  "All rights reserved.": "جميع الحقوق محفوظة.",
+  "DA": "د.ج",
+  "Anter-2008": "عنتر-2008",
+  "Salhe 2006": "صالح 2006",
+  "All Buses": "جميع الحافلات"
+};
+
+export default function App() {
+  const [lang, setLang] = useState('en');
+  const [activeTab, setActiveTab] = useState('tracker');
+  const [activeTimetable, setActiveTimetable] = useState('All Buses');
+
+  const t = useCallback((text) => (lang === 'ar' && arDict[text]) ? arDict[text] : text, [lang]);
+
+  // Original Base Schedule Data
+  const scheduleLayaycha = ['6:30am', '8:00am', '9:30am', '11:00am', '12:30pm', '14:00pm', '15:30pm', '17:00pm'];
+  const scheduleJijel = ['7:20am', '8:50am', '10:20am', '11:50am', '13:20pm', '14:50pm', '16:20pm', '17:50pm'];
+
+  const STOPS = [
+    { name: 'Layaycha', outOffset: 0, inOffset: 40 },
+    { name: 'Firma', outOffset: 11.25, inOffset: 30 },
+    { name: 'Kaous Senter', outOffset: 22.5, inOffset: 20 },
+    { name: 'the_5km', outOffset: 33.75, inOffset: 10 },
+    { name: 'Jijel', outOffset: 45, inOffset: 0 },
+  ];
+
+  // AI & Time Tracking State
+  const [isSimulated, setIsSimulated] = useState(false);
+  const [simMinutes, setSimMinutes] = useState(390); // Default simulation to 6:30 AM
+  const [liveMinutes, setLiveMinutes] = useState(0);
+  const [selectedStopFilter, setSelectedStopFilter] = useState('Kaous Senter');
+
+  const [buses, setBuses] = useState([]);
+  const [activeBusId, setActiveBusId] = useState(null); // Tracks which bus is currently clicked
+
+  // 1. Track Real-World System Time
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setLiveMinutes(now.getHours() * 60 + now.getMinutes() + (now.getSeconds() / 60));
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const activeMinutes = isSimulated ? simMinutes : liveMinutes;
+
+  const parseTime = (str) => {
+    const isPM = str.toLowerCase().includes('pm');
+    let [h, m] = str.replace(/[a-zA-Z]/g, '').split(':').map(Number);
+    if (isPM && h < 12) h += 12;
+    if (!isPM && h === 12) h = 0;
+    return h * 60 + m;
+  };
+
+  // Bus 1 (Base Schedule)
+  const trips1 = useMemo(() => {
+    let t = [];
+    scheduleLayaycha.forEach(str => t.push({ dir: 'outbound', depart: parseTime(str), arrive: parseTime(str) + 45 }));
+    // Inbound now takes exactly 40 mins (17:50 -> 18:30)
+    scheduleJijel.forEach(str => t.push({ dir: 'inbound', depart: parseTime(str), arrive: parseTime(str) + 40 }));
+    return t.sort((a, b) => a.depart - b.depart);
+  }, [scheduleLayaycha, scheduleJijel]);
+
+  // Bus 2 (+30 Mins Schedule)
+  const trips2 = useMemo(() => {
+    return trips1.map(t => ({
+      dir: t.dir,
+      depart: t.depart + 30,
+      arrive: t.arrive + 30
+    }));
+  }, [trips1]);
+
+  // Combined Schedule for Timetables and Filters
+  const allTrips = useMemo(() => {
+    return [...trips1, ...trips2].sort((a, b) => a.depart - b.depart);
+  }, [trips1, trips2]);
+
+  const formatTimeDisplay = useCallback((mins) => {
+    if (mins === 0) return "--:--";
+    const h = Math.floor(mins / 60);
+    const m = Math.floor(mins % 60);
+    const ampm = h >= 12 ? (lang === 'ar' ? 'م' : 'PM') : (lang === 'ar' ? 'ص' : 'AM');
+    const displayH = h % 12 || 12;
+    return `${displayH}:${m.toString().padStart(2, '0')} ${ampm}`;
+  }, [lang]);
+
+  const combinedScheduleLayaychaStrings = useMemo(() => {
+    return allTrips.filter(t => t.dir === 'outbound').map(t => formatTimeDisplay(t.depart));
+  }, [allTrips, formatTimeDisplay]);
+
+  const combinedScheduleJijelStrings = useMemo(() => {
+    return allTrips.filter(t => t.dir === 'inbound').map(t => formatTimeDisplay(t.depart));
+  }, [allTrips, formatTimeDisplay]);
+
+  // Specific Bus Schedules for UI Filtering
+  const bus1LayaychaStrings = useMemo(() => trips1.filter(t => t.dir === 'outbound').map(t => formatTimeDisplay(t.depart)), [trips1, formatTimeDisplay]);
+  const bus1JijelStrings = useMemo(() => trips1.filter(t => t.dir === 'inbound').map(t => formatTimeDisplay(t.depart)), [trips1, formatTimeDisplay]);
+
+  const bus2LayaychaStrings = useMemo(() => trips2.filter(t => t.dir === 'outbound').map(t => formatTimeDisplay(t.depart)), [trips2, formatTimeDisplay]);
+  const bus2JijelStrings = useMemo(() => trips2.filter(t => t.dir === 'inbound').map(t => formatTimeDisplay(t.depart)), [trips2, formatTimeDisplay]);
+
+  const displayLayaycha = activeTimetable === 'All Buses' ? combinedScheduleLayaychaStrings : (activeTimetable === 'Salhe 2006' ? bus1LayaychaStrings : bus2LayaychaStrings);
+  const displayJijel = activeTimetable === 'All Buses' ? combinedScheduleJijelStrings : (activeTimetable === 'Salhe 2006' ? bus1JijelStrings : bus2JijelStrings);
+
+  // Unified Bus State Calculator
+  const calculateBusState = useCallback((trips, activeMins, busId, colorTheme) => {
+    let progress = 0;
+    let status = 'Unknown';
+    let passengers = { sitting: 0, standing: 0 };
+    let nextStopName = t('Done for today');
+    let nextStopTime = null;
+
+    if (activeMins < trips[0].depart) {
+      progress = 0;
+      const waitMins = trips[0].depart - activeMins;
+      if (waitMins <= 5) {
+        const m = Math.floor(waitMins);
+        const s = Math.floor((waitMins % 1) * 60);
+        status = lang === 'ar' ? `صعود الركاب (ينطلق خلال ${m}د ${s}ث)` : `Boarding (Departs in ${m}m ${s}s)`;
+        passengers = { sitting: 15, standing: 0 };
+      } else {
+        status = t('Sleeping at Layaycha Station');
+        passengers = { sitting: 0, standing: 0 };
+      }
+      nextStopName = t('First Departure');
+      nextStopTime = trips[0].depart - activeMins;
+    } else if (activeMins > trips[trips.length - 1].arrive) {
+      progress = trips[trips.length - 1].dir === 'outbound' ? 100 : 0;
+      status = t('Shift Ended');
+      passengers = { sitting: 0, standing: 0 };
+    } else {
+      for (let i = 0; i < trips.length; i++) {
+        const trip = trips[i];
         
-        /* شاشة المني جيمز */
-        #minigame-overlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.9); display: none; flex-direction: column; 
-            justify-content: center; align-items: center; color: white; z-index: 100;
+        if (activeMins >= trip.depart && activeMins <= trip.arrive) {
+          const ratio = (activeMins - trip.depart) / (trip.arrive - trip.depart);
+          progress = trip.dir === 'outbound' ? (ratio * 100) : (100 + ratio * 100);
+          status = lang === 'ar' 
+            ? `في الطريق إلى ${trip.dir === 'outbound' ? 'جيجل' : 'لعيايشة'}`
+            : `En Route to ${trip.dir === 'outbound' ? 'Jijel' : 'Layaycha'}`;
+          passengers = { sitting: 27, standing: 14 }; 
+          
+          const elapsed = activeMins - trip.depart;
+          if (trip.dir === 'outbound') {
+            if (elapsed < 11.25) { nextStopName = t('Firma'); nextStopTime = 11.25 - elapsed; }
+            else if (elapsed < 22.5) { nextStopName = t('Kaous Senter'); nextStopTime = 22.5 - elapsed; }
+            else if (elapsed < 33.75) { nextStopName = t('the_5km'); nextStopTime = 33.75 - elapsed; }
+            else { nextStopName = t('Jijel'); nextStopTime = 45 - elapsed; }
+          } else {
+            // New 40 min inbound trip spacing (10 mins per segment)
+            if (elapsed < 10) { nextStopName = t('the_5km'); nextStopTime = 10 - elapsed; }
+            else if (elapsed < 20) { nextStopName = t('Kaous Senter'); nextStopTime = 20 - elapsed; }
+            else if (elapsed < 30) { nextStopName = t('Firma'); nextStopTime = 30 - elapsed; }
+            else { nextStopName = t('Layaycha'); nextStopTime = 40 - elapsed; }
+          }
+          break;
         }
-        .rank-card { background: #34495e; margin: 5px; padding: 15px; border-radius: 10px; width: 80%; text-align: center; }
-    </style>
-</head>
-<body>
-
-    <div id="minigame-overlay">
-        <h1>🏆 انتهاء الجولة - المني جيم!</h1>
-        <p>يتم حساب النتائج العشوائية للمسابقة...</p>
-        <div id="results"></div>
-        <button onclick="closeMinigame()" style="margin-top:20px;">العودة للوحة</button>
-    </div>
-
-    <div id="ui">
-        <div class="info" id="status">بداية اللعبة - دور اللاعب 1</div>
-        <button id="rollBtn">رمي النرد 🎲</button>
-    </div>
-
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-            }
+        
+        const nextTrip = trips[i + 1];
+        if (nextTrip && activeMins > trip.arrive && activeMins < nextTrip.depart) {
+          progress = trip.dir === 'outbound' ? 100 : 0;
+          const waitMins = nextTrip.depart - activeMins;
+          const m = Math.floor(waitMins);
+          const s = Math.floor((waitMins % 1) * 60);
+          
+          if (trip.dir === 'outbound') {
+            status = lang === 'ar' 
+              ? `وصلت مبكراً إلى جيجل بـ 5د • تنطلق خلال ${m}د ${s}ث`
+              : `Arrived 5m early in Jijel • Departs in ${m}m ${s}s`;
+          } else {
+            status = lang === 'ar' 
+              ? `وصلت مبكراً إلى لعيايشة بـ 5د • تنطلق خلال ${m}د ${s}ث`
+              : `Arrived 5m early in Layaycha • Departs in ${m}m ${s}s`;
+          }
+          passengers = { sitting: 18, standing: 0 };
+          nextStopName = t('Departure');
+          nextStopTime = nextTrip.depart - activeMins;
+          break;
         }
-    </script>
+      }
+    }
+    return { id: busId, colorTheme, capacity: { sitting: 27, standing: 16, total: 43 }, passengers, progress, status, nextStopName, nextStopTime };
+  }, [lang, t]);
 
-    <script type="module">
-        import * as THREE from 'three';
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+  useEffect(() => {
+    const bus1 = calculateBusState(trips1, activeMinutes, 'Salhe 2006', 'amber');
+    const bus2 = calculateBusState(trips2, activeMinutes, t('Anter-2008'), 'teal');
+    
+    setBuses([bus1, bus2]);
 
-        // --- إعدادات العالم ---
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x1a1a2e);
-        scene.fog = new THREE.Fog(0x1a1a2e, 15, 45);
+  }, [activeMinutes, trips1, trips2, calculateBusState, t]);
 
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 15, 15);
+  const activeFilterStop = STOPS.find(s => s.name === selectedStopFilter);
+  const nextOutboundTrip = allTrips.find(t => t.dir === 'outbound' && (t.depart + activeFilterStop.outOffset) > activeMinutes);
+  const nextInboundTrip = allTrips.find(t => t.dir === 'inbound' && (t.depart + activeFilterStop.inOffset) > activeMinutes);
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.shadowMap.enabled = true;
-        document.body.appendChild(renderer.domElement);
-
-        const controls = new OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-
-        // إضاءة وسماء
-        const light = new THREE.DirectionalLight(0xffffff, 1.5);
-        light.position.set(10, 20, 10);
-        light.castShadow = true;
-        scene.add(light);
-        scene.add(new THREE.AmbientLight(0xffffff, 0.4));
-
-        // --- بناء المسار الدائري (30 خطوة) ---
-        const pathPoints = [];
-        const tiles = [];
-        const numSteps = 30;
-        const radius = 12;
-
-        for (let i = 0; i < numSteps; i++) {
-            const angle = (i / numSteps) * Math.PI * 2;
-            const x = Math.cos(angle) * radius + Math.sin(i * 0.8) * 2;
-            const z = Math.sin(angle) * radius;
-            pathPoints.push({ x, z });
-
-            // تحديد "قدرة" البلاطة بناءً على اللون
-            let type = "normal";
-            let color = 0xffffff;
-            if (i % 7 === 0) { color = 0xe74c3c; type = "trap"; }    // فخ: عودة للخلف
-            else if (i % 5 === 0) { color = 0x2ecc71; type = "boost"; } // دفعة: تقدم للأمام
-            else if (i % 10 === 0) { color = 0xf1c40f; type = "star"; } // جائزة
-
-            const tile = new THREE.Mesh(
-                new THREE.BoxGeometry(2, 0.4, 2),
-                new THREE.MeshStandardMaterial({ color: color, roughness: 0.3 })
-            );
-            tile.position.set(x, 0, z);
-            tile.userData = { type };
-            scene.add(tile);
-            tiles.push(tile);
-        }
-
-        // --- اللاعبين ---
-        function createPlayer(color) {
-            const group = new THREE.Group();
-            const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.4, 0.6, 4, 8), new THREE.MeshStandardMaterial({ color }));
-            body.position.y = 0.8;
-            group.add(body);
-            scene.add(group);
-            return group;
-        }
-
-        const players = [
-            { mesh: createPlayer(0xff4757), pos: 0, score: 0, id: 1 },
-            { mesh: createPlayer(0x2ed573), pos: 0, score: 0, id: 2 },
-            { mesh: createPlayer(0x1e90ff), pos: 0, score: 0, id: 3 }
-        ];
-
-        let turn = 0;
-        let roundCounter = 0;
-
-        // --- منطق الحركة والقدرات ---
-        function movePlayer() {
-            const roll = Math.floor(Math.random() * 6) + 1;
-            const p = players[turn];
+  return (
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-800" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+      {/* Navigation */}
+      <nav className="bg-blue-900 text-white shadow-lg sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center gap-2">
+              <Bus className="w-8 h-8 text-amber-400" />
+              <span className="text-2xl font-bold tracking-tight">nadjib <span className="text-amber-400">G-line</span></span>
+            </div>
             
-            p.pos = (p.pos + roll) % numSteps;
-            const currentTile = tiles[p.pos].userData;
+            <div className="hidden md:flex gap-8 font-medium items-center">
+              <button 
+                onClick={() => setActiveTab('tracker')}
+                className={`hover:text-amber-400 transition-colors ${activeTab === 'tracker' ? 'text-amber-400 border-b-2 border-amber-400' : ''}`}
+              >
+                {t('Live Tracker')}
+              </button>
+              <button 
+                onClick={() => setActiveTab('info')}
+                className={`hover:text-amber-400 transition-colors ${activeTab === 'info' ? 'text-amber-400 border-b-2 border-amber-400' : ''}`}
+              >
+                {t('Info')}
+              </button>
+              <button 
+                onClick={() => setActiveTab('tickets')}
+                className={`hover:text-amber-400 transition-colors ${activeTab === 'tickets' ? 'text-amber-400 border-b-2 border-amber-400' : ''}`}
+              >
+                {t('Buy Tickets')}
+              </button>
+            </div>
 
-            // تنفيذ القدرات
-            let msg = `اللاعب ${p.id} رمى ${roll}`;
-            if (currentTile.type === "trap") { p.pos = (p.pos - 2 + numSteps) % numSteps; msg += " - وقع في فخ! (عودة -2)"; }
-            if (currentTile.type === "boost") { p.pos = (p.pos + 2) % numSteps; msg += " - دفعة سرعة! (تقدم +2)"; }
-            if (currentTile.type === "star") { p.score += 10; msg += " - حصل على 10 نقاط! ⭐"; }
+            <div className="flex items-center gap-4">
+              {/* Language Toggle */}
+              <button 
+                onClick={() => setLang(lang === 'en' ? 'ar' : 'en')}
+                className="flex items-center gap-1.5 text-sm font-bold bg-blue-800 hover:bg-blue-700 px-3 py-1.5 rounded-full transition-colors border border-blue-700 shadow-sm"
+              >
+                <Globe size={16} className={lang === 'ar' ? 'text-amber-400' : 'text-blue-200'} />
+                {lang === 'en' ? 'العربية' : 'EN'}
+              </button>
 
-            updateGraphics();
-            document.getElementById('status').innerText = msg;
+              {/* Mobile Menu Toggle (Simplified) */}
+              <div className="md:hidden flex gap-3">
+                 <button onClick={() => setActiveTab('tracker')} className={`text-sm ${activeTab === 'tracker' ? 'text-amber-400' : ''}`}>{t('Live Tracker')}</button>
+                 <button onClick={() => setActiveTab('info')} className={`text-sm ${activeTab === 'info' ? 'text-amber-400' : ''}`}>{t('Info')}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
 
-            // تبديل الدور وفحص نهاية الجولة
-            turn++;
-            if (turn >= 3) {
-                turn = 0;
-                roundCounter++;
-                setTimeout(startMinigame, 1500); // بدء المني جيم بعد نهاية دور الجميع
-            }
-        }
+      {/* Hero Section */}
+      <header className="bg-blue-800 text-white py-12 md:py-20 px-4 text-center relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
+        <div className="max-w-3xl mx-auto relative z-10">
+          <h1 className="text-4xl md:text-6xl font-extrabold mb-4 leading-tight">
+            {t('Seamless Travel Between')} <br/>
+            <span className="text-amber-400">{t('Layaycha & Jijel')}</span>
+          </h1>
+          <p className="text-lg md:text-xl text-blue-100 mb-8 max-w-2xl mx-auto leading-relaxed">
+            {t('Experience comfortable, reliable, and punctual bus services. Track your bus in real-time or book your seat in seconds.')}
+          </p>
+          <div className="flex justify-center gap-4">
+            <button 
+              onClick={() => setActiveTab('info')}
+              className="bg-amber-500 hover:bg-amber-600 text-blue-950 font-bold py-3 px-8 rounded-full shadow-lg transition-transform hover:scale-105 flex items-center gap-2"
+            >
+              <Info size={20} /> {t('More Info')}
+            </button>
+          </div>
+        </div>
+      </header>
 
-        function updateGraphics() {
-            players.forEach((p, i) => {
-                const target = pathPoints[p.pos];
-                p.mesh.position.set(target.x + (i*0.3), 0, target.z + (i*0.3));
-            });
-        }
+      {/* Main Content Area */}
+      <main className="max-w-6xl mx-auto px-4 py-12">
+        
+        {/* TRACKER VIEW */}
+        {activeTab === 'tracker' && (
+          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl font-bold text-blue-950 mb-2">{t('Live Route Tracker')}</h2>
+              <p className="text-slate-500">{t('Monitor our active bus dynamically on the Layaycha - Jijel circuit.')}</p>
+            </div>
 
-        // --- نظام المني جيمز ---
-        function startMinigame() {
-            const overlay = document.getElementById('minigame-overlay');
-            const resultsDiv = document.getElementById('results');
-            overlay.style.display = 'flex';
-            
-            // محاكاة نتائج المني جيم
-            const ranks = [...players].sort(() => Math.random() - 0.5); 
-            resultsDiv.innerHTML = ranks.map((p, i) => {
-                const prize = (3 - i) * 5;
-                p.score += prize;
-                return `<div class="rank-card">المركز ${i+1}: لاعب ${p.id} (جائزة: ${prize} نقطة)</div>`;
-            }).join('');
-        }
+            {/* AI Time Controller */}
+            <div className="bg-blue-50 p-6 rounded-2xl mb-8 border border-blue-100 flex flex-col md:flex-row items-center gap-6 shadow-sm">
+              <div className="flex items-center gap-3 text-blue-900 bg-white px-4 py-3 rounded-xl shadow-sm border border-blue-50 w-full md:w-auto">
+                <Cpu className="text-amber-500 animate-pulse" />
+                <div className="text-left">
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-blue-500 mb-0.5">{t('AI Schedule Engine')}</div>
+                  <div className="font-bold text-sm leading-none tracking-tight">{t('Syncing Bus to Timetable')}</div>
+                </div>
+              </div>
+              
+              <div className="flex-1 w-full space-y-3">
+                <div className="flex justify-between items-center">
+                  <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
+                    <Clock size={16} className="text-blue-500"/>
+                    {t('Time:')} <span className="text-blue-700 font-mono bg-white px-2 py-1 rounded shadow-inner border border-slate-200">{formatTimeDisplay(activeMinutes)}</span>
+                  </label>
+                  <div className="flex items-center gap-3 bg-white px-3 py-1.5 rounded-full border border-slate-200 shadow-sm">
+                    <span className={`text-xs font-bold ${!isSimulated ? 'text-blue-600' : 'text-slate-400'}`}>{t('Live')}</span>
+                    <button 
+                      onClick={() => setIsSimulated(!isSimulated)}
+                      className={`w-12 h-6 rounded-full relative transition-colors shadow-inner ${isSimulated ? 'bg-amber-500' : 'bg-blue-600'}`}
+                    >
+                      <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-all shadow-md ${isSimulated ? (lang === 'ar' ? 'right-7' : 'left-7') : (lang === 'ar' ? 'right-1' : 'left-1')}`}></div>
+                    </button>
+                    <span className={`text-xs font-bold ${isSimulated ? 'text-amber-600' : 'text-slate-400'}`}>{t('Simulate')}</span>
+                  </div>
+                </div>
+                
+                {isSimulated && (
+                  <div className="pt-2 animate-in fade-in duration-300">
+                    <input 
+                      type="range" 
+                      min={360} // 6:00 AM
+                      max={1170} // 7:30 PM
+                      value={simMinutes} 
+                      onChange={(e) => setSimMinutes(Number(e.target.value))}
+                      className={`w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-500 ${lang === 'ar' ? 'rotate-180' : ''}`}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
 
-        window.closeMinigame = () => {
-            document.getElementById('minigame-overlay').style.display = 'none';
-            document.getElementById('status').innerText = `الجولة ${roundCounter + 1} - دور اللاعب 1`;
-        };
+            {/* The Visual Track (Two Straight Roads layout) */}
+            <div className="bg-white p-6 md:p-12 rounded-3xl shadow-xl border border-slate-100 overflow-hidden relative" dir="ltr">
+              
+              {/* City Labels */}
+              <div className="flex justify-between items-center mb-8 relative z-10" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+                <div className="text-center bg-white/80 p-2 rounded-lg backdrop-blur-sm">
+                  <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-2 border-4 border-white shadow-md">
+                    <MapPin size={28} />
+                  </div>
+                  <h3 className="font-bold text-xl text-blue-950">{t('Layaycha')}</h3>
+                  <p className="text-sm text-slate-500">{t('Start / End')}</p>
+                </div>
+                
+                <div className="text-center bg-white/80 p-2 rounded-lg backdrop-blur-sm">
+                  <div className="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-2 border-4 border-white shadow-md">
+                    <MapPin size={28} />
+                  </div>
+                  <h3 className="font-bold text-xl text-blue-950">{t('Jijel')}</h3>
+                  <p className="text-sm text-slate-500">{t('Turnaround')}</p>
+                </div>
+              </div>
 
-        document.getElementById('rollBtn').onclick = movePlayer;
+              {/* TWO LONG ROADS CONTAINER */}
+              <div className="relative max-w-5xl mx-auto h-64 md:h-80 my-8 px-8 sm:px-16">
+                <div className="relative w-full h-full">
+                  
+                  {/* Top Road (Outbound to Jijel) */}
+                  <div className="absolute top-[25%] left-0 right-0 h-14 sm:h-16 bg-slate-700 rounded-xl shadow-inner flex items-center overflow-hidden border-y-2 border-slate-500 transform -translate-y-1/2">
+                    <div className="w-full border-t-4 border-dashed border-slate-400/50"></div>
+                    <div className="absolute inset-y-0 right-4 flex items-center opacity-30 text-white animate-pulse">
+                      <ChevronRight size={32} />
+                      <ChevronRight size={32} className="-ml-4" />
+                    </div>
+                  </div>
 
-        function animate() {
-            requestAnimationFrame(animate);
-            controls.update();
-            renderer.render(scene, camera);
-        }
-        updateGraphics();
-        animate();
-    </script>
-</body>
-</html>
+                  {/* Bottom Road (Inbound to Layaycha) */}
+                  <div className="absolute top-[75%] left-0 right-0 h-14 sm:h-16 bg-slate-700 rounded-xl shadow-inner flex items-center overflow-hidden border-y-2 border-slate-500 transform -translate-y-1/2">
+                    <div className="w-full border-t-4 border-dashed border-slate-400/50"></div>
+                    <div className="absolute inset-y-0 left-4 flex items-center opacity-30 text-white animate-pulse">
+                      <ChevronRight size={32} className="rotate-180" />
+                      <ChevronRight size={32} className="rotate-180 -ml-4" />
+                    </div>
+                  </div>
+
+                  {/* Route Stops mapped on both roads */}
+                  {[
+                    { name: 'Layaycha', pos: 0, type: 'terminal', colorClass: 'border-blue-500', bgClass: 'bg-blue-100', textClass: 'text-blue-900' },
+                    { name: 'Firma', pos: 25, type: 'regular', colorClass: 'border-slate-400', bgClass: 'bg-white', textClass: 'text-slate-600' },
+                    { name: 'Kaous Senter', pos: 50, type: 'major', colorClass: 'border-teal-500', bgClass: 'bg-teal-50', textClass: 'text-teal-900' },
+                    { name: 'the_5km', pos: 75, type: 'regular', colorClass: 'border-slate-400', bgClass: 'bg-white', textClass: 'text-slate-600' },
+                    { name: 'Jijel', pos: 100, type: 'terminal', colorClass: 'border-amber-500', bgClass: 'bg-amber-100', textClass: 'text-amber-900' }
+                  ].map((stop, i) => (
+                    <React.Fragment key={`stop-${i}`}>
+                      {/* Top Road Marker */}
+                      <div className="absolute flex flex-col items-center justify-center z-10" style={{ left: `${stop.pos}%`, top: '25%', transform: 'translate(-50%, -50%)' }}>
+                        <div className={`absolute bottom-full mb-2 sm:mb-3 text-[10px] sm:text-xs font-bold whitespace-nowrap px-2 py-1 rounded-lg shadow-sm border-2 ${stop.bgClass} ${stop.textClass} border-slate-200`}>
+                          {t(stop.name)}
+                        </div>
+                        <div className={`bg-white border-4 ${stop.colorClass} rounded-full shadow-md ${stop.type === 'terminal' ? 'w-8 h-8 sm:w-10 sm:h-10 border-[6px]' : stop.type === 'major' ? 'w-6 h-6 border-[5px]' : 'w-4 h-4'}`}></div>
+                      </div>
+
+                      {/* Bottom Road Marker */}
+                      <div className="absolute flex flex-col items-center justify-center z-10" style={{ left: `${stop.pos}%`, top: '75%', transform: 'translate(-50%, -50%)' }}>
+                        <div className={`bg-white border-4 ${stop.colorClass} rounded-full shadow-md ${stop.type === 'terminal' ? 'w-8 h-8 sm:w-10 sm:h-10 border-[6px]' : stop.type === 'major' ? 'w-6 h-6 border-[5px]' : 'w-4 h-4'}`}></div>
+                        <div className={`absolute top-full mt-2 sm:mt-3 text-[10px] sm:text-xs font-bold whitespace-nowrap px-2 py-1 rounded-lg shadow-sm border-2 ${stop.bgClass} ${stop.textClass} border-slate-200`}>
+                          {t(stop.name)}
+                        </div>
+                      </div>
+                    </React.Fragment>
+                  ))}
+
+                  {/* Render Buses on the Roads */}
+                  {buses.map((bus) => {
+                    const isOutbound = bus.progress <= 100;
+                    const percent = isOutbound ? bus.progress : (200 - bus.progress);
+                    
+                    // Color assignment based on bus state
+                    const bgClass = bus.colorTheme === 'amber' ? 'bg-amber-500' : 'bg-teal-500';
+                    const textClass = bus.colorTheme === 'amber' ? 'text-amber-400' : 'text-teal-400';
+                    
+                    return (
+                      <div 
+                        key={bus.id}
+                        className="absolute flex flex-col items-center justify-center transition-all duration-1000 ease-linear z-30"
+                        style={{
+                          left: `${Math.max(0, Math.min(100, percent))}%`,
+                          top: isOutbound ? '25%' : '75%',
+                          transform: `translate(-50%, -50%) ${!isOutbound ? 'scaleX(-1)' : ''}`,
+                        }}
+                      >
+                        <div className="relative cursor-pointer" onClick={() => setActiveBusId(activeBusId === bus.id ? null : bus.id)}>
+                          <div className={`w-14 h-14 ${bgClass} border-4 border-white rounded-full flex items-center justify-center shadow-lg transform transition-all duration-300 ${activeBusId === bus.id ? 'scale-110 ring-4 ring-blue-300 shadow-blue-500/50' : 'hover:scale-110'}`}>
+                            <Bus size={24} className="text-white drop-shadow-md" />
+                          </div>
+                          
+                          {/* Click-based Info Popup with Timer */}
+                          <div className={`absolute transition-all duration-300 bottom-full left-1/2 -translate-x-1/2 mb-3 bg-blue-950 text-white p-0 rounded-xl shadow-2xl w-64 text-left z-40 ${activeBusId === bus.id ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-2 pointer-events-none'}`} style={{ transform: !isOutbound ? 'translate(-50%, 0) scaleX(-1)' : 'translate(-50%, 0)' }} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+                            <div className="p-4">
+                                <p className={`font-bold ${textClass} border-b border-blue-800 pb-2 mb-2 flex justify-between items-center`}>
+                                  {bus.id}
+                                  <span className="text-blue-400 opacity-50 text-xs font-normal hover:opacity-100 transition-opacity">✕</span>
+                                </p>
+                                <p className="text-xs text-blue-200 mb-2 leading-tight">
+                                  <span className="text-blue-400">{t('Status:')}</span> <span className="text-green-400 font-medium inline-block mt-0.5">{bus.status}</span>
+                                </p>
+                                <p className="text-xs text-blue-200 flex justify-between mt-2">{t('Passengers:')} <span>{bus.passengers.sitting + bus.passengers.standing}/{bus.capacity.total}</span></p>
+                                <div className="flex justify-between text-[10px] text-blue-300 mt-1 px-1 border-t border-blue-800/50 pt-2">
+                                  <span>🪑 {bus.passengers.sitting}/{bus.capacity.sitting}</span>
+                                  <span>🧍 {bus.passengers.standing}/{bus.capacity.standing}</span>
+                                </div>
+                            </div>
+                            
+                            {/* Personal Next Stop Timer */}
+                            <div className="bg-slate-900 p-4 rounded-b-xl border-t border-blue-900">
+                               <div className="text-[10px] text-slate-400 uppercase tracking-widest mb-1">
+                                 {t('Next:')} <span className="text-blue-300 font-bold px-1">{bus.nextStopName}</span>
+                               </div>
+                               <div className="font-mono text-sm font-bold text-amber-400 flex items-center gap-2">
+                                  <Clock size={16} className="text-amber-500" />
+                                  {bus.nextStopTime !== null ? (
+                                    <span>{Math.floor(bus.nextStopTime)}{lang === 'ar' ? 'د' : 'm'} {Math.floor((bus.nextStopTime % 1) * 60)}{lang === 'ar' ? 'ث' : 's'}</span>
+                                  ) : (
+                                    <span
+className="text-slate-500 font-sans text-xs">{t('Finished')}</span>
+                                  )}
+                               </div>
+                            </div>
+                            
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-slate-900"></div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              
+              {/* Legend */}
+              <div className="mt-4 flex justify-center gap-8 text-sm font-medium text-slate-600" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+                <div className="flex items-center gap-2">
+                  <Navigation className="text-blue-500 rotate-90" size={16} /> {t('Towards Jijel (Top Lane)')}
+                </div>
+                <div className="flex items-center gap-2">
+                  <Navigation className="text-blue-500 -rotate-90" size={16} /> {t('Towards Layaycha (Bottom Lane)')}
+                </div>
+              </div>
+            </div>
+
+            {/* Fleet Status Cards (Now rendering multiple buses) */}
+            <div className="grid grid-cols-1 md:grid-cols-2 max-w-4xl mx-auto gap-6 mt-8">
+              {buses.map(bus => (
+                <div key={bus.id} className="bg-white rounded-2xl p-6 shadow-md border border-slate-100 flex items-start gap-4">
+                  <div className={`p-3 rounded-xl text-white ${bus.colorTheme === 'amber' ? 'bg-amber-500' : 'bg-teal-500'}`}>
+                    <Bus size={24} />
+                  </div>
+                  <div className="flex-1 w-full">
+                    <h4 className="font-bold text-lg text-blue-950">{bus.id}</h4>
+                    <p className="text-sm font-semibold text-blue-600 mb-2 whitespace-nowrap overflow-hidden text-ellipsis">
+                      {bus.status}
+                    </p>
+                    <div className="flex justify-between items-start text-sm font-medium">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-slate-600 flex items-center gap-2">
+                          <User size={16} className="text-blue-500" /> {bus.passengers.sitting + bus.passengers.standing} / {bus.capacity.total} {t('Total')}
+                        </span>
+                        <div className={`flex gap-3 text-xs text-slate-400 ${lang === 'ar' ? 'mr-6' : 'ml-6'}`}>
+                          <span>🪑 {bus.passengers.sitting}/{bus.capacity.sitting} {t('sitting')}</span>
+                          <span>🧍 {bus.passengers.standing}/{bus.capacity.standing} {t('standing')}</span>
+                        </div>
+                      </div>
+                      <span className="text-blue-600">{Math.round(bus.progress > 100 ? 200 - bus.progress : bus.progress)} {t('% journey')}</span>
+                    </div>
+                    {/* Mini Progress bar */}
+                    <div className="w-full bg-slate-100 h-2 rounded-full mt-2 overflow-hidden" dir="ltr">
+                      <div 
+                        className={`${bus.colorTheme === 'amber' ? 'bg-amber-500' : 'bg-teal-500'} h-full rounded-full transition-all duration-1000`}
+                        style={{ width: `${bus.progress > 100 ? (bus.progress - 100) : bus.progress}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Smart Stop ETA Filter */}
+            <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-8 mt-8">
+              <div className="flex flex-col md:flex-row justify-between items-center mb-6 pb-4 border-b border-slate-100 gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-blue-100 p-2 rounded-lg text-blue-600">
+                    <Filter size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-blue-950">{t('Stop Arrival Times')}</h3>
+                    <p className="text-sm text-slate-500">{t('Filter to see when the next bus arrives at your location.')}</p>
+                  </div>
+                </div>
+                
+                {/* Stop Selector */}
+                <div className="flex flex-wrap justify-center gap-2">
+                  {STOPS.map(stop => (
+                    <button 
+                      key={stop.name}
+                      onClick={() => setSelectedStopFilter(stop.name)}
+                      className={`px-4 py-2 rounded-full text-sm font-semibold transition-all shadow-sm ${selectedStopFilter === stop.name ? 'bg-blue-600 text-white shadow-blue-500/30' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                    >
+                      {t(stop.name)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* ETA Results */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Towards Jijel */}
+                <div className="bg-gradient-to-br from-blue-50 to-white p-6 rounded-2xl border border-blue-100 relative overflow-hidden">
+                  <div className={`absolute top-0 p-4 opacity-10 ${lang === 'ar' ? 'left-0' : 'right-0'}`}><Navigation size={64} className="rotate-90"/></div>
+                  <h4 className="text-blue-900 font-bold mb-1 flex items-center gap-2">
+                    <MapPin size={16} className="text-blue-500" /> {t('Towards Jijel')}
+                  </h4>
+                  <p className="text-sm text-blue-700 mb-4">{t('Passing through')} {t(selectedStopFilter)}</p>
+                  
+                  {nextOutboundTrip ? (
+                    <div className="flex items-end gap-3">
+                      <span className="text-3xl font-black text-blue-600">{formatTimeDisplay(nextOutboundTrip.depart + activeFilterStop.outOffset)}</span>
+                      <span className="text-sm font-medium text-slate-500 mb-1">
+                        ({lang === 'ar' ? 'خلال' : 'in'} {Math.ceil((nextOutboundTrip.depart + activeFilterStop.outOffset) - activeMinutes)} {lang === 'ar' ? 'د' : 'mins'})
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-lg font-bold text-slate-400">{t('No more buses today')}</span>
+                  )}
+                </div>
+
+                {/* Towards Layaycha */}
+                <div className="bg-gradient-to-br from-amber-50 to-white p-6 rounded-2xl border border-amber-100 relative overflow-hidden">
+                  <div className={`absolute top-0 p-4 opacity-10 ${lang === 'ar' ? 'left-0' : 'right-0'}`}><Navigation size={64} className="-rotate-90"/></div>
+                  <h4 className="text-amber-900 font-bold mb-1 flex items-center gap-2">
+                    <MapPin size={16} className="text-amber-500" /> {t('Towards Layaycha')}
+                  </h4>
+                  <p className="text-sm text-amber-700 mb-4">{t('Passing through')} {t(selectedStopFilter)}</p>
+
+                  {nextInboundTrip ? (
+                    <div className="flex items-end gap-3">
+                      <span className="text-3xl font-black text-amber-600">{formatTimeDisplay(nextInboundTrip.depart + activeFilterStop.inOffset)}</span>
+                      <span className="text-sm font-medium text-slate-500 mb-1">
+                        ({lang === 'ar' ? 'خلال' : 'in'} {Math.ceil((nextInboundTrip.depart + activeFilterStop.inOffset) - activeMinutes)} {lang === 'ar' ? 'د' : 'mins'})
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-lg font-bold text-slate-400">{t('No more buses today')}</span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Daily Schedule Timetable */}
+            <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-8 md:p-12 mt-8">
+              <h3 className="text-2xl font-bold text-blue-950 mb-6 text-center">{t('Daily Bus Schedule')}</h3>
+              
+              {/* Timetable Toggle */}
+              <div className="flex flex-wrap justify-center gap-2 mb-8 border-b border-slate-100 pb-6">
+                {['All Buses', 'Salhe 2006', 'Anter-2008'].map(busOption => (
+                  <button 
+                    key={busOption}
+                    onClick={() => setActiveTimetable(busOption)}
+                    className={`px-6 py-2 rounded-full text-sm font-semibold transition-all shadow-sm ${activeTimetable === busOption ? 'bg-blue-600 text-white shadow-blue-500/30' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                  >
+                    {t(busOption)}
+                  </button>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                {/* Layaycha to Jijel */}
+                <div>
+                  <div className="flex items-center gap-3 mb-4 text-blue-900 font-bold text-lg">
+                    <MapPin className="text-blue-500" />
+                    {t('Layaycha')} <ChevronRight size={16} className={lang === 'ar' ? 'rotate-180' : ''} /> {t('Jijel')}
+                  </div>
+<div className="grid grid-cols-3 sm:grid-cols-4 gap-3" dir="ltr">
+                    {displayLayaycha.map((time, i) => (
+                      <div key={i} className="bg-blue-50 border border-blue-100 text-blue-900 font-medium py-2 px-2 rounded-lg text-center shadow-sm text-sm">
+                        {time}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Jijel to Layaycha */}
+                <div>
+                  <div className="flex items-center gap-3 mb-4 text-amber-700 font-bold text-lg">
+                    <MapPin className="text-amber-500" />
+                    {t('Jijel')} <ChevronRight size={16} className={lang === 'ar' ? 'rotate-180' : ''} /> {t('Layaycha')}
+                  </div>
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-3" dir="ltr">
+                    {displayJijel.map((time, i) => (
+                      <div key={i} className="bg-amber-50 border border-amber-100 text-amber-900 font-medium py-2 px-2 rounded-lg text-center shadow-sm text-sm">
+                        {time}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* INFO VIEW */}
+        {activeTab === 'info' && (
+          <div className="max-w-5xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl font-bold text-blue-950 mb-2">{t('About nadjib G-line')}</h2>
+              <p className="text-slate-500">{t('Everything you need to know about our daily bus service.')}</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Pricing */}
+              <div className="bg-white rounded-3xl shadow-lg border border-slate-100 p-8 text-center flex flex-col items-center hover:shadow-xl transition-shadow">
+                <div className="w-16 h-16 bg-green-100 text-green-600 rounded-2xl flex items-center justify-center mb-4 rotate-3">
+                  <BadgeDollarSign size={32} />
+                </div>
+                <h3 className="text-xl font-bold text-blue-950 mb-2">{t('Ticket Price')}</h3>
+                <p className="text-slate-500 mb-6">{t('Route Fares')}</p>
+                
+                <div className="w-full space-y-2 mt-auto">
+                  <div className="flex justify-between items-center bg-green-50 px-3 py-2 rounded-xl">
+                    <span className="font-semibold text-slate-700 text-xs">{t('Layaycha')} ↔ {t('Kaous Senter')}</span>
+                    <span className="font-black text-green-600 text-sm">20 {t('DA')}</span>
+                  </div>
+                  <div className="flex justify-between items-center bg-green-50 px-3 py-2 rounded-xl">
+                    <span className="font-semibold text-slate-700 text-xs">{t('Jijel')} ↔ {t('the_5km')}</span>
+                    <span className="font-black text-green-600 text-sm">20 {t('DA')}</span>
+                  </div>
+                  <div className="flex justify-between items-center bg-green-50 px-3 py-2 rounded-xl">
+                    <span className="font-semibold text-slate-700 text-xs">{t('Jijel')} ↔ {t('Kaous Senter')}</span>
+                    <span className="font-black text-green-600 text-sm">25 {t('DA')}</span>
+                  </div>
+                  <div className="flex justify-between items-center bg-green-100 px-3 py-2 rounded-xl border border-green-200 mt-2">
+                    <span className="font-bold text-slate-800 text-sm">{t('Jijel')} ↔ {t('Layaycha')}</span>
+                    <span className="font-black text-green-700 text-sm">30 {t('DA')}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Operating Hours */}
+              <div className="bg-white rounded-3xl shadow-lg border border-slate-100 p-8 text-center flex flex-col items-center hover:shadow-xl transition-shadow">
+                <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-4 -rotate-3">
+                  <Clock size={32} />
+                </div>
+                <h3 className="text-xl font-bold text-blue-950 mb-2">{t('Operating Hours')}</h3>
+                <p className="text-slate-500 mb-4">{t('First bus at 6:30 AM, last arrival at 6:30 PM')}</p>
+                <div className="text-lg font-bold text-blue-600 mt-auto flex flex-col">
+                  <span>{t('Layaycha')} ↔ {t('Jijel')}</span>
+                </div>
+              </div>
+
+              {/* Contact */}
+              <div className="bg-white rounded-3xl shadow-lg border border-slate-100 p-8 text-center flex flex-col items-center hover:shadow-xl transition-shadow">
+                <div className="w-16 h-16 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mb-4 rotate-3">
+                  <Phone size={32} />
+                </div>
+                <h3 className="text-xl font-bold text-blue-950 mb-2">{t('Contact & Support')}</h3>
+                <p className="text-slate-500 mb-4">{t('For inquiries or lost items')}</p>
+                <div className="text-xl font-black text-amber-600 mt-auto" dir="ltr">
+                  +213 555 00 00 00
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-slate-900 text-slate-400 py-8 text-center mt-12">
+        <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Bus className="w-6 h-6 text-amber-400" />
+            <span className="text-xl font-bold text-white tracking-tight">nadjib <span className="text-amber-400">G-line</span></span>
+          </div>
+          <p className="text-sm">© 2026 nadjib G-line. {t('All rights reserved.')}</p>
+          <div className="flex gap-4 text-sm">
+            <a href="#" className="hover:text-white transition-colors">{t('Support')}</a>
+            <a href="#" className="hover:text-white transition-colors">{t('Terms')}</a>
+            <a href="#" className="hover:text-white transition-colors">{t('Privacy')}</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
