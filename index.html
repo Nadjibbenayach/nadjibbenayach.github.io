@@ -1,60 +1,136 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real-Time Bus Tracker</title>
-    
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
+    <title>Reflex Tester</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Remove default margins so the map fills the whole window */
-        body { margin: 0; padding: 0; }
-        #map { width: 100vw; height: 100vh; } 
+        #game-area {
+            position: relative;
+            overflow: hidden;
+        }
+        #target {
+            position: absolute;
+            transition: transform 0.1s;
+        }
+        #target:active {
+            transform: scale(0.9);
+        }
     </style>
 </head>
-<body>
+<body class="bg-slate-900 text-white font-sans h-screen flex flex-col">
 
-    <div id="map"></div>
-
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
-    <script>
-        // --- MAP SETUP ---
-        // Initialize the map and set the starting view (Latitude, Longitude, and Zoom Level)
-        // I've centered this near Algiers for our example!
-        const map = L.map('map').setView([36.7538, 3.0588], 14);
-
-        // Add the street map imagery from OpenStreetMap
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
-
-        // --- BUS MARKER SETUP ---
-        // Define the starting coordinates for our bus
-        let busCoordinates = [36.7538, 3.0588];
+    <!-- Header -->
+    <header class="p-6 text-center shadow-md bg-slate-800">
+        <h1 class="text-3xl font-bold text-blue-400 mb-2">Reflex Tester</h1>
+        <p class="text-slate-400">Click the red dot as fast as you can!</p>
         
-        // Add a marker to the map at those coordinates
-        const busMarker = L.marker(busCoordinates).addTo(map)
-            .bindPopup('<b>Bus 42</b><br>On route.')
-            .openPopup();
+        <div class="mt-4 flex justify-center gap-8 text-lg">
+            <div>Score: <span id="score" class="font-bold text-green-400">0</span></div>
+            <div>Avg Time: <span id="avg-time" class="font-bold text-yellow-400">0</span> ms</div>
+        </div>
+    </header>
 
-        // --- REAL-TIME SIMULATION ---
-        // The setInterval function runs code repeatedly on a timer (every 2000 milliseconds = 2 seconds)
-        setInterval(() => {
-            // 1. Simulate the bus moving by changing its coordinates slightly
-            busCoordinates[0] += 0.0002; // Move North
-            busCoordinates[1] += 0.0003; // Move East
+    <!-- Main Game Area -->
+<main class="flex-grow p-4 flex flex-col items-center justify-center">
+        
+        <!-- Start Screen -->
+        <div id="start-screen" class="text-center">
+            <button id="start-btn" class="px-8 py-4 bg-blue-500 hover:bg-blue-600 text-white rounded-full font-bold text-xl shadow-lg shadow-blue-500/50 transition-all transform hover:scale-105 active:scale-95">
+                Start Game
+            </button>
+        </div>
 
-            // 2. Tell the map marker to update its position to the new coordinates
-            busMarker.setLatLng(busCoordinates);
+        <!-- Game Canvas (Hidden by default) -->
+        <div id="game-area" class="hidden w-full max-w-2xl h-[60vh] bg-slate-800 rounded-2xl border-2 border-slate-700 shadow-inner">
+            <button id="target" class="w-12 h-12 bg-red-500 rounded-full shadow-lg shadow-red-500/50 cursor-pointer hidden focus:outline-none"></button>
+        </div>
+        
+    </main>
 
-            // Optional: Tell the map to follow the bus as it moves
-            map.panTo(busCoordinates);
+    <script>
+        const startBtn = document.getElementById('start-btn');
+        const startScreen = document.getElementById('start-screen');
+        const gameArea = document.getElementById('game-area');
+        const target = document.getElementById('target');
+        const scoreEl = document.getElementById('score');
+        const avgTimeEl = document.getElementById('avg-time');
 
-            console.log("Bus moved to:", busCoordinates);
-        }, 2000); 
+        let score = 0;
+        let totalTime = 0;
+        let startTime = 0;
+        let isPlaying = false;
+        let timeoutId = null;
+
+        startBtn.addEventListener('click', startGame);
+        target.addEventListener('mousedown', hitTarget);
+        target.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Prevent double firing on touch devices
+            hitTarget();
+        });
+
+        function startGame() {
+            score = 0;
+            totalTime = 0;
+            updateStats();
+            
+            startScreen.classList.add('hidden');
+            gameArea.classList.remove('hidden');
+            isPlaying = true;
+            
+            queueNextTarget();
+        }
+
+        function queueNextTarget() {
+            target.classList.add('hidden');
+            
+            // Random delay between 500ms and 2000ms
+            const delay = Math.random() * 1500 + 500;
+            
+            timeoutId = setTimeout(() => {
+if (!isPlaying) return;
+                showTarget();
+            }, delay);
+        }
+
+        function showTarget() {
+            const areaWidth = gameArea.clientWidth;
+            const areaHeight = gameArea.clientHeight;
+            const targetSize = 48; // 12 * 4px (w-12 class)
+
+            // Calculate random position within bounds
+            const maxX = areaWidth - targetSize;
+            const maxY = areaHeight - targetSize;
+            
+            const randomX = Math.max(0, Math.floor(Math.random() * maxX));
+            const randomY = Math.max(0, Math.floor(Math.random() * maxY));
+
+            target.style.left = `${randomX}px`;
+            target.style.top = `${randomY}px`;
+            
+            target.classList.remove('hidden');
+            startTime = Date.now();
+        }
+
+        function hitTarget() {
+            if (!isPlaying || target.classList.contains('hidden')) return;
+
+            const reactionTime = Date.now() - startTime;
+            
+            score++;
+            totalTime += reactionTime;
+            
+            updateStats();
+            queueNextTarget();
+        }
+
+        function updateStats() {
+            scoreEl.textContent = score;
+            const avg = score > 0 ? Math.round(totalTime / score) : 0;
+            avgTimeEl.textContent = avg;
+        }
     </script>
 </body>
 </html>
