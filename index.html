@@ -1,381 +1,490 @@
-```react
-import React, { useState, useEffect } from 'react';
-import { Bus, Clock, Play, FastForward, Pause, X, MapPin, Navigation, Info } from 'lucide-react';
-
-// === Core System Configuration ===
-const START_TIME_MINUTES = 6 * 60 + 30; // 06:30 AM
-const END_TIME_MINUTES = 19 * 60; // 19:00 PM
-const CYCLE_DURATION = 90; // Full cycle: 90 minutes
-
-const BUSES = [
-  { id: 1, name: 'حافلة 1', offset: 0, color: 'bg-emerald-500', glow: 'shadow-[0_0_20px_rgba(16,185,129,0.6)]', text: 'text-emerald-400' },
-  { id: 2, name: 'حافلة 2', offset: 30, color: 'bg-blue-500', glow: 'shadow-[0_0_20px_rgba(59,130,246,0.6)]', text: 'text-blue-400' },
-  { id: 3, name: 'حافلة 3', offset: 60, color: 'bg-purple-500', glow: 'shadow-[0_0_20px_rgba(168,85,247,0.6)]', text: 'text-purple-400' }
-];
-
-// Advanced route map with exact wait/move timings
-const ROUTE_STEPS = [
-  { id: 's1_out', name: 'العيايشة', x: 30, y: 15, wait: 5, move: 10, nextX: 30, nextY: 40 },
-  { id: 's2_out', name: 'وسط قاوس', x: 30, y: 40, wait: 5, move: 10, nextX: 30, nextY: 65 }, // Updated name
-  { id: 's3_in_term', name: 'دخول المحطة', x: 30, y: 65, wait: 0, move: 2, nextX: 50, nextY: 86 },
-  { id: 'terminal', name: 'محطة جيجل', x: 50, y: 86, wait: 10, move: 3, nextX: 70, nextY: 65 }, 
-  { id: 's3_inbound', name: 'خروج من المحطة', x: 70, y: 65, wait: 0, move: 10, nextX: 70, nextY: 40 },
-  { id: 's2_in', name: 'وسط قاوس (عودة)', x: 70, y: 40, wait: 5, move: 10, nextX: 70, nextY: 15 }, // Updated name
-  { id: 's1_in', name: 'العيايشة (عودة)', x: 70, y: 15, wait: 5, move: 10, nextX: 30, nextY: 15 },
-  { id: 's1_buffer', name: 'استراحة', x: 30, y: 15, wait: 5, move: 0, nextX: 30, nextY: 15 }
-];
-
-const STOPS = [
-  { id: 's1', name: 'العيايشة', y: 15 },
-  { id: 's2', name: 'وسط قاوس (Kaous Center)', y: 40 } // Updated Name
-];
-
-export default function App() {
-  const [simulatedTime, setSimulatedTime] = useState(() => new Date());
-  const [timeMultiplier, setTimeMultiplier] = useState(1);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [isLiveMode, setIsLiveMode] = useState(true);
-  const [selectedBusId, setSelectedBusId] = useState(null); // State for the individual bus dashboard
-
-  // Smart Time Engine
-  useEffect(() => {
-    if (!isPlaying) return;
-    const intervalId = setInterval(() => {
-      if (isLiveMode) {
-        setSimulatedTime(new Date());
-      } else {
-        setSimulatedTime(prev => new Date(prev.getTime() + (50 * timeMultiplier)));
-      }
-    }, isLiveMode ? 1000 : 50);
-    return () => clearInterval(intervalId);
-  }, [timeMultiplier, isPlaying, isLiveMode]);
-
-  // Logic to calculate exact bus position and status
-  const getBusData = (busOffset, busId) => {
-    const currentMinutes = simulatedTime.getHours() * 60 + simulatedTime.getMinutes() + simulatedTime.getSeconds() / 60;
-    const diff = currentMinutes - START_TIME_MINUTES - busOffset;
-
-    if (diff < 0) return { status: 'في المرآب (ينتظر الانطلاق)', x: 30 + (busId * 2), y: 10, isMoving: false, rotation: 180, isParked: true, countdown: null, progress: 0 };
-
-    const maxAllowedActiveTime = END_TIME_MINUTES - START_TIME_MINUTES - busOffset;
-    const busEndOfShiftActiveTime = Math.floor(maxAllowedActiveTime / CYCLE_DURATION) * CYCLE_DURATION;
-
-    if (diff >= busEndOfShiftActiveTime) {
-      return { status: 'انتهاء الوردية (المرآب)', x: 30 + (busId * 2), y: 10, isMoving: false, rotation: 180, isParked: true, countdown: null, progress: 100 };
-    }
-
-    const cycleTime = diff % CYCLE_DURATION;
-    const progress = (cycleTime / CYCLE_DURATION) * 100; // Track cycle progress percentage
+```html
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Tracker Pro - المرقاب الذكي</title>
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons (CDN) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     
-    let accumulatedTime = 0;
-    let currentStep = ROUTE_STEPS[0];
-    let timeInStep = 0;
-
-    for (let i = 0; i < ROUTE_STEPS.length; i++) {
-        const step = ROUTE_STEPS[i];
-        const stepDuration = step.wait + step.move;
-        if (cycleTime < accumulatedTime + stepDuration) {
-            currentStep = step;
-            timeInStep = cycleTime - accumulatedTime;
-            break;
+    <style>
+        /* إعدادات إضافية لجعل الحركة ناعمة جداً */
+        .bus-element {
+            transition: left 0.05s linear, top 0.05s linear, transform 0.2s ease-out;
         }
-        accumulatedTime += stepDuration;
-    }
+    </style>
+</head>
+<body class="min-h-screen bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-[#0b1121] to-black text-slate-100 font-sans p-4 md:p-8 flex flex-col md:flex-row gap-8">
 
-    let fraction = 0;
-    let isMoving = false;
-    let status = `${currentStep.name} - انتظار`;
-    let countdown = null;
-
-    if (timeInStep < currentStep.wait) {
-        isMoving = false;
-        if (currentStep.id === 'terminal') {
-            status = 'محطة جيجل - انتظار للعودة';
-            const remMinutes = currentStep.wait - timeInStep;
-            const m = Math.floor(remMinutes);
-            const s = Math.floor((remMinutes - m) * 60);
-            countdown = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-        } else {
-            status = `${currentStep.name} - ركوب/نزول`;
-        }
-    } else {
-        isMoving = true;
-        const moveTime = timeInStep - currentStep.wait;
-        fraction = moveTime / currentStep.move;
-        const nextStepIndex = (ROUTE_STEPS.indexOf(currentStep) + 1) % ROUTE_STEPS.length;
-        status = `متجه إلى ${ROUTE_STEPS[nextStepIndex].name}`;
-    }
-
-    const x = currentStep.x + (currentStep.nextX - currentStep.x) * fraction;
-    const y = currentStep.y + (currentStep.nextY - currentStep.y) * fraction;
-
-    let rotation = 0;
-    if (isMoving) {
-        const angle = Math.atan2(currentStep.nextY - currentStep.y, currentStep.nextX - currentStep.x) * (180 / Math.PI);
-        rotation = angle + 90; 
-    } else {
-        if (currentStep.id === 'terminal') rotation = 180; 
-        else if (currentStep.x < 50) rotation = 180; 
-        else rotation = 0; 
-    }
-
-    return { status, x, y, isMoving, rotation, isParked: false, countdown, progress };
-  };
-
-  const formatTime = (date) => date.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-
-  // Get selected bus data for the modal
-  const selectedBus = BUSES.find(b => b.id === selectedBusId);
-  const selectedBusData = selectedBus ? getBusData(selectedBus.offset, selectedBus.id) : null;
-
-  return (
-    <div className="min-h-screen bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-[#0b1121] to-black text-slate-100 font-sans p-4 md:p-8 flex flex-col md:flex-row gap-8" dir="rtl">
-      
-      {/* === Individual Bus Dashboard Modal === */}
-      {selectedBusId && selectedBus && selectedBusData && (
-        <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity"
-          onClick={() => setSelectedBusId(null)}
-        >
-          <div 
-            className="bg-slate-900 border border-slate-700/50 rounded-3xl p-6 shadow-2xl w-full max-w-sm relative overflow-hidden"
-            onClick={e => e.stopPropagation()}
-          >
-            {/* Ambient Background Glow for the Modal */}
-            <div className={`absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl opacity-20 ${selectedBus.color}`}></div>
+    <!-- === Individual Bus Dashboard Modal === -->
+    <div id="busModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity hidden" onclick="closeModal()">
+        <div id="modalContent" class="bg-slate-900 border border-slate-700/50 rounded-3xl p-6 shadow-2xl w-full max-w-sm relative overflow-hidden" onclick="event.stopPropagation()">
+            <!-- Ambient Glow -->
+            <div id="modalGlow" class="absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl opacity-20"></div>
             
-            <button 
-              onClick={() => setSelectedBusId(null)}
-              className="absolute top-4 left-4 p-2 bg-slate-800/50 hover:bg-slate-700 rounded-full transition-colors"
-            >
-              <X size={20} className="text-slate-400" />
+            <button onclick="closeModal()" class="absolute top-4 left-4 p-2 bg-slate-800/50 hover:bg-slate-700 rounded-full transition-colors">
+                <i data-lucide="x" class="text-slate-400 w-5 h-5"></i>
             </button>
 
-            <div className="flex flex-col items-center mt-4">
-              <div className={`w-20 h-20 rounded-2xl ${selectedBus.color} ${selectedBus.glow} flex items-center justify-center mb-4`}>
-                <Bus size={40} className="text-white" />
-              </div>
-              <h2 className="text-2xl font-bold text-white mb-1">{selectedBus.name}</h2>
-              <span className={`px-3 py-1 rounded-full text-xs font-bold border border-slate-700 ${selectedBus.text} bg-slate-800/50`}>
-                {selectedBusData.isParked ? 'خارج الخدمة' : 'في الخدمة'}
-              </span>
+            <div class="flex flex-col items-center mt-4">
+                <div id="modalBusIcon" class="w-20 h-20 rounded-2xl flex items-center justify-center mb-4">
+                    <i data-lucide="bus" class="text-white w-10 h-10"></i>
+                </div>
+                <h2 id="modalBusName" class="text-2xl font-bold text-white mb-1"></h2>
+                <span id="modalBusStatus" class="px-3 py-1 rounded-full text-xs font-bold border border-slate-700 bg-slate-800/50"></span>
             </div>
 
-            <div className="mt-8 space-y-4">
-              <div className="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50">
-                <div className="flex items-center gap-3 mb-2">
-                  <Navigation size={18} className="text-slate-400" />
-                  <span className="text-sm text-slate-400">الحالة الحالية</span>
+            <div class="mt-8 space-y-4">
+                <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50">
+                    <div class="flex items-center gap-3 mb-2">
+                        <i data-lucide="navigation" class="text-slate-400 w-4 h-4"></i>
+                        <span class="text-sm text-slate-400">الحالة الحالية</span>
+                    </div>
+                    <div id="modalLiveStatus" class="text-lg font-bold text-slate-200"></div>
+                    <div id="modalCountdownContainer" class="mt-2 flex items-center gap-2 hidden">
+                        <i data-lucide="clock" class="text-red-400 w-4 h-4"></i>
+                        <span id="modalCountdownText" class="text-sm font-mono text-red-400 font-bold bg-red-950/50 px-2 py-1 rounded"></span>
+                    </div>
                 </div>
-                <div className="text-lg font-bold text-slate-200">
-                  {selectedBusData.status}
-                </div>
-                {selectedBusData.countdown && (
-                   <div className="mt-2 flex items-center gap-2">
-                     <Clock size={16} className="text-red-400" />
-                     <span className="text-sm font-mono text-red-400 font-bold bg-red-950/50 px-2 py-1 rounded">
-                       يغادر بعد {selectedBusData.countdown}
-                     </span>
-                   </div>
-                )}
-              </div>
 
-              <div className="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50">
-                <div className="flex items-center gap-3 mb-3">
-                  <MapPin size={18} className="text-slate-400" />
-                  <span className="text-sm text-slate-400">تقدم الرحلة (دورة 90 دقيقة)</span>
+                <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50">
+                    <div class="flex items-center gap-3 mb-3">
+                        <i data-lucide="map-pin" class="text-slate-400 w-4 h-4"></i>
+                        <span class="text-sm text-slate-400">تقدم الرحلة (دورة 90 دقيقة)</span>
+                    </div>
+                    <div class="w-full bg-slate-950 rounded-full h-3 mb-2 border border-slate-800 overflow-hidden">
+                        <div id="modalProgressBar" class="h-3 rounded-full transition-all duration-300 ease-linear w-0"></div>
+                    </div>
+                    <div id="modalProgressText" class="text-right text-xs text-slate-500 font-mono">0% مكتمل</div>
                 </div>
-                <div className="w-full bg-slate-950 rounded-full h-3 mb-2 border border-slate-800 overflow-hidden">
-                  <div 
-                    className={`h-3 rounded-full ${selectedBus.color} transition-all duration-300 ease-linear`}
-                    style={{ width: `${selectedBusData.progress}%` }}
-                  ></div>
-                </div>
-                <div className="text-right text-xs text-slate-500 font-mono">
-                  {Math.round(selectedBusData.progress)}% مكتمل
-                </div>
-              </div>
             </div>
-          </div>
         </div>
-      )}
+    </div>
 
-      {/* === Right Panel: Main Dashboard Controls === */}
-      <div className="w-full md:w-1/3 flex flex-col gap-6 z-10">
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-2xl relative overflow-hidden">
-          {/* Subtle decoration */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl"></div>
-          
-          <div className="flex items-center justify-between mb-4 relative z-10">
-            <h1 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-l from-white to-slate-400">
-              مركز التحكم
-            </h1>
-            <div className={`flex items-center gap-2 text-xs px-3 py-1.5 rounded-full font-bold ${isLiveMode ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800 text-slate-400 border border-slate-700'}`}>
-               {isLiveMode ? '📡 حي' : '⚙️ محاكاة'}
+    <!-- === Right Panel: Main Dashboard Controls === -->
+    <div class="w-full md:w-1/3 flex flex-col gap-6 z-10">
+        <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl"></div>
+            
+            <div class="flex items-center justify-between mb-4 relative z-10">
+                <h1 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-l from-white to-slate-400">
+                    مركز التحكم
+                </h1>
+                <div id="modeIndicator" class="flex items-center gap-2 text-xs px-3 py-1.5 rounded-full font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                   📡 حي
+                </div>
             </div>
-          </div>
-          
-          <div className="text-5xl font-mono font-light text-center my-8 tracking-widest text-white drop-shadow-md">
-            {formatTime(simulatedTime)}
-          </div>
+            
+            <div id="mainClock" class="text-5xl font-mono font-light text-center my-8 tracking-widest text-white drop-shadow-md">
+                00:00:00
+            </div>
 
-          <div className="flex flex-wrap justify-center gap-2 relative z-10">
-            <button 
-              onClick={() => setIsPlaying(!isPlaying)}
-              className="p-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-600 transition-colors"
-            >
-              {isPlaying ? <Pause size={20} className="text-amber-400"/> : <Play size={20} className="text-emerald-400"/>}
-            </button>
-            <button 
-              onClick={() => { setIsLiveMode(true); setTimeMultiplier(1); }}
-              className={`px-4 py-3 rounded-xl text-sm font-bold transition-colors border ${isLiveMode ? 'bg-emerald-600/90 border-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.4)]' : 'bg-slate-800/80 border-slate-600 text-slate-300 hover:bg-slate-700'}`}
-            >
-              مزامنة 📡
-            </button>
-            <button 
-              onClick={() => { setIsLiveMode(false); setTimeMultiplier(60); }} 
-              className={`px-4 py-3 rounded-xl text-sm font-bold flex items-center gap-1 transition-colors border ${!isLiveMode && timeMultiplier === 60 ? 'bg-blue-600/90 border-blue-500 text-white shadow-[0_0_15px_rgba(59,130,246,0.4)]' : 'bg-slate-800/80 border-slate-600 text-slate-300 hover:bg-slate-700'}`}
-            >
-              <FastForward size={16}/> x60
-            </button>
-            <button 
-              onClick={() => { setIsLiveMode(false); setTimeMultiplier(600); }} 
-              className={`px-4 py-3 rounded-xl text-sm font-bold flex items-center gap-1 transition-colors border ${!isLiveMode && timeMultiplier === 600 ? 'bg-purple-600/90 border-purple-500 text-white shadow-[0_0_15px_rgba(168,85,247,0.4)]' : 'bg-slate-800/80 border-slate-600 text-slate-300 hover:bg-slate-700'}`}
-            >
-              <FastForward size={16}/> x600
-            </button>
-          </div>
+            <div class="flex flex-wrap justify-center gap-2 relative z-10">
+                <button onclick="togglePlay()" id="btnPlay" class="p-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-600 transition-colors">
+                    <i data-lucide="pause" class="text-amber-400 w-5 h-5"></i>
+                </button>
+                <button onclick="setMode(true, 1)" id="btnSync" class="px-4 py-3 rounded-xl text-sm font-bold transition-colors border bg-emerald-600/90 border-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.4)]">
+                    مزامنة 📡
+                </button>
+                <button onclick="setMode(false, 60)" id="btnX60" class="px-4 py-3 rounded-xl text-sm font-bold flex items-center gap-1 transition-colors border bg-slate-800/80 border-slate-600 text-slate-300 hover:bg-slate-700">
+                    <i data-lucide="fast-forward" class="w-4 h-4"></i> x60
+                </button>
+                <button onclick="setMode(false, 600)" id="btnX600" class="px-4 py-3 rounded-xl text-sm font-bold flex items-center gap-1 transition-colors border bg-slate-800/80 border-slate-600 text-slate-300 hover:bg-slate-700">
+                    <i data-lucide="fast-forward" class="w-4 h-4"></i> x600
+                </button>
+            </div>
         </div>
 
-        {/* Bus List (Clickable) */}
-        <div className="flex flex-col gap-3">
-          <h2 className="text-sm font-bold text-slate-400 mb-1 ml-2 uppercase tracking-wider">أسطول الحافلات (اضغط للتفاصيل)</h2>
-          {BUSES.map((bus) => {
-            const data = getBusData(bus.offset, bus.id);
-            return (
-              <div 
-                key={bus.id} 
-                onClick={() => setSelectedBusId(bus.id)}
-                className="bg-white/5 backdrop-blur-md border border-white/10 hover:border-white/20 rounded-2xl p-4 flex items-center gap-4 transition-all cursor-pointer group"
-              >
-                <div className={`p-3 rounded-xl relative transition-transform group-hover:scale-110 ${data.isParked ? 'bg-slate-800' : bus.color} ${data.isParked ? '' : bus.glow}`}>
-                  <Bus size={20} className={data.isParked ? 'text-slate-500' : 'text-white'} />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-slate-100">{bus.name}</h3>
-                  <div className="flex justify-between items-center mt-1">
-                    <p className={`text-xs font-medium truncate max-w-[180px] ${data.isParked ? 'text-slate-500' : 'text-slate-300'}`}>
-                      {data.status}
-                    </p>
-                  </div>
-                </div>
-                {/* Visual Indicator */}
-                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-800/50 group-hover:bg-slate-700/50 transition-colors">
-                   <Info size={16} className="text-slate-400" />
-                </div>
-              </div>
-            );
-          })}
+        <!-- Bus List -->
+        <div class="flex flex-col gap-3">
+            <h2 class="text-sm font-bold text-slate-400 mb-1 ml-2 uppercase tracking-wider">أسطول الحافلات (اضغط للتفاصيل)</h2>
+            <div id="busListContainer" class="flex flex-col gap-3">
+                <!-- Injected via JS -->
+            </div>
         </div>
-      </div>
+    </div>
 
-      {/* === Left Panel: Advanced Live Map === */}
-      <div className="w-full md:w-2/3 h-[600px] md:h-auto bg-slate-900/50 backdrop-blur-2xl border border-white/10 rounded-3xl relative overflow-hidden flex items-center justify-center shadow-2xl">
+    <!-- === Left Panel: Advanced Live Map === -->
+    <div class="w-full md:w-2/3 h-[600px] md:h-auto bg-slate-900/50 backdrop-blur-2xl border border-white/10 rounded-3xl relative overflow-hidden flex items-center justify-center shadow-2xl">
         
-        {/* Map Grid Background Texture */}
-        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
+        <!-- Map Grid Background Texture -->
+        <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px); background-size: 20px 20px;"></div>
 
-        {/* High-Tech Glowing SVG Tracks */}
-        <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 0 }}>
-          {/* Main Loop Tracks */}
-          <line x1="30%" y1="15%" x2="30%" y2="65%" stroke="rgba(255,255,255,0.15)" strokeWidth="6" strokeLinecap="round" />
-          <line x1="30%" y1="15%" x2="30%" y2="65%" stroke="rgba(255,255,255,0.4)" strokeWidth="2" strokeDasharray="10 15" strokeLinecap="round" />
-          
-          <line x1="70%" y1="15%" x2="70%" y2="65%" stroke="rgba(255,255,255,0.15)" strokeWidth="6" strokeLinecap="round" />
-          <line x1="70%" y1="15%" x2="70%" y2="65%" stroke="rgba(255,255,255,0.4)" strokeWidth="2" strokeDasharray="10 15" strokeLinecap="round" />
-          
-          {/* Top Arc */}
-          <path d="M 30% 15% Q 50% -5% 70% 15%" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="6" strokeLinecap="round" />
-          <path d="M 30% 15% Q 50% -5% 70% 15%" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2" strokeDasharray="10 15" strokeLinecap="round" />
-          
-          {/* Branching to Terminal */}
-          <line x1="30%" y1="65%" x2="50%" y2="86%" stroke="rgba(255,255,255,0.15)" strokeWidth="6" strokeLinecap="round" />
-          <line x1="30%" y1="65%" x2="50%" y2="86%" stroke="rgba(255,255,255,0.4)" strokeWidth="2" strokeDasharray="10 15" strokeLinecap="round" />
-          
-          <line x1="70%" y1="65%" x2="50%" y2="86%" stroke="rgba(255,255,255,0.15)" strokeWidth="6" strokeLinecap="round" />
-          <line x1="70%" y1="65%" x2="50%" y2="86%" stroke="rgba(255,255,255,0.4)" strokeWidth="2" strokeDasharray="10 15" strokeLinecap="round" />
+        <!-- Glowing Tracks -->
+        <svg class="absolute inset-0 w-full h-full" style="z-index: 0;">
+            <line x1="30%" y1="15%" x2="30%" y2="65%" stroke="rgba(255,255,255,0.15)" stroke-width="6" stroke-linecap="round" />
+            <line x1="30%" y1="15%" x2="30%" y2="65%" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-dasharray="10 15" stroke-linecap="round" />
+            <line x1="70%" y1="15%" x2="70%" y2="65%" stroke="rgba(255,255,255,0.15)" stroke-width="6" stroke-linecap="round" />
+            <line x1="70%" y1="15%" x2="70%" y2="65%" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-dasharray="10 15" stroke-linecap="round" />
+            <path d="M 30% 15% Q 50% -5% 70% 15%" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="6" stroke-linecap="round" />
+            <path d="M 30% 15% Q 50% -5% 70% 15%" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-dasharray="10 15" stroke-linecap="round" />
+            <line x1="30%" y1="65%" x2="50%" y2="86%" stroke="rgba(255,255,255,0.15)" stroke-width="6" stroke-linecap="round" />
+            <line x1="30%" y1="65%" x2="50%" y2="86%" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-dasharray="10 15" stroke-linecap="round" />
+            <line x1="70%" y1="65%" x2="50%" y2="86%" stroke="rgba(255,255,255,0.15)" stroke-width="6" stroke-linecap="round" />
+            <line x1="70%" y1="65%" x2="50%" y2="86%" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-dasharray="10 15" stroke-linecap="round" />
         </svg>
 
-        {/* The Terminal Hub (Jijel Station) */}
-        <div className="absolute left-[15%] right-[15%] top-[72%] bottom-[4%] bg-slate-950/80 backdrop-blur-md border border-slate-700/80 rounded-2xl flex flex-col items-center justify-start pt-3 z-0 shadow-2xl">
-          <h3 className="text-slate-100 font-bold text-xs tracking-wider mb-2 px-6 py-1.5 bg-slate-800 rounded-full border border-slate-600 shadow-lg">
-            محطة الحافلات جيجل
-          </h3>
-          <div className="w-full flex justify-center gap-4 px-4 mt-1">
-            <div className="border border-dashed border-slate-600/50 bg-slate-900/50 w-16 h-20 rounded-lg flex items-end justify-center pb-2 text-[10px] text-slate-500">P1</div>
-            
-            {/* Main Terminal Slot with Neon Glow */}
-            <div className="border border-emerald-500/50 bg-emerald-950/30 w-20 h-20 rounded-lg flex items-end justify-center pb-2 text-[11px] text-emerald-400 font-bold relative shadow-[inset_0_0_20px_rgba(16,185,129,0.1)]">
-                موقف العيايشة
+        <!-- The Terminal Hub -->
+        <div class="absolute left-[15%] right-[15%] top-[72%] bottom-[4%] bg-slate-950/80 backdrop-blur-md border border-slate-700/80 rounded-2xl flex flex-col items-center justify-start pt-3 z-0 shadow-2xl">
+            <h3 class="text-slate-100 font-bold text-xs tracking-wider mb-2 px-6 py-1.5 bg-slate-800 rounded-full border border-slate-600 shadow-lg">
+                محطة الحافلات جيجل
+            </h3>
+            <div class="w-full flex justify-center gap-4 px-4 mt-1">
+                <div class="border border-dashed border-slate-600/50 bg-slate-900/50 w-16 h-20 rounded-lg flex items-end justify-center pb-2 text-[10px] text-slate-500">P1</div>
+                <div class="border border-emerald-500/50 bg-emerald-950/30 w-20 h-20 rounded-lg flex items-end justify-center pb-2 text-[11px] text-emerald-400 font-bold relative shadow-[inset_0_0_20px_rgba(16,185,129,0.1)]">
+                    موقف العيايشة
+                </div>
+                <div class="border border-dashed border-slate-600/50 bg-slate-900/50 w-16 h-20 rounded-lg flex items-end justify-center pb-2 text-[10px] text-slate-500">P3</div>
             </div>
-
-            <div className="border border-dashed border-slate-600/50 bg-slate-900/50 w-16 h-20 rounded-lg flex items-end justify-center pb-2 text-[10px] text-slate-500">P3</div>
-          </div>
         </div>
 
-        {/* Regular Stops */}
-        {STOPS.map((stop) => (
-          <React.Fragment key={stop.id}>
-            <div className="absolute w-5 h-5 rounded-full bg-slate-800 border-4 border-slate-400 z-10 shadow-lg" style={{ left: '30%', top: `${stop.y}%`, transform: 'translate(-50%, -50%)' }}>
-              <div className="absolute right-8 top-1/2 -translate-y-1/2 whitespace-nowrap text-xs text-white font-medium bg-slate-800/90 backdrop-blur border border-slate-600 px-3 py-1.5 rounded-lg shadow-xl">
-                {stop.name} <span className="text-slate-400 text-[10px] ml-1">(ذهاب)</span>
-              </div>
-            </div>
-            <div className="absolute w-5 h-5 rounded-full bg-slate-800 border-4 border-slate-400 z-10 shadow-lg" style={{ left: '70%', top: `${stop.y}%`, transform: 'translate(-50%, -50%)' }}>
-               <div className="absolute left-8 top-1/2 -translate-y-1/2 whitespace-nowrap text-xs text-white font-medium bg-slate-800/90 backdrop-blur border border-slate-600 px-3 py-1.5 rounded-lg shadow-xl">
-                 {stop.name} <span className="text-slate-400 text-[10px] mr-1">(عودة)</span>
-              </div>
-            </div>
-          </React.Fragment>
-        ))}
+        <!-- Regular Stops Container -->
+        <div id="stopsContainer"></div>
 
-        {/* Interactive Buses on the Map */}
-        {BUSES.map((bus) => {
-          const data = getBusData(bus.offset, bus.id);
-          
-          return (
-            <div
-              key={bus.id}
-              onClick={() => setSelectedBusId(bus.id)}
-              className="absolute z-20 transition-all duration-75 ease-linear cursor-pointer group"
-              style={{ left: `${data.x}%`, top: `${data.y}%` }}
-            >
-              {/* The Bus Icon */}
-              <div 
-                className={`w-12 h-12 -ml-6 -mt-6 rounded-2xl ${data.isParked ? 'bg-slate-700 border-slate-500' : `${bus.color} border-white ${bus.glow}`} border-2 flex items-center justify-center transition-transform group-hover:scale-125 group-hover:z-50`}
-                style={{ transform: `rotate(${data.rotation}deg)` }}
-              >
-                <Bus size={20} className="text-white drop-shadow-md" />
-                
-                {/* Floating Bus Tag */}
-                <div className="absolute -top-8 bg-slate-900/90 backdrop-blur text-[11px] px-2.5 py-1 rounded-md text-white font-bold whitespace-nowrap border border-slate-700 shadow-xl opacity-80 group-hover:opacity-100 transition-opacity" style={{transform: `rotate(-${data.rotation}deg)`}}>
-                  {bus.name}
-                </div>
-              </div>
+        <!-- Interactive Buses Container -->
+        <div id="mapBusesContainer"></div>
 
-              {/* Map Countdown Timer */}
-              {data.countdown && (
-                <div className="absolute -top-16 left-1/2 -translate-x-1/2 bg-red-600/90 backdrop-blur border border-red-400 text-white text-[11px] px-2 py-1 rounded-md font-mono animate-pulse shadow-[0_0_15px_rgba(220,38,38,0.5)] whitespace-nowrap pointer-events-none">
-                  ⏳ {data.countdown}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
     </div>
-  );
-}
 
+    <script>
+        // === Core Configuration ===
+        const START_TIME_MINUTES = 6 * 60 + 30; // 06:30 AM
+        const END_TIME_MINUTES = 19 * 60; // 19:00 PM
+        const CYCLE_DURATION = 90;
+
+        const BUSES = [
+            { id: 1, name: 'حافلة 1', offset: 0, color: 'bg-emerald-500', glow: 'shadow-[0_0_20px_rgba(16,185,129,0.6)]', text: 'text-emerald-400' },
+            { id: 2, name: 'حافلة 2', offset: 30, color: 'bg-blue-500', glow: 'shadow-[0_0_20px_rgba(59,130,246,0.6)]', text: 'text-blue-400' },
+            { id: 3, name: 'حافلة 3', offset: 60, color: 'bg-purple-500', glow: 'shadow-[0_0_20px_rgba(168,85,247,0.6)]', text: 'text-purple-400' }
+        ];
+
+        const ROUTE_STEPS = [
+            { id: 's1_out', name: 'العيايشة', x: 30, y: 15, wait: 5, move: 10, nextX: 30, nextY: 40 },
+            { id: 's2_out', name: 'وسط قاوس', x: 30, y: 40, wait: 5, move: 10, nextX: 30, nextY: 65 },
+            { id: 's3_in_term', name: 'دخول المحطة', x: 30, y: 65, wait: 0, move: 2, nextX: 50, nextY: 86 },
+            { id: 'terminal', name: 'محطة جيجل', x: 50, y: 86, wait: 10, move: 3, nextX: 70, nextY: 65 }, 
+            { id: 's3_inbound', name: 'خروج من المحطة', x: 70, y: 65, wait: 0, move: 10, nextX: 70, nextY: 40 },
+            { id: 's2_in', name: 'وسط قاوس (عودة)', x: 70, y: 40, wait: 5, move: 10, nextX: 70, nextY: 15 },
+            { id: 's1_in', name: 'العيايشة (عودة)', x: 70, y: 15, wait: 5, move: 10, nextX: 30, nextY: 15 },
+            { id: 's1_buffer', name: 'استراحة', x: 30, y: 15, wait: 5, move: 0, nextX: 30, nextY: 15 }
+        ];
+
+        const STOPS = [
+            { id: 's1', name: 'العيايشة', y: 15 },
+            { id: 's2', name: 'وسط قاوس (Kaous Center)', y: 40 }
+        ];
+
+        // === State ===
+        let state = {
+            simulatedTime: new Date(),
+            timeMultiplier: 1,
+            isPlaying: true,
+            isLiveMode: true,
+            selectedBusId: null,
+            intervalId: null
+        };
+
+        // === Data Logic ===
+        function getBusData(busOffset, busId) {
+            const currentMinutes = state.simulatedTime.getHours() * 60 + state.simulatedTime.getMinutes() + state.simulatedTime.getSeconds() / 60;
+            const diff = currentMinutes - START_TIME_MINUTES - busOffset;
+
+            if (diff < 0) return { status: 'في المرآب (ينتظر الانطلاق)', x: 30 + (busId * 2), y: 10, isMoving: false, rotation: 180, isParked: true, countdown: null, progress: 0 };
+
+            const maxAllowedActiveTime = END_TIME_MINUTES - START_TIME_MINUTES - busOffset;
+            const busEndOfShiftActiveTime = Math.floor(maxAllowedActiveTime / CYCLE_DURATION) * CYCLE_DURATION;
+
+            if (diff >= busEndOfShiftActiveTime) {
+                return { status: 'انتهاء الوردية (المرآب)', x: 30 + (busId * 2), y: 10, isMoving: false, rotation: 180, isParked: true, countdown: null, progress: 100 };
+            }
+
+            const cycleTime = diff % CYCLE_DURATION;
+            const progress = (cycleTime / CYCLE_DURATION) * 100;
+            
+            let accumulatedTime = 0;
+            let currentStep = ROUTE_STEPS[0];
+            let timeInStep = 0;
+
+            for (let i = 0; i < ROUTE_STEPS.length; i++) {
+                const step = ROUTE_STEPS[i];
+                const stepDuration = step.wait + step.move;
+                if (cycleTime < accumulatedTime + stepDuration) {
+                    currentStep = step;
+                    timeInStep = cycleTime - accumulatedTime;
+                    break;
+                }
+                accumulatedTime += stepDuration;
+            }
+
+            let fraction = 0;
+            let isMoving = false;
+            let status = `${currentStep.name} - انتظار`;
+            let countdown = null;
+
+            if (timeInStep < currentStep.wait) {
+                isMoving = false;
+                if (currentStep.id === 'terminal') {
+                    status = 'محطة جيجل - انتظار للعودة';
+                    const remMinutes = currentStep.wait - timeInStep;
+                    const m = Math.floor(remMinutes);
+                    const s = Math.floor((remMinutes - m) * 60);
+                    countdown = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                } else {
+                    status = `${currentStep.name} - ركوب/نزول`;
+                }
+            } else {
+                isMoving = true;
+                const moveTime = timeInStep - currentStep.wait;
+                fraction = moveTime / currentStep.move;
+                const nextStepIndex = (ROUTE_STEPS.indexOf(currentStep) + 1) % ROUTE_STEPS.length;
+                status = `متجه إلى ${ROUTE_STEPS[nextStepIndex].name}`;
+            }
+
+            const x = currentStep.x + (currentStep.nextX - currentStep.x) * fraction;
+            const y = currentStep.y + (currentStep.nextY - currentStep.y) * fraction;
+
+            let rotation = 0;
+            if (isMoving) {
+                const angle = Math.atan2(currentStep.nextY - currentStep.y, currentStep.nextX - currentStep.x) * (180 / Math.PI);
+                rotation = angle + 90; 
+            } else {
+                if (currentStep.id === 'terminal') rotation = 180; 
+                else if (currentStep.x < 50) rotation = 180; 
+                else rotation = 0; 
+            }
+
+            return { status, x, y, isMoving, rotation, isParked: false, countdown, progress };
+        }
+
+        function formatTime(date) {
+            return date.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+
+        // === UI Building & Updating ===
+        function initDOM() {
+            // Build Stops
+            const stopsContainer = document.getElementById('stopsContainer');
+            STOPS.forEach(stop => {
+                stopsContainer.innerHTML += `
+                    <div class="absolute w-5 h-5 rounded-full bg-slate-800 border-4 border-slate-400 z-10 shadow-lg" style="left: 30%; top: ${stop.y}%; transform: translate(-50%, -50%)">
+                        <div class="absolute right-8 top-1/2 -translate-y-1/2 whitespace-nowrap text-xs text-white font-medium bg-slate-800/90 backdrop-blur border border-slate-600 px-3 py-1.5 rounded-lg shadow-xl">
+                            ${stop.name} <span class="text-slate-400 text-[10px] ml-1">(ذهاب)</span>
+                        </div>
+                    </div>
+                    <div class="absolute w-5 h-5 rounded-full bg-slate-800 border-4 border-slate-400 z-10 shadow-lg" style="left: 70%; top: ${stop.y}%; transform: translate(-50%, -50%)">
+                        <div class="absolute left-8 top-1/2 -translate-y-1/2 whitespace-nowrap text-xs text-white font-medium bg-slate-800/90 backdrop-blur border border-slate-600 px-3 py-1.5 rounded-lg shadow-xl">
+                            ${stop.name} <span class="text-slate-400 text-[10px] mr-1">(عودة)</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Build Buses
+            const listContainer = document.getElementById('busListContainer');
+            const mapContainer = document.getElementById('mapBusesContainer');
+
+            BUSES.forEach(bus => {
+                // List Item
+                listContainer.innerHTML += `
+                    <div onclick="openModal(${bus.id})" class="bg-white/5 backdrop-blur-md border border-white/10 hover:border-white/20 rounded-2xl p-4 flex items-center gap-4 transition-all cursor-pointer group">
+                        <div id="list-icon-bg-${bus.id}" class="p-3 rounded-xl relative transition-transform group-hover:scale-110">
+                            <i data-lucide="bus" id="list-icon-${bus.id}" class="w-5 h-5"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-bold text-slate-100">${bus.name}</h3>
+                            <div class="flex justify-between items-center mt-1">
+                                <p id="list-status-${bus.id}" class="text-xs font-medium truncate max-w-[180px]"></p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-center w-8 h-8 rounded-full bg-slate-800/50 group-hover:bg-slate-700/50 transition-colors">
+                            <i data-lucide="info" class="text-slate-400 w-4 h-4"></i>
+                        </div>
+                    </div>
+                `;
+
+                // Map Item
+                mapContainer.innerHTML += `
+                    <div onclick="openModal(${bus.id})" id="map-bus-container-${bus.id}" class="absolute z-20 cursor-pointer group bus-element">
+                        <div id="map-icon-bg-${bus.id}" class="w-12 h-12 -ml-6 -mt-6 rounded-2xl border-2 flex items-center justify-center transition-transform group-hover:scale-125 group-hover:z-50">
+                            <i data-lucide="bus" id="map-icon-${bus.id}" class="w-5 h-5 drop-shadow-md"></i>
+                            <div id="map-name-${bus.id}" class="absolute -top-8 bg-slate-900/90 backdrop-blur text-[11px] px-2.5 py-1 rounded-md text-white font-bold whitespace-nowrap border border-slate-700 shadow-xl opacity-80 group-hover:opacity-100 transition-opacity">${bus.name}</div>
+                        </div>
+                        <div id="map-countdown-${bus.id}" class="hidden absolute -top-16 left-1/2 -translate-x-1/2 bg-red-600/90 backdrop-blur border border-red-400 text-white text-[11px] px-2 py-1 rounded-md font-mono animate-pulse shadow-[0_0_15px_rgba(220,38,38,0.5)] whitespace-nowrap pointer-events-none"></div>
+                    </div>
+                `;
+            });
+
+            lucide.createIcons();
+            startEngine();
+        }
+
+        function updateUI() {
+            // Main Clock
+            document.getElementById('mainClock').innerText = formatTime(state.simulatedTime);
+
+            BUSES.forEach(bus => {
+                const data = getBusData(bus.offset, bus.id);
+
+                // Update List Status
+                document.getElementById(`list-status-${bus.id}`).innerText = data.status;
+                
+                // Update List Colors
+                const listBg = document.getElementById(`list-icon-bg-${bus.id}`);
+                const listIcon = document.getElementById(`list-icon-${bus.id}`);
+                const listStatus = document.getElementById(`list-status-${bus.id}`);
+                if(data.isParked) {
+                    listBg.className = `p-3 rounded-xl relative transition-transform group-hover:scale-110 bg-slate-800`;
+                    listIcon.classList.replace('text-white', 'text-slate-500');
+                    listStatus.className = `text-xs font-medium truncate max-w-[180px] text-slate-500`;
+                } else {
+                    listBg.className = `p-3 rounded-xl relative transition-transform group-hover:scale-110 ${bus.color} ${bus.glow}`;
+                    listIcon.classList.replace('text-slate-500', 'text-white');
+                    listStatus.className = `text-xs font-medium truncate max-w-[180px] text-slate-300`;
+                }
+
+                // Update Map Positioning
+                const mapContainer = document.getElementById(`map-bus-container-${bus.id}`);
+                mapContainer.style.left = `${data.x}%`;
+                mapContainer.style.top = `${data.y}%`;
+
+                // Update Map Icon Rotation & Colors
+                const mapBg = document.getElementById(`map-icon-bg-${bus.id}`);
+                const mapName = document.getElementById(`map-name-${bus.id}`);
+                const mapIcon = document.getElementById(`map-icon-${bus.id}`);
+                
+                mapBg.style.transform = `rotate(${data.rotation}deg)`;
+                mapName.style.transform = `rotate(-${data.rotation}deg)`;
+
+                if(data.isParked) {
+                    mapBg.className = `w-12 h-12 -ml-6 -mt-6 rounded-2xl border-2 flex items-center justify-center transition-transform group-hover:scale-125 group-hover:z-50 bg-slate-700 border-slate-500`;
+                    mapIcon.classList.replace('text-white', 'text-slate-400');
+                } else {
+                    mapBg.className = `w-12 h-12 -ml-6 -mt-6 rounded-2xl border-2 flex items-center justify-center transition-transform group-hover:scale-125 group-hover:z-50 border-white ${bus.color} ${bus.glow}`;
+                    mapIcon.classList.replace('text-slate-400', 'text-white');
+                }
+
+                // Update Map Countdown
+                const mapCountdown = document.getElementById(`map-countdown-${bus.id}`);
+                if (data.countdown) {
+                    mapCountdown.innerHTML = `⏳ ${data.countdown}`;
+                    mapCountdown.classList.remove('hidden');
+                } else {
+                    mapCountdown.classList.add('hidden');
+                }
+
+                // Update Modal if this bus is selected
+                if (state.selectedBusId === bus.id) {
+                    document.getElementById('modalLiveStatus').innerText = data.status;
+                    document.getElementById('modalProgressBar').style.width = `${data.progress}%`;
+                    document.getElementById('modalProgressText').innerText = `${Math.round(data.progress)}% مكتمل`;
+                    
+                    const cdContainer = document.getElementById('modalCountdownContainer');
+                    const cdText = document.getElementById('modalCountdownText');
+                    if (data.countdown) {
+                        cdText.innerText = `يغادر بعد ${data.countdown}`;
+                        cdContainer.classList.remove('hidden');
+                    } else {
+                        cdContainer.classList.add('hidden');
+                    }
+                }
+            });
+        }
+
+        // === Controls & Modal functions ===
+        function startEngine() {
+            if (state.intervalId) clearInterval(state.intervalId);
+            
+            if (!state.isPlaying) {
+                updatePlayButton();
+                return;
+            }
+            
+            state.intervalId = setInterval(() => {
+                if (state.isLiveMode) {
+                    state.simulatedTime = new Date();
+                } else {
+                    state.simulatedTime = new Date(state.simulatedTime.getTime() + (50 * state.timeMultiplier));
+                }
+                updateUI();
+            }, state.isLiveMode ? 1000 : 50);
+
+            updatePlayButton();
+            updateModeButtons();
+        }
+
+        function togglePlay() {
+            state.isPlaying = !state.isPlaying;
+            startEngine();
+        }
+
+        function setMode(isLive, multiplier) {
+            state.isLiveMode = isLive;
+            state.timeMultiplier = multiplier;
+            state.isPlaying = true;
+            startEngine();
+            updateModeButtons();
+        }
+
+        function updatePlayButton() {
+            const btn = document.getElementById('btnPlay');
+            if (state.isPlaying) {
+                btn.innerHTML = `<i data-lucide="pause" class="text-amber-400 w-5 h-5"></i>`;
+            } else {
+                btn.innerHTML = `<i data-lucide="play" class="text-emerald-400 w-5 h-5"></i>`;
+            }
+            lucide.createIcons();
+        }
+
+        function updateModeButtons() {
+            const ind = document.getElementById('modeIndicator');
+            ind.className = state.isLiveMode 
+                ? 'flex items-center gap-2 text-xs px-3 py-1.5 rounded-full font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                : 'flex items-center gap-2 text-xs px-3 py-1.5 rounded-full font-bold bg-slate-800 text-slate-400 border border-slate-700';
+            ind.innerText = state.isLiveMode ? '📡 حي' : '⚙️ محاكاة';
+
+            document.getElementById('btnSync').className = `px-4 py-3 rounded-xl text-sm font-bold transition-colors border ${state.isLiveMode ? 'bg-emerald-600/90 border-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.4)]' : 'bg-slate-800/80 border-slate-600 text-slate-300 hover:bg-slate-700'}`;
+            document.getElementById('btnX60').className = `px-4 py-3 rounded-xl text-sm font-bold flex items-center gap-1 transition-colors border ${!state.isLiveMode && state.timeMultiplier === 60 ? 'bg-blue-600/90 border-blue-500 text-white shadow-[0_0_15px_rgba(59,130,246,0.4)]' : 'bg-slate-800/80 border-slate-600 text-slate-300 hover:bg-slate-700'}`;
+            document.getElementById('btnX600').className = `px-4 py-3 rounded-xl text-sm font-bold flex items-center gap-1 transition-colors border ${!state.isLiveMode && state.timeMultiplier === 600 ? 'bg-purple-600/90 border-purple-500 text-white shadow-[0_0_15px_rgba(168,85,247,0.4)]' : 'bg-slate-800/80 border-slate-600 text-slate-300 hover:bg-slate-700'}`;
+        }
+
+        function openModal(busId) {
+            state.selectedBusId = busId;
+            const bus = BUSES.find(b => b.id === busId);
+            const data = getBusData(bus.offset, bus.id);
+
+            // Set Static Modal info
+            document.getElementById('modalBusName').innerText = bus.name;
+            document.getElementById('modalGlow').className = `absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl opacity-20 ${bus.color}`;
+            
+            const modalIconBg = document.getElementById('modalBusIcon');
+            modalIconBg.className = `w-20 h-20 rounded-2xl flex items-center justify-center mb-4 ${bus.color} ${bus.glow}`;
+            
+            const modalStatusText = document.getElementById('modalBusStatus');
+            modalStatusText.innerText = data.isParked ? 'خارج الخدمة' : 'في الخدمة';
+            modalStatusText.className = `px-3 py-1 rounded-full text-xs font-bold border border-slate-700 bg-slate-800/50 ${bus.text}`;
+
+            document.getElementById('modalProgressBar').className = `h-3 rounded-full transition-all duration-300 ease-linear ${bus.color}`;
+
+            // Show modal
+            const modal = document.getElementById('busModal');
+            modal.classList.remove('hidden');
+            
+            updateUI(); // immediate update
+        }
+
+        function closeModal() {
+            state.selectedBusId = null;
+            document.getElementById('busModal').classList.add('hidden');
+        }
+
+        // Initialize application
+        window.onload = initDOM;
+
+    </script>
+</body>
+</html>
 
 ```
