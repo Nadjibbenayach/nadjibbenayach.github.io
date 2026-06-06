@@ -10,9 +10,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
-        .bus-element {
-            transition: left 0.1s linear, top 0.1s linear, transform 0.3s ease-out;
-        }
+        .bus-element { transition: left 0.1s linear, top 0.1s linear, transform 0.3s ease-out; }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
         .pulse-glow { animation: pulseGlow 2s infinite; }
@@ -268,7 +266,7 @@
 
             <div class="flex gap-2 border-t border-slate-700 pt-4">
                 <button onclick="resetAdminConfig()" id="btnResetData" class="px-3 py-2 bg-slate-800 border border-slate-600 text-slate-400 rounded-xl text-xs font-bold transition-all">إعادة ضبط</button>
-                <button onclick="saveAdminConfig()" class="flex-1 py-2 bg-emerald-600 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2">
+                <button id="mainSaveBtn" onclick="saveAdminConfig()" class="flex-1 py-2 bg-emerald-600 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all">
                     <i data-lucide="cloud-upload" class="w-4 h-4"></i> حفظ ونشر للجميع
                 </button>
             </div>
@@ -281,9 +279,6 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // ==========================================
-        // 1. المتغيرات الأساسية
-        // ==========================================
         window.START_TIME_MINUTES = 6 * 60 + 30; 
         window.END_TIME_MINUTES = 19 * 60; 
         window.CYCLE_DURATION = 90;
@@ -313,9 +308,6 @@
         window.isAdminAuthenticated = false;
         window.isCloudEnabled = false;
 
-        // ==========================================
-        // 2. دوال المنطق والواجهة
-        // ==========================================
         window.getBusData = function(bus) {
             const currentMinutes = state.simulatedTime.getHours() * 60 + state.simulatedTime.getMinutes() + state.simulatedTime.getSeconds() / 60;
             const diff = currentMinutes - window.START_TIME_MINUTES - bus.offset;
@@ -536,9 +528,6 @@
         }
         window.closeModal = function() { state.selectedBusId = null; document.getElementById('busModal').classList.add('hidden'); }
 
-        // ==========================================
-        // 3. الإدارة
-        // ==========================================
         window.initiateAdminAccess = function() {
             if (isAdminAuthenticated) openAdminPanel();
             else {
@@ -566,6 +555,13 @@
             tempBuses = JSON.parse(JSON.stringify(window.BUSES));
             renderAdminBuses();
             document.getElementById('saveStatus').classList.add('hidden');
+            
+            // إعادة شكل الزر في حال تم التعديل عليه سابقاً
+            const btn = document.getElementById('mainSaveBtn');
+            btn.innerHTML = '<i data-lucide="cloud-upload" class="w-4 h-4"></i> حفظ ونشر للجميع';
+            btn.className = "flex-1 py-2 bg-emerald-600 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all";
+            lucide.createIcons();
+            
             document.getElementById('adminModal').classList.remove('hidden');
         }
         window.closeAdminPanel = function() { document.getElementById('adminModal').classList.add('hidden'); }
@@ -600,9 +596,6 @@
             renderAdminBuses();
         }
 
-        // ==========================================
-        // 4. التشغيل المبدئي للواجهة (المحلي)
-        // ==========================================
         try {
             const savedLocal = localStorage.getItem('busTrackerConfig');
             if(savedLocal) {
@@ -616,14 +609,10 @@
         window.initDOM();
         window.updateUI();
 
-        // ==========================================
-        // 5. إعداد Firebase (السحابة) المباشر
-        // ==========================================
         let db, auth;
-        const appId = 'bustruker-9f717'; // تم تغييره ليتوافق مع اسم مشروعك
+        const appId = 'bustruker-9f717';
 
         try {
-            // إعدادات مشروعك تم وضعها هنا
             const firebaseConfig = {
                 apiKey: "AIzaSyAWg5d4zkUkN5ZsUiVHs9hiOBs_hmRwy_k",
                 authDomain: "bustruker-9f717.firebaseapp.com",
@@ -650,7 +639,6 @@
                 const docRef = doc(db, 'projects', appId, 'settings', 'config');
                 
                 onSnapshot(docRef, (docSnap) => {
-                    // إظهار شارة "متصل" الزرقاء في الأعلى
                     document.getElementById('syncIndicator').classList.remove('hidden');
                     document.getElementById('syncIndicator').classList.add('flex');
                     
@@ -662,7 +650,6 @@
                         window.initDOM(); 
                         window.updateUI();
                     } else {
-                        // في حال كانت قاعدة البيانات فارغة، سيقوم بإنشاء البيانات الأولى تلقائياً
                         setDoc(docRef, { START_TIME_MINUTES: window.START_TIME_MINUTES, END_TIME_MINUTES: window.END_TIME_MINUTES, CYCLE_DURATION: window.CYCLE_DURATION, BUSES: window.BUSES });
                     }
                 }, (error) => { console.error("Snapshot error:", error); });
@@ -671,35 +658,40 @@
             console.error("فشل الاتصال بالسحابة. مستمر في الوضع المحلي.", e);
         }
 
-        // ==========================================
-        // 6. الحفظ السحابي والمحلي المدمج
-        // ==========================================
         window.saveAdminConfig = async function() {
-            const start = timeToMinutes(document.getElementById('adminStartTime').value);
-            const end = timeToMinutes(document.getElementById('adminEndTime').value);
-            const newBuses = JSON.parse(JSON.stringify(tempBuses));
+            // تغيير شكل الزر بمجرد الضغط عليه للتأكيد للمستخدم
+            const btn = document.getElementById('mainSaveBtn');
+            btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> جاري الحفظ...';
+            btn.className = "flex-1 py-2 bg-blue-600 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all";
+            lucide.createIcons();
 
-            localStorage.setItem('busTrackerConfig', JSON.stringify({ START_TIME_MINUTES: start, END_TIME_MINUTES: end, CYCLE_DURATION: window.CYCLE_DURATION, BUSES: newBuses }));
-            window.START_TIME_MINUTES = start; window.END_TIME_MINUTES = end; window.BUSES = newBuses;
+            try {
+                const start = timeToMinutes(document.getElementById('adminStartTime').value);
+                const end = timeToMinutes(document.getElementById('adminEndTime').value);
+                const newBuses = JSON.parse(JSON.stringify(tempBuses));
 
-            if (window.isCloudEnabled && db) {
-                try {
+                localStorage.setItem('busTrackerConfig', JSON.stringify({ START_TIME_MINUTES: start, END_TIME_MINUTES: end, CYCLE_DURATION: window.CYCLE_DURATION, BUSES: newBuses }));
+                window.START_TIME_MINUTES = start; window.END_TIME_MINUTES = end; window.BUSES = newBuses;
+
+                if (window.isCloudEnabled && db) {
                     const docRef = doc(db, 'projects', appId, 'settings', 'config');
                     await setDoc(docRef, { START_TIME_MINUTES: start, END_TIME_MINUTES: end, CYCLE_DURATION: window.CYCLE_DURATION, BUSES: newBuses });
                     
-                    const status = document.getElementById('saveStatus');
-                    status.innerText = "تم الحفظ بنجاح ومزامنته للجميع!";
-                    status.className = "text-center text-xs text-emerald-400 mb-3 bg-emerald-900/30 py-2 rounded-lg";
-                    status.classList.remove('hidden');
+                    btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> تم النشر للجميع!';
+                    btn.className = "flex-1 py-2 bg-emerald-500 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all";
+                    lucide.createIcons();
+                    
                     setTimeout(() => closeAdminPanel(), 1500);
-                } catch (error) { console.error("Error saving to cloud:", error); }
-            } else {
-                window.initDOM(); window.updateUI();
-                const status = document.getElementById('saveStatus');
-                status.innerText = "تم الحفظ بوضع الأوفلاين (في جهازك فقط)";
-                status.className = "text-center text-xs text-amber-400 mb-3 bg-amber-900/30 py-2 rounded-lg";
-                status.classList.remove('hidden');
-                setTimeout(() => closeAdminPanel(), 1500);
+                } else {
+                    window.initDOM(); window.updateUI();
+                    btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> حفظ محلي فقط';
+                    setTimeout(() => closeAdminPanel(), 1500);
+                }
+            } catch (error) {
+                alert("حدث خطأ أثناء الحفظ: " + error.message);
+                btn.innerHTML = '<i data-lucide="cloud-upload" class="w-4 h-4"></i> حفظ ونشر للجميع';
+                btn.className = "flex-1 py-2 bg-emerald-600 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all";
+                lucide.createIcons();
             }
         }
 
