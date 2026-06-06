@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -40,6 +39,7 @@
             </div>
         </div>
         <div class="flex items-center gap-2">
+            <!-- مؤشر السحابة -->
             <div id="syncIndicator" class="hidden items-center gap-1 text-[9px] px-2 py-1 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">
                 <i data-lucide="cloud-lightning" class="w-3 h-3"></i> متصل
             </div>
@@ -278,18 +278,12 @@
     <!-- ===== السكريبت المنطقي + Firebase ===== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Setup
-        let firebaseConfig = {};
-        try { firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}'); } catch(e){}
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'bus-tracker-jijel';
-
-        // المتغيرات الأساسية (التي ستتزامن مع السحابة)
+        // ==========================================
+        // 1. المتغيرات الأساسية
+        // ==========================================
         window.START_TIME_MINUTES = 6 * 60 + 30; 
         window.END_TIME_MINUTES = 19 * 60; 
         window.CYCLE_DURATION = 90;
@@ -300,7 +294,6 @@
             { id: 3, name: 'حافلة 3', offset: 60, isPaused: false, color: 'bg-purple-500', glow: 'shadow-[0_0_15px_rgba(168,85,247,0.8)]', text: 'text-purple-400' }
         ];
 
-        // ثوابت المسار والمحطات
         const ROUTE_STEPS = [
             { id: 's1_out', name: 'العيايشة', x: 20, y: 15, wait: 5, move: 8, nextX: 20, nextY: 35 },
             { id: 's2_out', name: 'وسط قاوس', x: 20, y: 35, wait: 2, move: 8, nextX: 20, nextY: 55 },
@@ -318,60 +311,25 @@
 
         window.state = { simulatedTime: new Date(), timeMultiplier: 1, isPlaying: true, isLiveMode: true, selectedBusId: null, intervalId: null };
         window.isAdminAuthenticated = false;
-
-        // تهيئة المصادقة السحابية (مخفية عن المستخدم، ضرورية لقواعد بيانات Firebase)
-        const initAuth = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) { console.error("Auth error", error); }
-        };
-        initAuth();
-
-        // الاستماع للتغييرات الحية من السحابة لجميع المستخدمين
-        onAuthStateChanged(auth, (user) => {
-            if (!user) return;
-            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'bus_settings', 'main_config');
-            
-            onSnapshot(docRef, (docSnap) => {
-                document.getElementById('syncIndicator').classList.remove('hidden');
-                document.getElementById('syncIndicator').classList.add('flex');
-                
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    window.START_TIME_MINUTES = data.START_TIME_MINUTES;
-                    window.END_TIME_MINUTES = data.END_TIME_MINUTES;
-                    window.BUSES = data.BUSES;
-                    
-                    window.initDOM(); 
-                    window.updateUI();
-                } else {
-                    // أول مرة يفتح فيها التطبيق، نرسل البيانات الافتراضية للسحابة
-                    setDoc(docRef, { START_TIME_MINUTES, END_TIME_MINUTES, CYCLE_DURATION, BUSES });
-                }
-            }, (error) => { console.error("Snapshot error:", error); });
-        });
+        window.isCloudEnabled = false;
 
         // ==========================================
-        // وظائف التطبيق الأساسية
+        // 2. دوال المنطق والواجهة
         // ==========================================
         window.getBusData = function(bus) {
             const currentMinutes = state.simulatedTime.getHours() * 60 + state.simulatedTime.getMinutes() + state.simulatedTime.getSeconds() / 60;
-            const diff = currentMinutes - START_TIME_MINUTES - bus.offset;
+            const diff = currentMinutes - window.START_TIME_MINUTES - bus.offset;
 
             if (bus.isPaused) return { status: 'متوقفة مؤقتاً ⚠️', x: 20 + (bus.id * 3), y: 8, isMoving: false, rotation: 180, isParked: true, isPaused: true, progress: 0, cycleTime: -1 };
             if (diff < 0) return { status: 'بالمرآب (انتظار)', x: 20 + (bus.id * 3), y: 8, isMoving: false, rotation: 180, isParked: true, isPaused: false, progress: 0, cycleTime: -1 };
 
-            const maxAllowed = END_TIME_MINUTES - START_TIME_MINUTES - bus.offset;
-            const busEnd = Math.floor(maxAllowed / CYCLE_DURATION) * CYCLE_DURATION;
+            const maxAllowed = window.END_TIME_MINUTES - window.START_TIME_MINUTES - bus.offset;
+            const busEnd = Math.floor(maxAllowed / window.CYCLE_DURATION) * window.CYCLE_DURATION;
 
             if (diff >= busEnd) return { status: 'نهاية العمل', x: 20 + (bus.id * 3), y: 8, isMoving: false, rotation: 180, isParked: true, isPaused: false, progress: 100, cycleTime: -1 };
 
-            const cycleTime = diff % CYCLE_DURATION;
-            const progress = (cycleTime / CYCLE_DURATION) * 100;
+            const cycleTime = diff % window.CYCLE_DURATION;
+            const progress = (cycleTime / window.CYCLE_DURATION) * 100;
             
             let acc = 0; let currentStep = ROUTE_STEPS[0]; let timeInStep = 0;
 
@@ -429,7 +387,7 @@
             const mapContainer = document.getElementById('mapBusesContainer');
             listContainer.innerHTML = ''; mapContainer.innerHTML = '';
 
-            BUSES.forEach(bus => {
+            window.BUSES.forEach(bus => {
                 listContainer.innerHTML += `
                     <div onclick="openModal(${bus.id})" class="bg-slate-800/40 border border-slate-700 rounded-2xl p-3 flex items-center gap-3 active:scale-[0.98] transition-all cursor-pointer">
                         <div id="list-icon-bg-${bus.id}" class="p-2.5 rounded-xl"><i data-lucide="bus" id="list-icon-${bus.id}" class="w-4 h-4"></i></div>
@@ -461,7 +419,7 @@
 
             const targetTime = parseInt(stopSelect); let closestBus = null; let minEta = 999;
 
-            BUSES.forEach(bus => {
+            window.BUSES.forEach(bus => {
                 if (bus.isPaused) return;
                 const data = getBusData(bus);
                 if (data.isParked || data.isPaused) return;
@@ -483,7 +441,7 @@
             document.getElementById('mainClock').innerText = state.simulatedTime.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
             updatePassengerETA();
 
-            BUSES.forEach(bus => {
+            window.BUSES.forEach(bus => {
                 const data = getBusData(bus);
                 document.getElementById(`list-status-${bus.id}`).innerText = data.status;
                 const listBg = document.getElementById(`list-icon-bg-${bus.id}`);
@@ -562,7 +520,7 @@
 
         window.openModal = function(busId) {
             state.selectedBusId = busId;
-            const bus = BUSES.find(b => b.id === busId);
+            const bus = window.BUSES.find(b => b.id === busId);
             const data = getBusData(bus);
 
             document.getElementById('modalBusName').innerText = bus.name;
@@ -579,7 +537,7 @@
         window.closeModal = function() { state.selectedBusId = null; document.getElementById('busModal').classList.add('hidden'); }
 
         // ==========================================
-        // الإدارة والمزامنة السحابية
+        // 3. الإدارة
         // ==========================================
         window.initiateAdminAccess = function() {
             if (isAdminAuthenticated) openAdminPanel();
@@ -603,9 +561,9 @@
         window.minutesToTime = function(m) { return `${Math.floor(m/60).toString().padStart(2,'0')}:${(m%60).toString().padStart(2,'0')}`; }
 
         window.openAdminPanel = function() {
-            document.getElementById('adminStartTime').value = minutesToTime(START_TIME_MINUTES);
-            document.getElementById('adminEndTime').value = minutesToTime(END_TIME_MINUTES);
-            tempBuses = JSON.parse(JSON.stringify(BUSES));
+            document.getElementById('adminStartTime').value = minutesToTime(window.START_TIME_MINUTES);
+            document.getElementById('adminEndTime').value = minutesToTime(window.END_TIME_MINUTES);
+            tempBuses = JSON.parse(JSON.stringify(window.BUSES));
             renderAdminBuses();
             document.getElementById('saveStatus').classList.add('hidden');
             document.getElementById('adminModal').classList.remove('hidden');
@@ -642,29 +600,109 @@
             renderAdminBuses();
         }
 
-        // الحفظ في قاعدة البيانات السحابية
+        // ==========================================
+        // 4. التشغيل المبدئي للواجهة (المحلي)
+        // ==========================================
+        try {
+            const savedLocal = localStorage.getItem('busTrackerConfig');
+            if(savedLocal) {
+                const d = JSON.parse(savedLocal);
+                window.START_TIME_MINUTES = d.START_TIME_MINUTES; 
+                window.END_TIME_MINUTES = d.END_TIME_MINUTES; 
+                window.BUSES = d.BUSES;
+            }
+        } catch(e) {}
+
+        window.initDOM();
+        window.updateUI();
+
+        // ==========================================
+        // 5. إعداد Firebase (السحابة) المباشر
+        // ==========================================
+        let db, auth;
+        const appId = 'bustruker-9f717'; // تم تغييره ليتوافق مع اسم مشروعك
+
+        try {
+            // إعدادات مشروعك تم وضعها هنا
+            const firebaseConfig = {
+                apiKey: "AIzaSyAWg5d4zkUkN5ZsUiVHs9hiOBs_hmRwy_k",
+                authDomain: "bustruker-9f717.firebaseapp.com",
+                projectId: "bustruker-9f717",
+                storageBucket: "bustruker-9f717.firebasestorage.app",
+                messagingSenderId: "543529041667",
+                appId: "1:543529041667:web:0063318912541a2bab3336"
+            };
+
+            const app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            window.isCloudEnabled = true;
+
+            const initAuth = async () => {
+                try {
+                    await signInAnonymously(auth);
+                } catch (error) { console.error("Auth error", error); }
+            };
+            initAuth();
+
+            onAuthStateChanged(auth, (user) => {
+                if (!user) return;
+                const docRef = doc(db, 'projects', appId, 'settings', 'config');
+                
+                onSnapshot(docRef, (docSnap) => {
+                    // إظهار شارة "متصل" الزرقاء في الأعلى
+                    document.getElementById('syncIndicator').classList.remove('hidden');
+                    document.getElementById('syncIndicator').classList.add('flex');
+                    
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        window.START_TIME_MINUTES = data.START_TIME_MINUTES;
+                        window.END_TIME_MINUTES = data.END_TIME_MINUTES;
+                        window.BUSES = data.BUSES;
+                        window.initDOM(); 
+                        window.updateUI();
+                    } else {
+                        // في حال كانت قاعدة البيانات فارغة، سيقوم بإنشاء البيانات الأولى تلقائياً
+                        setDoc(docRef, { START_TIME_MINUTES: window.START_TIME_MINUTES, END_TIME_MINUTES: window.END_TIME_MINUTES, CYCLE_DURATION: window.CYCLE_DURATION, BUSES: window.BUSES });
+                    }
+                }, (error) => { console.error("Snapshot error:", error); });
+            });
+        } catch(e) {
+            console.error("فشل الاتصال بالسحابة. مستمر في الوضع المحلي.", e);
+        }
+
+        // ==========================================
+        // 6. الحفظ السحابي والمحلي المدمج
+        // ==========================================
         window.saveAdminConfig = async function() {
             const start = timeToMinutes(document.getElementById('adminStartTime').value);
             const end = timeToMinutes(document.getElementById('adminEndTime').value);
             const newBuses = JSON.parse(JSON.stringify(tempBuses));
 
-            try {
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'bus_settings', 'main_config');
-                await setDoc(docRef, {
-                    START_TIME_MINUTES: start,
-                    END_TIME_MINUTES: end,
-                    CYCLE_DURATION: CYCLE_DURATION,
-                    BUSES: newBuses
-                });
-                
-                document.getElementById('saveStatus').classList.remove('hidden');
+            localStorage.setItem('busTrackerConfig', JSON.stringify({ START_TIME_MINUTES: start, END_TIME_MINUTES: end, CYCLE_DURATION: window.CYCLE_DURATION, BUSES: newBuses }));
+            window.START_TIME_MINUTES = start; window.END_TIME_MINUTES = end; window.BUSES = newBuses;
+
+            if (window.isCloudEnabled && db) {
+                try {
+                    const docRef = doc(db, 'projects', appId, 'settings', 'config');
+                    await setDoc(docRef, { START_TIME_MINUTES: start, END_TIME_MINUTES: end, CYCLE_DURATION: window.CYCLE_DURATION, BUSES: newBuses });
+                    
+                    const status = document.getElementById('saveStatus');
+                    status.innerText = "تم الحفظ بنجاح ومزامنته للجميع!";
+                    status.className = "text-center text-xs text-emerald-400 mb-3 bg-emerald-900/30 py-2 rounded-lg";
+                    status.classList.remove('hidden');
+                    setTimeout(() => closeAdminPanel(), 1500);
+                } catch (error) { console.error("Error saving to cloud:", error); }
+            } else {
+                window.initDOM(); window.updateUI();
+                const status = document.getElementById('saveStatus');
+                status.innerText = "تم الحفظ بوضع الأوفلاين (في جهازك فقط)";
+                status.className = "text-center text-xs text-amber-400 mb-3 bg-amber-900/30 py-2 rounded-lg";
+                status.classList.remove('hidden');
                 setTimeout(() => closeAdminPanel(), 1500);
-            } catch (error) {
-                console.error("Error saving to cloud:", error);
             }
         }
 
-        // إعادة ضبط القيم السحابية بضغطة مزدوجة
         let resetClicks = 0;
         window.resetAdminConfig = async function() {
             const btn = document.getElementById('btnResetData');
@@ -675,24 +713,25 @@
                 return;
             }
             
-            // إعادة تعيين إلى الافتراضي السحابي
             resetClicks = 0;
             const defaultBuses = [
                 { id: 1, name: 'حافلة 1', offset: 0, isPaused: false, color: 'bg-emerald-500', glow: 'shadow-[0_0_15px_rgba(16,185,129,0.8)]', text: 'text-emerald-400' },
                 { id: 2, name: 'حافلة 2', offset: 30, isPaused: false, color: 'bg-blue-500', glow: 'shadow-[0_0_15px_rgba(59,130,246,0.8)]', text: 'text-blue-400' },
                 { id: 3, name: 'حافلة 3', offset: 60, isPaused: false, color: 'bg-purple-500', glow: 'shadow-[0_0_15px_rgba(168,85,247,0.8)]', text: 'text-purple-400' }
             ];
-            try {
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'bus_settings', 'main_config');
-                await setDoc(docRef, { START_TIME_MINUTES: 390, END_TIME_MINUTES: 1140, CYCLE_DURATION: 90, BUSES: defaultBuses });
-                closeAdminPanel();
-            } catch (e) {}
+            
+            localStorage.removeItem('busTrackerConfig');
+            
+            if (window.isCloudEnabled && db) {
+                try {
+                    const docRef = doc(db, 'projects', appId, 'settings', 'config');
+                    await setDoc(docRef, { START_TIME_MINUTES: 390, END_TIME_MINUTES: 1140, CYCLE_DURATION: 90, BUSES: defaultBuses });
+                    closeAdminPanel();
+                } catch (e) {}
+            } else {
+                location.reload();
+            }
         }
-
-        // تشغيل مبدئي (قبل وصول بيانات السحابة)
-        initDOM();
     </script>
 </body>
 </html>
-
-```
