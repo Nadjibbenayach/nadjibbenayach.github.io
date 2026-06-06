@@ -1,183 +1,325 @@
-```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bus Tracker Pro - المرقاب الذكي</title>
-    <!-- Tailwind CSS (CDN) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons (CDN) -->
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
-        /* إعدادات إضافية لجعل الحركة ناعمة جداً */
+        /* حركة سلسة جداً للحافلات */
         .bus-element {
-            transition: left 0.05s linear, top 0.05s linear, transform 0.2s ease-out;
+            transition: left 0.1s linear, top 0.1s linear, transform 0.3s ease-out;
+        }
+        /* تصميم شريط التمرير */
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        /* نبض خفيف للمحطات */
+        .pulse-glow { animation: pulseGlow 2s infinite; }
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(56, 189, 248, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
         }
     </style>
 </head>
-<body class="min-h-screen bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-[#0b1121] to-black text-slate-100 font-sans p-4 md:p-8 flex flex-col md:flex-row gap-8">
+<body class="min-h-screen bg-slate-950 text-slate-100 font-sans pb-10">
 
-    <!-- === Individual Bus Dashboard Modal === -->
-    <div id="busModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity hidden" onclick="closeModal()">
-        <div id="modalContent" class="bg-slate-900 border border-slate-700/50 rounded-3xl p-6 shadow-2xl w-full max-w-sm relative overflow-hidden" onclick="event.stopPropagation()">
-            <!-- Ambient Glow -->
+    <!-- خلفية احترافية مدمجة -->
+    <div class="fixed inset-0 z-[-1] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/30 via-slate-950 to-black pointer-events-none"></div>
+
+    <!-- === شريط التنقل العلوي للموبايل === -->
+    <div class="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-xl border-b border-white/10 px-4 py-3 flex justify-between items-center shadow-lg">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.4)]">
+                <i data-lucide="bus-front" class="text-slate-950 w-6 h-6"></i>
+            </div>
+            <div>
+                <h1 class="text-lg font-black text-transparent bg-clip-text bg-gradient-to-l from-white to-slate-400 leading-tight">مرقاب جيجل</h1>
+                <p class="text-[10px] text-emerald-400 font-mono tracking-widest" id="mainClock">00:00:00</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <div id="modeIndicator" class="flex items-center gap-1 text-[10px] px-2 py-1 rounded-full font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+               📡 حي
+            </div>
+            <button onclick="initiateAdminAccess()" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 transition-colors shadow-lg">
+                <i data-lucide="settings" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- === المحتوى الرئيسي (مكدس عمودياً للموبايل) === -->
+    <div class="flex flex-col gap-6 p-4 max-w-md mx-auto relative z-10">
+
+        <!-- 1. أداة المسافر: فلترة المحطة (أين تنتظر؟) -->
+        <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-5 shadow-2xl relative overflow-hidden">
+            <div class="absolute -right-10 -top-10 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl"></div>
+            
+            <h2 class="text-sm font-bold text-cyan-400 mb-3 flex items-center gap-2">
+                <i data-lucide="map-pin" class="w-4 h-4"></i> أين تنتظر الحافلة؟
+            </h2>
+            
+            <select id="passengerStop" onchange="updateUI()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-cyan-500 mb-4 appearance-none shadow-inner">
+                <option value="none" selected disabled>اختر محطتك الحالية...</option>
+                <option value="0">📍 العيايشة (الانطلاق)</option>
+                <option value="13">📍 وسط قاوس (باتجاه جيجل)</option>
+                <option value="23">📍 الكلم 5 (باتجاه جيجل)</option>
+                <option value="35">📍 محطة الحافلات جيجل</option>
+                <option value="55">📍 الكلم 5 (باتجاه العيايشة)</option>
+                <option value="65">📍 وسط قاوس (باتجاه العيايشة)</option>
+            </select>
+
+            <!-- لوحة النتيجة -->
+            <div id="etaResultBoard" class="hidden bg-slate-900/80 border border-slate-700 rounded-xl p-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div id="etaBusIcon" class="w-10 h-10 rounded-full flex items-center justify-center border-2">
+                        <i data-lucide="bus" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-400">الحافلة القادمة</p>
+                        <p id="etaBusName" class="font-bold text-white text-sm">--</p>
+                    </div>
+                </div>
+                <div class="text-left">
+                    <p class="text-[10px] text-slate-400 mb-1">الوقت المتبقي</p>
+                    <p id="etaTime" class="text-xl font-black text-cyan-400 font-mono">-- د</p>
+                </div>
+            </div>
+            <p id="etaNoBus" class="hidden text-center text-xs text-amber-400 bg-amber-950/30 p-3 rounded-xl border border-amber-900/50">لا توجد حافلات نشطة في هذا الاتجاه حالياً.</p>
+        </div>
+
+        <!-- 2. الخريطة الحية (مُكيفة للموبايل) -->
+        <div class="w-full h-[450px] bg-slate-900/50 backdrop-blur-2xl border border-white/10 rounded-3xl relative overflow-hidden flex items-center justify-center shadow-[0_0_40px_rgba(0,0,0,0.5)]">
+            <div class="absolute inset-0 opacity-[0.04] pointer-events-none" style="background-image: linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px); background-size: 20px 20px;"></div>
+
+            <!-- تم توسيع المسار للموبايل (20% و 80%) -->
+            <svg class="absolute inset-0 w-full h-full" style="z-index: 0;">
+                <line x1="20%" y1="15%" x2="20%" y2="65%" stroke="rgba(255,255,255,0.15)" stroke-width="4" stroke-linecap="round" />
+                <line x1="20%" y1="15%" x2="20%" y2="65%" stroke="rgba(255,255,255,0.5)" stroke-width="2" stroke-dasharray="8 12" stroke-linecap="round" />
+                <line x1="80%" y1="15%" x2="80%" y2="65%" stroke="rgba(255,255,255,0.15)" stroke-width="4" stroke-linecap="round" />
+                <line x1="80%" y1="15%" x2="80%" y2="65%" stroke="rgba(255,255,255,0.5)" stroke-width="2" stroke-dasharray="8 12" stroke-linecap="round" />
+                <path d="M 20% 15% Q 50% -5% 80% 15%" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="4" stroke-linecap="round" />
+                <path d="M 20% 15% Q 50% -5% 80% 15%" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2" stroke-dasharray="8 12" stroke-linecap="round" />
+                <line x1="20%" y1="65%" x2="50%" y2="86%" stroke="rgba(255,255,255,0.15)" stroke-width="4" stroke-linecap="round" />
+                <line x1="20%" y1="65%" x2="50%" y2="86%" stroke="rgba(255,255,255,0.5)" stroke-width="2" stroke-dasharray="8 12" stroke-linecap="round" />
+                <line x1="80%" y1="65%" x2="50%" y2="86%" stroke="rgba(255,255,255,0.15)" stroke-width="4" stroke-linecap="round" />
+                <line x1="80%" y1="65%" x2="50%" y2="86%" stroke="rgba(255,255,255,0.5)" stroke-width="2" stroke-dasharray="8 12" stroke-linecap="round" />
+            </svg>
+
+            <!-- محطة جيجل السفلية -->
+            <div class="absolute left-[10%] right-[10%] top-[72%] bottom-[4%] bg-slate-950 border border-slate-700/80 rounded-2xl flex flex-col items-center justify-start pt-2 z-0 shadow-2xl">
+                <h3 class="text-slate-200 font-bold text-[10px] tracking-wider mb-2 px-4 py-1 bg-slate-800 rounded-full border border-slate-600">محطة جيجل</h3>
+                <div class="w-full flex justify-center gap-3 px-2">
+                    <div class="border border-dashed border-slate-700 bg-slate-900/50 w-12 h-16 rounded-lg flex items-end justify-center pb-1 text-[8px] text-slate-500">P1</div>
+                    <div class="border border-emerald-500/50 bg-emerald-950/30 w-14 h-16 rounded-lg flex items-end justify-center pb-1 text-[9px] text-emerald-400 font-bold relative pulse-glow">العيايشة</div>
+                    <div class="border border-dashed border-slate-700 bg-slate-900/50 w-12 h-16 rounded-lg flex items-end justify-center pb-1 text-[8px] text-slate-500">P3</div>
+                </div>
+            </div>
+
+            <div id="stopsContainer"></div>
+            <div id="mapBusesContainer"></div>
+        </div>
+
+        <!-- 3. قائمة الأسطول -->
+        <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-5 shadow-2xl">
+            <h2 class="text-sm font-bold text-slate-300 mb-4 flex items-center gap-2">
+                <i data-lucide="list" class="w-4 h-4"></i> حالة الأسطول
+            </h2>
+            <div id="busListContainer" class="flex flex-col gap-3">
+                <!-- يُحقن عبر JS -->
+            </div>
+        </div>
+
+        <!-- 4. أزرار التحكم بالمحاكاة (تظهر أسفل الشاشة) -->
+        <div class="flex flex-wrap justify-center gap-2 bg-slate-900/80 backdrop-blur-xl p-3 rounded-2xl border border-slate-800">
+            <button onclick="togglePlay()" id="btnPlay" class="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 transition-colors">
+                <i data-lucide="pause" class="text-amber-400 w-5 h-5"></i>
+            </button>
+            <button onclick="setMode(true, 1)" id="btnSync" class="flex-1 py-3 rounded-xl text-xs font-bold transition-colors border bg-emerald-600 border-emerald-500 text-white">
+                حي 📡
+            </button>
+            <button onclick="setMode(false, 60)" id="btnX60" class="px-3 py-3 rounded-xl text-xs font-bold flex items-center gap-1 transition-colors border bg-slate-800 border-slate-600 text-slate-300">
+                <i data-lucide="fast-forward" class="w-3 h-3"></i> x60
+            </button>
+            <button onclick="setMode(false, 600)" id="btnX600" class="px-3 py-3 rounded-xl text-xs font-bold flex items-center gap-1 transition-colors border bg-slate-800 border-slate-600 text-slate-300">
+                <i data-lucide="fast-forward" class="w-3 h-3"></i> x600
+            </button>
+        </div>
+
+    </div>
+
+    <!-- === النوافذ المنبثقة (Modals) === -->
+    
+    <!-- نافذة تفاصيل الحافلة (نفس التصميم المحسن السابق) -->
+    <div id="busModal" class="fixed inset-0 z-50 flex items-end justify-center p-0 bg-black/80 backdrop-blur-sm transition-opacity hidden" onclick="closeModal()">
+        <div id="modalContent" class="bg-slate-900 border-t border-slate-700 rounded-t-3xl p-6 shadow-2xl w-full max-w-md relative overflow-hidden flex flex-col" onclick="event.stopPropagation()">
+            <div class="w-12 h-1.5 bg-slate-700 rounded-full mx-auto mb-4"></div>
             <div id="modalGlow" class="absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl opacity-20"></div>
             
-            <button onclick="closeModal()" class="absolute top-4 left-4 p-2 bg-slate-800/50 hover:bg-slate-700 rounded-full transition-colors">
-                <i data-lucide="x" class="text-slate-400 w-5 h-5"></i>
+            <div class="flex flex-col items-center flex-shrink-0">
+                <div id="modalBusIcon" class="w-16 h-16 rounded-2xl flex items-center justify-center mb-3">
+                    <i data-lucide="bus" class="text-white w-8 h-8"></i>
+                </div>
+                <h2 id="modalBusName" class="text-xl font-bold text-white mb-1"></h2>
+                <span id="modalBusStatus" class="px-3 py-1 rounded-full text-[10px] font-bold border border-slate-700 bg-slate-800/50"></span>
+            </div>
+
+            <div class="flex border-b border-slate-700/50 mt-4 mb-4 flex-shrink-0">
+                <button onclick="switchTab('info')" id="tabBtnInfo" class="flex-1 py-2 text-sm font-bold text-emerald-400 border-b-2 border-emerald-400 transition-colors">مسار الحافلة</button>
+                <button onclick="switchTab('tickets')" id="tabBtnTickets" class="flex-1 py-2 text-sm font-bold text-slate-400 border-b-2 border-transparent transition-colors">التذاكر</button>
+            </div>
+
+            <div class="overflow-y-auto custom-scrollbar flex-1 pb-4">
+                <div id="tabInfo" class="space-y-3 block">
+                    <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50">
+                        <p class="text-xs text-slate-400 mb-1">الحالة الحالية</p>
+                        <div id="modalLiveStatus" class="text-sm font-bold text-slate-200"></div>
+                    </div>
+                    <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50">
+                        <p class="text-xs text-slate-400 mb-2">الوقت المتبقي للوصول</p>
+                        <div class="flex gap-2">
+                            <div class="flex-1 bg-slate-900/80 p-2 rounded-xl border border-slate-700 text-center">
+                                <div class="text-[9px] text-slate-500 mb-1">إلى محطة جيجل</div>
+                                <div id="modalEtaJijel" class="text-base font-bold text-blue-400" dir="ltr">--</div>
+                            </div>
+                            <div class="flex-1 bg-slate-900/80 p-2 rounded-xl border border-slate-700 text-center">
+                                <div class="text-[9px] text-slate-500 mb-1">إلى العيايشة</div>
+                                <div id="modalEtaAyaycha" class="text-base font-bold text-emerald-400" dir="ltr">--</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50">
+                        <div class="flex justify-between text-xs mb-2">
+                            <span class="text-slate-400">التقدم الكلي (90 د)</span>
+                            <span id="modalProgressText" class="text-slate-500 font-mono">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-950 rounded-full h-2 overflow-hidden">
+                            <div id="modalProgressBar" class="h-2 rounded-full transition-all duration-300"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tabTickets" class="space-y-3 hidden">
+                    <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50">
+                        <ul class="space-y-3">
+                            <li class="flex justify-between items-center border-b border-slate-700/50 pb-2">
+                                <div class="flex flex-col">
+                                    <span class="text-sm text-slate-200">قصيرة (قاوس)</span>
+                                </div>
+                                <span class="font-bold text-amber-400 bg-amber-400/10 px-2 py-1 rounded-lg text-xs">20 د.ج</span>
+                            </li>
+                            <li class="flex justify-between items-center border-b border-slate-700/50 pb-2">
+                                <div class="flex flex-col">
+                                    <span class="text-sm text-slate-200">متوسطة (الكلم 5)</span>
+                                </div>
+                                <span class="font-bold text-amber-400 bg-amber-400/10 px-2 py-1 rounded-lg text-xs">25 د.ج</span>
+                            </li>
+                            <li class="flex justify-between items-center">
+                                <div class="flex flex-col">
+                                    <span class="text-sm text-slate-200">كاملة (محطة جيجل)</span>
+                                </div>
+                                <span class="font-bold text-amber-400 bg-amber-400/10 px-2 py-1 rounded-lg text-xs">30 د.ج</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة تسجيل الدخول -->
+    <div id="authModal" class="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden" onclick="closeAuth()">
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl w-full max-w-xs relative" onclick="event.stopPropagation()">
+            <div class="flex justify-center mb-4">
+                <div class="w-12 h-12 rounded-full bg-emerald-500/20 border-2 border-emerald-500/50 flex items-center justify-center">
+                    <i data-lucide="lock" class="text-emerald-400 w-6 h-6"></i>
+                </div>
+            </div>
+            <h2 class="text-lg font-bold text-center text-white mb-6">دخول الإدارة</h2>
+            <div class="space-y-3">
+                <input type="text" id="adminUser" placeholder="Username" class="w-full bg-slate-800 border border-slate-600 rounded-xl p-3 text-sm text-white focus:border-emerald-500 outline-none" dir="ltr" onkeypress="handleAuthKeyPress(event)">
+                <input type="password" id="adminPass" placeholder="Password" class="w-full bg-slate-800 border border-slate-600 rounded-xl p-3 text-sm text-white focus:border-emerald-500 outline-none" dir="ltr" onkeypress="handleAuthKeyPress(event)">
+            </div>
+            <p id="authError" class="text-red-400 text-xs text-center mt-2 hidden">بيانات خاطئة!</p>
+            <button onclick="checkAuth()" class="w-full py-3 mt-4 bg-emerald-600 text-white rounded-xl text-sm font-bold shadow-lg active:scale-95 transition-transform">دخول</button>
+        </div>
+    </div>
+
+    <!-- نافذة لوحة الإدارة (بها خيار الإيقاف المؤقت) -->
+    <div id="adminModal" class="fixed inset-0 z-[100] flex items-start justify-center p-4 pt-10 bg-black/80 backdrop-blur-md hidden" onclick="closeAdminPanel()">
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl p-5 shadow-2xl w-full max-w-md max-h-[85vh] overflow-y-auto custom-scrollbar relative" onclick="event.stopPropagation()">
+            <button onclick="closeAdminPanel()" class="absolute top-4 left-4 p-2 bg-slate-800 rounded-full">
+                <i data-lucide="x" class="text-slate-400 w-4 h-4"></i>
             </button>
-
-            <div class="flex flex-col items-center mt-4">
-                <div id="modalBusIcon" class="w-20 h-20 rounded-2xl flex items-center justify-center mb-4">
-                    <i data-lucide="bus" class="text-white w-10 h-10"></i>
-                </div>
-                <h2 id="modalBusName" class="text-2xl font-bold text-white mb-1"></h2>
-                <span id="modalBusStatus" class="px-3 py-1 rounded-full text-xs font-bold border border-slate-700 bg-slate-800/50"></span>
-            </div>
-
-            <div class="mt-8 space-y-4">
-                <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50">
-                    <div class="flex items-center gap-3 mb-2">
-                        <i data-lucide="navigation" class="text-slate-400 w-4 h-4"></i>
-                        <span class="text-sm text-slate-400">الحالة الحالية</span>
-                    </div>
-                    <div id="modalLiveStatus" class="text-lg font-bold text-slate-200"></div>
-                    <div id="modalCountdownContainer" class="mt-2 flex items-center gap-2 hidden">
-                        <i data-lucide="clock" class="text-red-400 w-4 h-4"></i>
-                        <span id="modalCountdownText" class="text-sm font-mono text-red-400 font-bold bg-red-950/50 px-2 py-1 rounded"></span>
-                    </div>
-                </div>
-
-                <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50">
-                    <div class="flex items-center gap-3 mb-3">
-                        <i data-lucide="map-pin" class="text-slate-400 w-4 h-4"></i>
-                        <span class="text-sm text-slate-400">تقدم الرحلة (دورة 90 دقيقة)</span>
-                    </div>
-                    <div class="w-full bg-slate-950 rounded-full h-3 mb-2 border border-slate-800 overflow-hidden">
-                        <div id="modalProgressBar" class="h-3 rounded-full transition-all duration-300 ease-linear w-0"></div>
-                    </div>
-                    <div id="modalProgressText" class="text-right text-xs text-slate-500 font-mono">0% مكتمل</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- === Right Panel: Main Dashboard Controls === -->
-    <div class="w-full md:w-1/3 flex flex-col gap-6 z-10">
-        <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-2xl relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl"></div>
+            <h2 class="text-xl font-bold text-emerald-400 mb-6 flex items-center gap-2 border-b border-slate-800 pb-3">
+                <i data-lucide="settings"></i> الإعدادات
+            </h2>
             
-            <div class="flex items-center justify-between mb-4 relative z-10">
-                <h1 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-l from-white to-slate-400">
-                    مركز التحكم
-                </h1>
-                <div id="modeIndicator" class="flex items-center gap-2 text-xs px-3 py-1.5 rounded-full font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                   📡 حي
+            <div class="grid grid-cols-2 gap-3 mb-6">
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">وقت البدء</label>
+                    <input type="time" id="adminStartTime" class="w-full bg-slate-800 border border-slate-600 rounded-lg p-2 text-sm text-white" dir="ltr">
                 </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">وقت التوقف</label>
+                    <input type="time" id="adminEndTime" class="w-full bg-slate-800 border border-slate-600 rounded-lg p-2 text-sm text-white" dir="ltr">
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-sm font-bold text-slate-200">الأسطول (تعديل وإيقاف مؤقت)</h3>
+                <button onclick="addAdminBus()" class="bg-slate-700 px-2 py-1 rounded text-xs text-white">+ إضافة</button>
             </div>
             
-            <div id="mainClock" class="text-5xl font-mono font-light text-center my-8 tracking-widest text-white drop-shadow-md">
-                00:00:00
+            <div id="adminBusesList" class="space-y-3 mb-6">
+                <!-- يُحقن برمجياً -->
             </div>
 
-            <div class="flex flex-wrap justify-center gap-2 relative z-10">
-                <button onclick="togglePlay()" id="btnPlay" class="p-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-600 transition-colors">
-                    <i data-lucide="pause" class="text-amber-400 w-5 h-5"></i>
-                </button>
-                <button onclick="setMode(true, 1)" id="btnSync" class="px-4 py-3 rounded-xl text-sm font-bold transition-colors border bg-emerald-600/90 border-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.4)]">
-                    مزامنة 📡
-                </button>
-                <button onclick="setMode(false, 60)" id="btnX60" class="px-4 py-3 rounded-xl text-sm font-bold flex items-center gap-1 transition-colors border bg-slate-800/80 border-slate-600 text-slate-300 hover:bg-slate-700">
-                    <i data-lucide="fast-forward" class="w-4 h-4"></i> x60
-                </button>
-                <button onclick="setMode(false, 600)" id="btnX600" class="px-4 py-3 rounded-xl text-sm font-bold flex items-center gap-1 transition-colors border bg-slate-800/80 border-slate-600 text-slate-300 hover:bg-slate-700">
-                    <i data-lucide="fast-forward" class="w-4 h-4"></i> x600
-                </button>
-            </div>
-        </div>
-
-        <!-- Bus List -->
-        <div class="flex flex-col gap-3">
-            <h2 class="text-sm font-bold text-slate-400 mb-1 ml-2 uppercase tracking-wider">أسطول الحافلات (اضغط للتفاصيل)</h2>
-            <div id="busListContainer" class="flex flex-col gap-3">
-                <!-- Injected via JS -->
+            <div class="flex gap-2 border-t border-slate-700 pt-4">
+                <button onclick="resetAdminConfig()" class="px-3 py-2 bg-red-900/50 text-red-400 rounded-xl text-xs font-bold">إعادة ضبط</button>
+                <button onclick="saveAdminConfig()" class="flex-1 py-2 bg-emerald-600 text-white rounded-xl text-sm font-bold">حفظ التغييرات</button>
             </div>
         </div>
     </div>
 
-    <!-- === Left Panel: Advanced Live Map === -->
-    <div class="w-full md:w-2/3 h-[600px] md:h-auto bg-slate-900/50 backdrop-blur-2xl border border-white/10 rounded-3xl relative overflow-hidden flex items-center justify-center shadow-2xl">
-        
-        <!-- Map Grid Background Texture -->
-        <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px); background-size: 20px 20px;"></div>
-
-        <!-- Glowing Tracks -->
-        <svg class="absolute inset-0 w-full h-full" style="z-index: 0;">
-            <line x1="30%" y1="15%" x2="30%" y2="65%" stroke="rgba(255,255,255,0.15)" stroke-width="6" stroke-linecap="round" />
-            <line x1="30%" y1="15%" x2="30%" y2="65%" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-dasharray="10 15" stroke-linecap="round" />
-            <line x1="70%" y1="15%" x2="70%" y2="65%" stroke="rgba(255,255,255,0.15)" stroke-width="6" stroke-linecap="round" />
-            <line x1="70%" y1="15%" x2="70%" y2="65%" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-dasharray="10 15" stroke-linecap="round" />
-            <path d="M 30% 15% Q 50% -5% 70% 15%" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="6" stroke-linecap="round" />
-            <path d="M 30% 15% Q 50% -5% 70% 15%" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-dasharray="10 15" stroke-linecap="round" />
-            <line x1="30%" y1="65%" x2="50%" y2="86%" stroke="rgba(255,255,255,0.15)" stroke-width="6" stroke-linecap="round" />
-            <line x1="30%" y1="65%" x2="50%" y2="86%" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-dasharray="10 15" stroke-linecap="round" />
-            <line x1="70%" y1="65%" x2="50%" y2="86%" stroke="rgba(255,255,255,0.15)" stroke-width="6" stroke-linecap="round" />
-            <line x1="70%" y1="65%" x2="50%" y2="86%" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-dasharray="10 15" stroke-linecap="round" />
-        </svg>
-
-        <!-- The Terminal Hub -->
-        <div class="absolute left-[15%] right-[15%] top-[72%] bottom-[4%] bg-slate-950/80 backdrop-blur-md border border-slate-700/80 rounded-2xl flex flex-col items-center justify-start pt-3 z-0 shadow-2xl">
-            <h3 class="text-slate-100 font-bold text-xs tracking-wider mb-2 px-6 py-1.5 bg-slate-800 rounded-full border border-slate-600 shadow-lg">
-                محطة الحافلات جيجل
-            </h3>
-            <div class="w-full flex justify-center gap-4 px-4 mt-1">
-                <div class="border border-dashed border-slate-600/50 bg-slate-900/50 w-16 h-20 rounded-lg flex items-end justify-center pb-2 text-[10px] text-slate-500">P1</div>
-                <div class="border border-emerald-500/50 bg-emerald-950/30 w-20 h-20 rounded-lg flex items-end justify-center pb-2 text-[11px] text-emerald-400 font-bold relative shadow-[inset_0_0_20px_rgba(16,185,129,0.1)]">
-                    موقف العيايشة
-                </div>
-                <div class="border border-dashed border-slate-600/50 bg-slate-900/50 w-16 h-20 rounded-lg flex items-end justify-center pb-2 text-[10px] text-slate-500">P3</div>
-            </div>
-        </div>
-
-        <!-- Regular Stops Container -->
-        <div id="stopsContainer"></div>
-
-        <!-- Interactive Buses Container -->
-        <div id="mapBusesContainer"></div>
-
-    </div>
-
+    <!-- ===== السكريبت المنطقي ===== -->
     <script>
-        // === Core Configuration ===
-        const START_TIME_MINUTES = 6 * 60 + 30; // 06:30 AM
-        const END_TIME_MINUTES = 19 * 60; // 19:00 PM
-        const CYCLE_DURATION = 90;
+        // إعدادات افتراضية
+        let START_TIME_MINUTES = 6 * 60 + 30; 
+        let END_TIME_MINUTES = 19 * 60; 
+        let CYCLE_DURATION = 90;
 
-        const BUSES = [
-            { id: 1, name: 'حافلة 1', offset: 0, color: 'bg-emerald-500', glow: 'shadow-[0_0_20px_rgba(16,185,129,0.6)]', text: 'text-emerald-400' },
-            { id: 2, name: 'حافلة 2', offset: 30, color: 'bg-blue-500', glow: 'shadow-[0_0_20px_rgba(59,130,246,0.6)]', text: 'text-blue-400' },
-            { id: 3, name: 'حافلة 3', offset: 60, color: 'bg-purple-500', glow: 'shadow-[0_0_20px_rgba(168,85,247,0.6)]', text: 'text-purple-400' }
+        // تمت إضافة خاصية isPaused للحافلات
+        let BUSES = [
+            { id: 1, name: 'حافلة 1', offset: 0, isPaused: false, color: 'bg-emerald-500', glow: 'shadow-[0_0_15px_rgba(16,185,129,0.8)]', text: 'text-emerald-400' },
+            { id: 2, name: 'حافلة 2', offset: 30, isPaused: false, color: 'bg-blue-500', glow: 'shadow-[0_0_15px_rgba(59,130,246,0.8)]', text: 'text-blue-400' },
+            { id: 3, name: 'حافلة 3', offset: 60, isPaused: false, color: 'bg-purple-500', glow: 'shadow-[0_0_15px_rgba(168,85,247,0.8)]', text: 'text-purple-400' }
         ];
 
+        // تم تعديل الإحداثيات لتناسب الموبايل (20% يساراً، 80% يميناً)
         const ROUTE_STEPS = [
-            { id: 's1_out', name: 'العيايشة', x: 30, y: 15, wait: 5, move: 10, nextX: 30, nextY: 40 },
-            { id: 's2_out', name: 'وسط قاوس', x: 30, y: 40, wait: 5, move: 10, nextX: 30, nextY: 65 },
-            { id: 's3_in_term', name: 'دخول المحطة', x: 30, y: 65, wait: 0, move: 2, nextX: 50, nextY: 86 },
-            { id: 'terminal', name: 'محطة جيجل', x: 50, y: 86, wait: 10, move: 3, nextX: 70, nextY: 65 }, 
-            { id: 's3_inbound', name: 'خروج من المحطة', x: 70, y: 65, wait: 0, move: 10, nextX: 70, nextY: 40 },
-            { id: 's2_in', name: 'وسط قاوس (عودة)', x: 70, y: 40, wait: 5, move: 10, nextX: 70, nextY: 15 },
-            { id: 's1_in', name: 'العيايشة (عودة)', x: 70, y: 15, wait: 5, move: 10, nextX: 30, nextY: 15 },
-            { id: 's1_buffer', name: 'استراحة', x: 30, y: 15, wait: 5, move: 0, nextX: 30, nextY: 15 }
+            { id: 's1_out', name: 'العيايشة', x: 20, y: 15, wait: 5, move: 8, nextX: 20, nextY: 35 },
+            { id: 's2_out', name: 'وسط قاوس', x: 20, y: 35, wait: 2, move: 8, nextX: 20, nextY: 55 },
+            { id: 's3_out', name: 'الكلم 5', x: 20, y: 55, wait: 2, move: 7, nextX: 20, nextY: 65 },
+            { id: 'term_in', name: 'دخول المحطة', x: 20, y: 65, wait: 0, move: 3, nextX: 50, nextY: 86 },
+            { id: 'terminal', name: 'محطة جيجل', x: 50, y: 86, wait: 10, move: 3, nextX: 80, nextY: 65 },
+            { id: 'term_out', name: 'خروج من المحطة', x: 80, y: 65, wait: 0, move: 7, nextX: 80, nextY: 55 },
+            { id: 's3_in', name: 'الكلم 5 (عودة)', x: 80, y: 55, wait: 2, move: 8, nextX: 80, nextY: 35 },
+            { id: 's2_in', name: 'وسط قاوس (عودة)', x: 80, y: 35, wait: 2, move: 8, nextX: 80, nextY: 15 },
+            { id: 's1_in', name: 'العيايشة (عودة)', x: 80, y: 15, wait: 2, move: 8, nextX: 20, nextY: 15 },
+            { id: 'buffer', name: 'استراحة', x: 20, y: 15, wait: 5, move: 0, nextX: 20, nextY: 15 }
         ];
 
         const STOPS = [
             { id: 's1', name: 'العيايشة', y: 15 },
-            { id: 's2', name: 'وسط قاوس (Kaous Center)', y: 40 }
+            { id: 's2', name: 'وسط قاوس', y: 35 },
+            { id: 's3', name: 'الكلم 5', y: 55 }
         ];
 
-        // === State ===
         let state = {
             simulatedTime: new Date(),
             timeMultiplier: 1,
@@ -186,37 +328,40 @@
             selectedBusId: null,
             intervalId: null
         };
+        let isAdminAuthenticated = false;
 
-        // === Data Logic ===
-        function getBusData(busOffset, busId) {
+        function getBusData(bus) {
             const currentMinutes = state.simulatedTime.getHours() * 60 + state.simulatedTime.getMinutes() + state.simulatedTime.getSeconds() / 60;
-            const diff = currentMinutes - START_TIME_MINUTES - busOffset;
+            const diff = currentMinutes - START_TIME_MINUTES - bus.offset;
 
-            if (diff < 0) return { status: 'في المرآب (ينتظر الانطلاق)', x: 30 + (busId * 2), y: 10, isMoving: false, rotation: 180, isParked: true, countdown: null, progress: 0 };
-
-            const maxAllowedActiveTime = END_TIME_MINUTES - START_TIME_MINUTES - busOffset;
-            const busEndOfShiftActiveTime = Math.floor(maxAllowedActiveTime / CYCLE_DURATION) * CYCLE_DURATION;
-
-            if (diff >= busEndOfShiftActiveTime) {
-                return { status: 'انتهاء الوردية (المرآب)', x: 30 + (busId * 2), y: 10, isMoving: false, rotation: 180, isParked: true, countdown: null, progress: 100 };
+            // إذا كانت الحافلة موقفة يدوياً من الأدمن
+            if (bus.isPaused) {
+                // تجميدها شكلياً في مكان انطلاقها أو جعلها رمادية
+                return { status: 'متوقفة مؤقتاً ⚠️', x: 20 + (bus.id * 3), y: 8, isMoving: false, rotation: 180, isParked: true, isPaused: true, progress: 0, cycleTime: -1 };
             }
+
+            if (diff < 0) return { status: 'بالمرآب (انتظار)', x: 20 + (bus.id * 3), y: 8, isMoving: false, rotation: 180, isParked: true, isPaused: false, progress: 0, cycleTime: -1 };
+
+            const maxAllowed = END_TIME_MINUTES - START_TIME_MINUTES - bus.offset;
+            const busEnd = Math.floor(maxAllowed / CYCLE_DURATION) * CYCLE_DURATION;
+
+            if (diff >= busEnd) return { status: 'نهاية العمل', x: 20 + (bus.id * 3), y: 8, isMoving: false, rotation: 180, isParked: true, isPaused: false, progress: 100, cycleTime: -1 };
 
             const cycleTime = diff % CYCLE_DURATION;
             const progress = (cycleTime / CYCLE_DURATION) * 100;
             
-            let accumulatedTime = 0;
+            let acc = 0;
             let currentStep = ROUTE_STEPS[0];
             let timeInStep = 0;
 
             for (let i = 0; i < ROUTE_STEPS.length; i++) {
-                const step = ROUTE_STEPS[i];
-                const stepDuration = step.wait + step.move;
-                if (cycleTime < accumulatedTime + stepDuration) {
-                    currentStep = step;
-                    timeInStep = cycleTime - accumulatedTime;
+                const stepDuration = ROUTE_STEPS[i].wait + ROUTE_STEPS[i].move;
+                if (cycleTime < acc + stepDuration) {
+                    currentStep = ROUTE_STEPS[i];
+                    timeInStep = cycleTime - acc;
                     break;
                 }
-                accumulatedTime += stepDuration;
+                acc += stepDuration;
             }
 
             let fraction = 0;
@@ -225,22 +370,18 @@
             let countdown = null;
 
             if (timeInStep < currentStep.wait) {
-                isMoving = false;
                 if (currentStep.id === 'terminal') {
-                    status = 'محطة جيجل - انتظار للعودة';
-                    const remMinutes = currentStep.wait - timeInStep;
-                    const m = Math.floor(remMinutes);
-                    const s = Math.floor((remMinutes - m) * 60);
-                    countdown = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                    status = 'محطة جيجل - توقف';
+                    const rem = currentStep.wait - timeInStep;
+                    countdown = `${Math.floor(rem).toString().padStart(2,'0')}:${Math.floor((rem%1)*60).toString().padStart(2,'0')}`;
                 } else {
-                    status = `${currentStep.name} - ركوب/نزول`;
+                    status = `${currentStep.name} - صعود`;
                 }
             } else {
                 isMoving = true;
-                const moveTime = timeInStep - currentStep.wait;
-                fraction = moveTime / currentStep.move;
-                const nextStepIndex = (ROUTE_STEPS.indexOf(currentStep) + 1) % ROUTE_STEPS.length;
-                status = `متجه إلى ${ROUTE_STEPS[nextStepIndex].name}`;
+                fraction = (timeInStep - currentStep.wait) / currentStep.move;
+                const nextI = (ROUTE_STEPS.indexOf(currentStep) + 1) % ROUTE_STEPS.length;
+                status = `إلى ${ROUTE_STEPS[nextI].name}`;
             }
 
             const x = currentStep.x + (currentStep.nextX - currentStep.x) * fraction;
@@ -248,243 +389,296 @@
 
             let rotation = 0;
             if (isMoving) {
-                const angle = Math.atan2(currentStep.nextY - currentStep.y, currentStep.nextX - currentStep.x) * (180 / Math.PI);
-                rotation = angle + 90; 
+                rotation = Math.atan2(currentStep.nextY - currentStep.y, currentStep.nextX - currentStep.x) * (180 / Math.PI) + 90; 
             } else {
-                if (currentStep.id === 'terminal') rotation = 180; 
-                else if (currentStep.x < 50) rotation = 180; 
-                else rotation = 0; 
+                if (currentStep.id === 'terminal' || currentStep.x < 50) rotation = 180; else rotation = 0; 
             }
 
-            return { status, x, y, isMoving, rotation, isParked: false, countdown, progress };
+            let etaJijel = Math.floor((35 - cycleTime + 90) % 90) + ' د';
+            if (cycleTime >= 35 && cycleTime < 45) etaJijel = 'بالمحطة';
+
+            let etaAyaycha = Math.floor((75 - cycleTime + 90) % 90) + ' د';
+            if (cycleTime >= 75 || cycleTime < 5) etaAyaycha = 'بالمحطة';
+
+            return { status, x, y, isMoving, rotation, isParked: false, isPaused: false, countdown, progress, etaJijel, etaAyaycha, cycleTime };
         }
 
-        function formatTime(date) {
-            return date.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        }
-
-        // === UI Building & Updating ===
         function initDOM() {
-            // Build Stops
             const stopsContainer = document.getElementById('stopsContainer');
+            stopsContainer.innerHTML = '';
             STOPS.forEach(stop => {
                 stopsContainer.innerHTML += `
-                    <div class="absolute w-5 h-5 rounded-full bg-slate-800 border-4 border-slate-400 z-10 shadow-lg" style="left: 30%; top: ${stop.y}%; transform: translate(-50%, -50%)">
-                        <div class="absolute right-8 top-1/2 -translate-y-1/2 whitespace-nowrap text-xs text-white font-medium bg-slate-800/90 backdrop-blur border border-slate-600 px-3 py-1.5 rounded-lg shadow-xl">
-                            ${stop.name} <span class="text-slate-400 text-[10px] ml-1">(ذهاب)</span>
-                        </div>
+                    <div class="absolute w-4 h-4 rounded-full bg-slate-800 border-[3px] border-slate-400 z-10" style="left: 20%; top: ${stop.y}%; transform: translate(-50%, -50%)">
+                        <div class="absolute right-5 top-1/2 -translate-y-1/2 whitespace-nowrap text-[9px] text-white bg-slate-800/90 px-2 py-1 rounded shadow-lg">${stop.name} <span class="text-slate-400">(ذهاب)</span></div>
                     </div>
-                    <div class="absolute w-5 h-5 rounded-full bg-slate-800 border-4 border-slate-400 z-10 shadow-lg" style="left: 70%; top: ${stop.y}%; transform: translate(-50%, -50%)">
-                        <div class="absolute left-8 top-1/2 -translate-y-1/2 whitespace-nowrap text-xs text-white font-medium bg-slate-800/90 backdrop-blur border border-slate-600 px-3 py-1.5 rounded-lg shadow-xl">
-                            ${stop.name} <span class="text-slate-400 text-[10px] mr-1">(عودة)</span>
-                        </div>
+                    <div class="absolute w-4 h-4 rounded-full bg-slate-800 border-[3px] border-slate-400 z-10" style="left: 80%; top: ${stop.y}%; transform: translate(-50%, -50%)">
+                        <div class="absolute left-5 top-1/2 -translate-y-1/2 whitespace-nowrap text-[9px] text-white bg-slate-800/90 px-2 py-1 rounded shadow-lg">${stop.name} <span class="text-slate-400">(عودة)</span></div>
                     </div>
                 `;
             });
 
-            // Build Buses
             const listContainer = document.getElementById('busListContainer');
             const mapContainer = document.getElementById('mapBusesContainer');
+            listContainer.innerHTML = ''; mapContainer.innerHTML = '';
 
             BUSES.forEach(bus => {
-                // List Item
                 listContainer.innerHTML += `
-                    <div onclick="openModal(${bus.id})" class="bg-white/5 backdrop-blur-md border border-white/10 hover:border-white/20 rounded-2xl p-4 flex items-center gap-4 transition-all cursor-pointer group">
-                        <div id="list-icon-bg-${bus.id}" class="p-3 rounded-xl relative transition-transform group-hover:scale-110">
-                            <i data-lucide="bus" id="list-icon-${bus.id}" class="w-5 h-5"></i>
-                        </div>
+                    <div onclick="openModal(${bus.id})" class="bg-slate-800/40 border border-slate-700 rounded-2xl p-3 flex items-center gap-3 active:scale-[0.98] transition-all">
+                        <div id="list-icon-bg-${bus.id}" class="p-2.5 rounded-xl"><i data-lucide="bus" id="list-icon-${bus.id}" class="w-4 h-4"></i></div>
                         <div class="flex-1">
-                            <h3 class="font-bold text-slate-100">${bus.name}</h3>
-                            <div class="flex justify-between items-center mt-1">
-                                <p id="list-status-${bus.id}" class="text-xs font-medium truncate max-w-[180px]"></p>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-center w-8 h-8 rounded-full bg-slate-800/50 group-hover:bg-slate-700/50 transition-colors">
-                            <i data-lucide="info" class="text-slate-400 w-4 h-4"></i>
+                            <h3 class="font-bold text-slate-200 text-sm">${bus.name}</h3>
+                            <p id="list-status-${bus.id}" class="text-[10px] text-slate-400 truncate"></p>
                         </div>
                     </div>
                 `;
-
-                // Map Item
                 mapContainer.innerHTML += `
-                    <div onclick="openModal(${bus.id})" id="map-bus-container-${bus.id}" class="absolute z-20 cursor-pointer group bus-element">
-                        <div id="map-icon-bg-${bus.id}" class="w-12 h-12 -ml-6 -mt-6 rounded-2xl border-2 flex items-center justify-center transition-transform group-hover:scale-125 group-hover:z-50">
-                            <i data-lucide="bus" id="map-icon-${bus.id}" class="w-5 h-5 drop-shadow-md"></i>
-                            <div id="map-name-${bus.id}" class="absolute -top-8 bg-slate-900/90 backdrop-blur text-[11px] px-2.5 py-1 rounded-md text-white font-bold whitespace-nowrap border border-slate-700 shadow-xl opacity-80 group-hover:opacity-100 transition-opacity">${bus.name}</div>
+                    <div onclick="openModal(${bus.id})" id="map-bus-container-${bus.id}" class="absolute z-20 bus-element">
+                        <div id="map-icon-bg-${bus.id}" class="w-10 h-10 -ml-5 -mt-5 rounded-2xl border-2 flex items-center justify-center">
+                            <i data-lucide="bus" id="map-icon-${bus.id}" class="w-4 h-4"></i>
+                            <div id="map-name-${bus.id}" class="absolute -top-6 bg-slate-900/90 text-[9px] px-2 py-0.5 rounded text-white font-bold whitespace-nowrap">${bus.name}</div>
                         </div>
-                        <div id="map-countdown-${bus.id}" class="hidden absolute -top-16 left-1/2 -translate-x-1/2 bg-red-600/90 backdrop-blur border border-red-400 text-white text-[11px] px-2 py-1 rounded-md font-mono animate-pulse shadow-[0_0_15px_rgba(220,38,38,0.5)] whitespace-nowrap pointer-events-none"></div>
                     </div>
                 `;
             });
-
             lucide.createIcons();
             startEngine();
+        }
+
+        // === منطق حساب أقرب حافلة للمسافر ===
+        function updatePassengerETA() {
+            const stopSelect = document.getElementById('passengerStop').value;
+            const resBoard = document.getElementById('etaResultBoard');
+            const noBus = document.getElementById('etaNoBus');
+
+            if (stopSelect === 'none') {
+                resBoard.classList.add('hidden');
+                noBus.classList.add('hidden');
+                return;
+            }
+
+            const targetTime = parseInt(stopSelect);
+            let closestBus = null;
+            let minEta = 999;
+
+            BUSES.forEach(bus => {
+                if (bus.isPaused) return;
+                const data = getBusData(bus);
+                if (data.isParked || data.isPaused) return;
+
+                let eta = targetTime - data.cycleTime;
+                if (eta < 0) eta += 90;
+
+                if (eta < minEta) {
+                    minEta = eta;
+                    closestBus = { bus, color: bus.text, border: bus.color.replace('bg-', 'border-'), iconText: bus.color.replace('bg-', 'text-') };
+                }
+            });
+
+            if (closestBus) {
+                noBus.classList.add('hidden');
+                resBoard.classList.remove('hidden');
+                document.getElementById('etaBusName').innerText = closestBus.bus.name;
+                document.getElementById('etaBusName').className = `font-bold text-sm ${closestBus.color}`;
+                document.getElementById('etaBusIcon').className = `w-10 h-10 rounded-full flex items-center justify-center border-2 ${closestBus.border}`;
+                document.getElementById('etaTime').innerText = Math.floor(minEta) + ' د';
+            } else {
+                resBoard.classList.add('hidden');
+                noBus.classList.remove('hidden');
+            }
         }
 
         function updateUI() {
-            // Main Clock
-            document.getElementById('mainClock').innerText = formatTime(state.simulatedTime);
+            document.getElementById('mainClock').innerText = state.simulatedTime.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            
+            updatePassengerETA();
 
             BUSES.forEach(bus => {
-                const data = getBusData(bus.offset, bus.id);
+                const data = getBusData(bus);
 
-                // Update List Status
                 document.getElementById(`list-status-${bus.id}`).innerText = data.status;
-                
-                // Update List Colors
                 const listBg = document.getElementById(`list-icon-bg-${bus.id}`);
                 const listIcon = document.getElementById(`list-icon-${bus.id}`);
-                const listStatus = document.getElementById(`list-status-${bus.id}`);
-                if(data.isParked) {
-                    listBg.className = `p-3 rounded-xl relative transition-transform group-hover:scale-110 bg-slate-800`;
-                    listIcon.classList.replace('text-white', 'text-slate-500');
-                    listStatus.className = `text-xs font-medium truncate max-w-[180px] text-slate-500`;
+                
+                if(data.isParked || data.isPaused) {
+                    listBg.className = `p-2.5 rounded-xl bg-slate-700 border border-slate-600`;
+                    listIcon.className = `w-4 h-4 text-slate-400`;
+                    document.getElementById(`list-status-${bus.id}`).className = data.isPaused ? "text-[10px] text-amber-500 font-bold" : "text-[10px] text-slate-500";
                 } else {
-                    listBg.className = `p-3 rounded-xl relative transition-transform group-hover:scale-110 ${bus.color} ${bus.glow}`;
-                    listIcon.classList.replace('text-slate-500', 'text-white');
-                    listStatus.className = `text-xs font-medium truncate max-w-[180px] text-slate-300`;
+                    listBg.className = `p-2.5 rounded-xl ${bus.color} ${bus.glow}`;
+                    listIcon.className = `w-4 h-4 text-white`;
+                    document.getElementById(`list-status-${bus.id}`).className = "text-[10px] text-slate-300";
                 }
 
-                // Update Map Positioning
                 const mapContainer = document.getElementById(`map-bus-container-${bus.id}`);
-                mapContainer.style.left = `${data.x}%`;
-                mapContainer.style.top = `${data.y}%`;
+                mapContainer.style.left = `${data.x}%`; mapContainer.style.top = `${data.y}%`;
 
-                // Update Map Icon Rotation & Colors
                 const mapBg = document.getElementById(`map-icon-bg-${bus.id}`);
                 const mapName = document.getElementById(`map-name-${bus.id}`);
-                const mapIcon = document.getElementById(`map-icon-${bus.id}`);
-                
                 mapBg.style.transform = `rotate(${data.rotation}deg)`;
                 mapName.style.transform = `rotate(-${data.rotation}deg)`;
 
-                if(data.isParked) {
-                    mapBg.className = `w-12 h-12 -ml-6 -mt-6 rounded-2xl border-2 flex items-center justify-center transition-transform group-hover:scale-125 group-hover:z-50 bg-slate-700 border-slate-500`;
-                    mapIcon.classList.replace('text-white', 'text-slate-400');
+                if(data.isParked || data.isPaused) {
+                    mapBg.className = `w-10 h-10 -ml-5 -mt-5 rounded-2xl border-2 flex items-center justify-center ${data.isPaused ? 'bg-amber-900 border-amber-500' : 'bg-slate-700 border-slate-500'}`;
+                    document.getElementById(`map-icon-${bus.id}`).className = `w-4 h-4 ${data.isPaused ? 'text-amber-400' : 'text-slate-400'}`;
                 } else {
-                    mapBg.className = `w-12 h-12 -ml-6 -mt-6 rounded-2xl border-2 flex items-center justify-center transition-transform group-hover:scale-125 group-hover:z-50 border-white ${bus.color} ${bus.glow}`;
-                    mapIcon.classList.replace('text-slate-400', 'text-white');
+                    mapBg.className = `w-10 h-10 -ml-5 -mt-5 rounded-2xl border-2 flex items-center justify-center border-white ${bus.color} ${bus.glow}`;
+                    document.getElementById(`map-icon-${bus.id}`).className = "w-4 h-4 text-white";
                 }
 
-                // Update Map Countdown
-                const mapCountdown = document.getElementById(`map-countdown-${bus.id}`);
-                if (data.countdown) {
-                    mapCountdown.innerHTML = `⏳ ${data.countdown}`;
-                    mapCountdown.classList.remove('hidden');
-                } else {
-                    mapCountdown.classList.add('hidden');
-                }
-
-                // Update Modal if this bus is selected
                 if (state.selectedBusId === bus.id) {
                     document.getElementById('modalLiveStatus').innerText = data.status;
                     document.getElementById('modalProgressBar').style.width = `${data.progress}%`;
-                    document.getElementById('modalProgressText').innerText = `${Math.round(data.progress)}% مكتمل`;
-                    
-                    const cdContainer = document.getElementById('modalCountdownContainer');
-                    const cdText = document.getElementById('modalCountdownText');
-                    if (data.countdown) {
-                        cdText.innerText = `يغادر بعد ${data.countdown}`;
-                        cdContainer.classList.remove('hidden');
-                    } else {
-                        cdContainer.classList.add('hidden');
-                    }
+                    document.getElementById('modalProgressText').innerText = `${Math.round(data.progress)}%`;
+                    document.getElementById('modalEtaJijel').innerText = data.etaJijel;
+                    document.getElementById('modalEtaAyaycha').innerText = data.etaAyaycha;
                 }
             });
         }
 
-        // === Controls & Modal functions ===
+        // محرك الوقت
         function startEngine() {
             if (state.intervalId) clearInterval(state.intervalId);
-            
-            if (!state.isPlaying) {
-                updatePlayButton();
-                return;
-            }
-            
+            if (!state.isPlaying) { updatePlayBtn(); return; }
             state.intervalId = setInterval(() => {
-                if (state.isLiveMode) {
-                    state.simulatedTime = new Date();
-                } else {
-                    state.simulatedTime = new Date(state.simulatedTime.getTime() + (50 * state.timeMultiplier));
-                }
+                if (state.isLiveMode) state.simulatedTime = new Date();
+                else state.simulatedTime = new Date(state.simulatedTime.getTime() + (50 * state.timeMultiplier));
                 updateUI();
             }, state.isLiveMode ? 1000 : 50);
-
-            updatePlayButton();
-            updateModeButtons();
+            updatePlayBtn(); updateModeBtns();
         }
 
-        function togglePlay() {
-            state.isPlaying = !state.isPlaying;
-            startEngine();
-        }
-
-        function setMode(isLive, multiplier) {
-            state.isLiveMode = isLive;
-            state.timeMultiplier = multiplier;
-            state.isPlaying = true;
-            startEngine();
-            updateModeButtons();
-        }
-
-        function updatePlayButton() {
-            const btn = document.getElementById('btnPlay');
-            if (state.isPlaying) {
-                btn.innerHTML = `<i data-lucide="pause" class="text-amber-400 w-5 h-5"></i>`;
-            } else {
-                btn.innerHTML = `<i data-lucide="play" class="text-emerald-400 w-5 h-5"></i>`;
-            }
+        function togglePlay() { state.isPlaying = !state.isPlaying; startEngine(); }
+        function setMode(isLive, mult) { state.isLiveMode = isLive; state.timeMultiplier = mult; state.isPlaying = true; startEngine(); }
+        
+        function updatePlayBtn() {
+            document.getElementById('btnPlay').innerHTML = state.isPlaying ? '<i data-lucide="pause" class="text-amber-400 w-5 h-5"></i>' : '<i data-lucide="play" class="text-emerald-400 w-5 h-5"></i>';
             lucide.createIcons();
         }
-
-        function updateModeButtons() {
+        function updateModeBtns() {
             const ind = document.getElementById('modeIndicator');
-            ind.className = state.isLiveMode 
-                ? 'flex items-center gap-2 text-xs px-3 py-1.5 rounded-full font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                : 'flex items-center gap-2 text-xs px-3 py-1.5 rounded-full font-bold bg-slate-800 text-slate-400 border border-slate-700';
-            ind.innerText = state.isLiveMode ? '📡 حي' : '⚙️ محاكاة';
+            ind.innerHTML = state.isLiveMode ? '📡 حي' : '⚙️ محاكاة';
+            ind.className = state.isLiveMode ? 'flex items-center gap-1 text-[10px] px-2 py-1 rounded-full font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'flex items-center gap-1 text-[10px] px-2 py-1 rounded-full font-bold bg-slate-800 text-slate-400 border border-slate-700';
+            
+            document.getElementById('btnSync').className = `flex-1 py-3 rounded-xl text-xs font-bold transition-colors border ${state.isLiveMode ? 'bg-emerald-600 border-emerald-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400'}`;
+            document.getElementById('btnX60').className = `px-3 py-3 rounded-xl text-xs font-bold flex items-center gap-1 transition-colors border ${!state.isLiveMode&&state.timeMultiplier===60 ? 'bg-cyan-600 border-cyan-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400'}`;
+            document.getElementById('btnX600').className = `px-3 py-3 rounded-xl text-xs font-bold flex items-center gap-1 transition-colors border ${!state.isLiveMode&&state.timeMultiplier===600 ? 'bg-purple-600 border-purple-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400'}`;
+        }
 
-            document.getElementById('btnSync').className = `px-4 py-3 rounded-xl text-sm font-bold transition-colors border ${state.isLiveMode ? 'bg-emerald-600/90 border-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.4)]' : 'bg-slate-800/80 border-slate-600 text-slate-300 hover:bg-slate-700'}`;
-            document.getElementById('btnX60').className = `px-4 py-3 rounded-xl text-sm font-bold flex items-center gap-1 transition-colors border ${!state.isLiveMode && state.timeMultiplier === 60 ? 'bg-blue-600/90 border-blue-500 text-white shadow-[0_0_15px_rgba(59,130,246,0.4)]' : 'bg-slate-800/80 border-slate-600 text-slate-300 hover:bg-slate-700'}`;
-            document.getElementById('btnX600').className = `px-4 py-3 rounded-xl text-sm font-bold flex items-center gap-1 transition-colors border ${!state.isLiveMode && state.timeMultiplier === 600 ? 'bg-purple-600/90 border-purple-500 text-white shadow-[0_0_15px_rgba(168,85,247,0.4)]' : 'bg-slate-800/80 border-slate-600 text-slate-300 hover:bg-slate-700'}`;
+        // تفاصيل الحافلة (النافذة المنبثقة)
+        function switchTab(t) {
+            document.getElementById('tabInfo').className = t==='info' ? 'space-y-3 block' : 'hidden';
+            document.getElementById('tabTickets').className = t==='tickets' ? 'space-y-3 block' : 'hidden';
+            document.getElementById('tabBtnInfo').className = `flex-1 py-2 text-sm font-bold transition-colors border-b-2 ${t==='info'?'text-emerald-400 border-emerald-400':'text-slate-500 border-transparent'}`;
+            document.getElementById('tabBtnTickets').className = `flex-1 py-2 text-sm font-bold transition-colors border-b-2 ${t==='tickets'?'text-emerald-400 border-emerald-400':'text-slate-500 border-transparent'}`;
         }
 
         function openModal(busId) {
             state.selectedBusId = busId;
             const bus = BUSES.find(b => b.id === busId);
-            const data = getBusData(bus.offset, bus.id);
+            const data = getBusData(bus);
 
-            // Set Static Modal info
             document.getElementById('modalBusName').innerText = bus.name;
             document.getElementById('modalGlow').className = `absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl opacity-20 ${bus.color}`;
+            document.getElementById('modalBusIcon').className = `w-14 h-14 rounded-2xl flex items-center justify-center mb-2 ${bus.color} ${bus.glow}`;
             
-            const modalIconBg = document.getElementById('modalBusIcon');
-            modalIconBg.className = `w-20 h-20 rounded-2xl flex items-center justify-center mb-4 ${bus.color} ${bus.glow}`;
-            
-            const modalStatusText = document.getElementById('modalBusStatus');
-            modalStatusText.innerText = data.isParked ? 'خارج الخدمة' : 'في الخدمة';
-            modalStatusText.className = `px-3 py-1 rounded-full text-xs font-bold border border-slate-700 bg-slate-800/50 ${bus.text}`;
+            const sts = document.getElementById('modalBusStatus');
+            sts.innerText = bus.isPaused ? 'متوقفة (أدمن)' : (data.isParked ? 'خارج الخدمة' : 'في الخدمة');
+            sts.className = `px-3 py-1 rounded-full text-[10px] font-bold border border-slate-700 bg-slate-800/50 ${bus.isPaused ? 'text-amber-400' : bus.text}`;
 
-            document.getElementById('modalProgressBar').className = `h-3 rounded-full transition-all duration-300 ease-linear ${bus.color}`;
+            document.getElementById('modalProgressBar').className = `h-2 rounded-full transition-all duration-300 ${bus.color}`;
 
-            // Show modal
-            const modal = document.getElementById('busModal');
-            modal.classList.remove('hidden');
-            
-            updateUI(); // immediate update
+            switchTab('info');
+            document.getElementById('busModal').classList.remove('hidden');
+            updateUI(); 
+        }
+        function closeModal() { state.selectedBusId = null; document.getElementById('busModal').classList.add('hidden'); }
+
+        // الحماية والإدارة
+        function initiateAdminAccess() {
+            if (isAdminAuthenticated) openAdminPanel();
+            else {
+                document.getElementById('authModal').classList.remove('hidden');
+                document.getElementById('authError').classList.add('hidden');
+                document.getElementById('adminUser').value = ''; document.getElementById('adminPass').value = '';
+            }
+        }
+        function closeAuth() { document.getElementById('authModal').classList.add('hidden'); }
+        function handleAuthKeyPress(e) { if (e.key === 'Enter') checkAuth(); }
+        function checkAuth() {
+            const user = document.getElementById('adminUser').value.trim().toLowerCase();
+            const pass = document.getElementById('adminPass').value.trim();
+            if (user === 'nadjibbenayache' && pass === 'nadjibkaous') {
+                isAdminAuthenticated = true; closeAuth(); openAdminPanel();
+            } else document.getElementById('authError').classList.remove('hidden');
         }
 
-        function closeModal() {
-            state.selectedBusId = null;
-            document.getElementById('busModal').classList.add('hidden');
+        let tempBuses = [];
+        function timeToMinutes(t) { if(!t)return 0; const [h,m]=t.split(':').map(Number); return h*60+m; }
+        function minutesToTime(m) { return `${Math.floor(m/60).toString().padStart(2,'0')}:${(m%60).toString().padStart(2,'0')}`; }
+
+        function openAdminPanel() {
+            document.getElementById('adminStartTime').value = minutesToTime(START_TIME_MINUTES);
+            document.getElementById('adminEndTime').value = minutesToTime(END_TIME_MINUTES);
+            tempBuses = JSON.parse(JSON.stringify(BUSES));
+            renderAdminBuses();
+            document.getElementById('adminModal').classList.remove('hidden');
+        }
+        function closeAdminPanel() { document.getElementById('adminModal').classList.add('hidden'); }
+
+        function toggleAdminPause(index) {
+            tempBuses[index].isPaused = !tempBuses[index].isPaused;
+            renderAdminBuses();
         }
 
-        // Initialize application
-        window.onload = initDOM;
+        function renderAdminBuses() {
+            const container = document.getElementById('adminBusesList'); container.innerHTML = '';
+            tempBuses.forEach((bus, i) => {
+                container.innerHTML += `
+                    <div class="flex flex-col gap-2 bg-slate-800 p-3 rounded-xl border ${bus.isPaused ? 'border-amber-500/50' : 'border-slate-700'}">
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full ${bus.isPaused ? 'bg-amber-500 animate-pulse' : bus.color}"></div>
+                            <input type="text" value="${bus.name}" onchange="tempBuses[${i}].name=this.value" class="flex-1 bg-slate-900 border border-slate-600 rounded p-1.5 text-xs text-white">
+                            <input type="number" value="${bus.offset}" onchange="tempBuses[${i}].offset=parseInt(this.value)" class="w-12 bg-slate-900 border border-slate-600 rounded p-1.5 text-xs text-white text-center" dir="ltr">
+                        </div>
+                        <div class="flex items-center justify-between gap-2 mt-1">
+                            <button onclick="toggleAdminPause(${i})" class="flex items-center justify-center gap-1 flex-1 py-1.5 rounded text-xs font-bold transition-colors ${bus.isPaused ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}">
+                                <i data-lucide="${bus.isPaused ? 'play' : 'pause-circle'}" class="w-3 h-3"></i> ${bus.isPaused ? 'استئناف' : 'إيقاف مؤقت'}
+                            </button>
+                            <button onclick="tempBuses.splice(${i},1);renderAdminBuses();" class="p-1.5 bg-red-900/50 text-red-400 rounded"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+            lucide.createIcons();
+        }
 
+        function addAdminBus() {
+            const id = tempBuses.length ? Math.max(...tempBuses.map(b=>b.id))+1 : 1;
+            tempBuses.push({ id, name:`حافلة ${id}`, offset:tempBuses.length*30, isPaused:false, color:'bg-fuchsia-500', glow:'shadow-[0_0_15px_rgba(217,70,239,0.8)]', text:'text-fuchsia-400' });
+            renderAdminBuses();
+        }
+
+        function saveAdminConfig() {
+            START_TIME_MINUTES = timeToMinutes(document.getElementById('adminStartTime').value);
+            END_TIME_MINUTES = timeToMinutes(document.getElementById('adminEndTime').value);
+            BUSES = JSON.parse(JSON.stringify(tempBuses));
+            localStorage.setItem('busTrackerConfig', JSON.stringify({ START_TIME_MINUTES, END_TIME_MINUTES, CYCLE_DURATION, BUSES }));
+            closeAdminPanel(); initDOM(); updateUI();
+        }
+
+        function resetAdminConfig() {
+            if(confirm('مسح وعودة للوضع الافتراضي؟')) { localStorage.removeItem('busTrackerConfig'); location.reload(); }
+        }
+
+        window.onload = () => {
+            const saved = localStorage.getItem('busTrackerConfig');
+            if(saved) {
+                const d = JSON.parse(saved); START_TIME_MINUTES=d.START_TIME_MINUTES; END_TIME_MINUTES=d.END_TIME_MINUTES; BUSES=d.BUSES;
+                // في حال كانت الإعدادات القديمة لا تحتوي على isPaused، نقوم بإضافتها
+                BUSES.forEach(b => { if(typeof b.isPaused === 'undefined') b.isPaused = false; });
+            }
+            initDOM();
+        };
     </script>
 </body>
 </html>
-
-```
