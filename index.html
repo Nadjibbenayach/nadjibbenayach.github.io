@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bus Tracker Pro - المرقاب الذكي</title>
     
+    <!-- PWA Setup -->
     <link rel="manifest" href="./manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="#020617">
@@ -17,9 +18,11 @@
         }
     </script>
 
+    <!-- Tailwind & Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 
+    <!-- Firebase (Classic) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
     
@@ -33,19 +36,18 @@
             70% { box-shadow: 0 0 0 10px rgba(56, 189, 248, 0); }
             100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
         }
-        
         body.light-mode { background-color: #f1f5f9; color: #0f172a; }
         body.light-mode .bg-slate-950, body.light-mode .bg-slate-900 { background-color: #ffffff !important; }
         body.light-mode .bg-slate-800 { background-color: #f8fafc !important; }
         body.light-mode .text-slate-100, body.light-mode .text-white { color: #0f172a !important; }
         body.light-mode .text-slate-300, body.light-mode .text-slate-400 { color: #475569 !important; }
-        body.light-mode .border-slate-700, body.light-mode .border-white\/10 { border-color: #e2e8f0 !important; }
-        body.light-mode .shadow-2xl { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important; }
+        body.light-mode .border-slate-700 { border-color: #e2e8f0 !important; }
         body.light-mode .text-transparent { background-image: none !important; color: #0f172a !important; }
     </style>
 </head>
 <body class="min-h-screen bg-slate-950 text-slate-100 font-sans pb-10 transition-colors duration-500">
 
+    <!-- الإشعار السحابي -->
     <div id="adminToast" class="fixed top-20 left-4 right-4 z-[120] bg-amber-600/90 text-white p-4 rounded-2xl shadow-2xl border border-amber-400 hidden animate-bounce backdrop-blur-md">
         <div class="flex items-center gap-3">
             <i data-lucide="alert-triangle" class="w-6 h-6 text-white"></i>
@@ -55,7 +57,8 @@
 
     <div class="fixed inset-0 z-[-1] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/30 via-slate-950 to-black pointer-events-none" id="bgGradient"></div>
 
-    <div class="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-xl border-b border-white/10 px-4 py-3 flex justify-between items-center shadow-lg transition-colors duration-500">
+    <!-- شريط التنقل -->
+    <div class="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800 px-4 py-3 flex justify-between items-center shadow-lg transition-colors duration-500">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.4)]">
                 <i data-lucide="bus-front" class="text-slate-950 w-6 h-6"></i>
@@ -66,24 +69,23 @@
             </div>
         </div>
         <div class="flex items-center gap-2">
-            <button onclick="toggleTheme()" class="p-2 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-xl border border-slate-700 transition-colors shadow-lg">
+            <button onclick="toggleTheme()" class="p-2 bg-slate-800 text-amber-400 rounded-xl border border-slate-700 transition-colors shadow-lg">
                 <i data-lucide="sun" id="themeIcon" class="w-4 h-4"></i>
             </button>
             <div id="syncIndicator" class="hidden items-center gap-1 text-[9px] px-2 py-1 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">
-                <i data-lucide="cloud-lightning" class="w-3 h-3"></i> متصل
+                متصل ☁️
             </div>
-            <div id="modeIndicator" class="flex items-center gap-1 text-[10px] px-2 py-1 rounded-full font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-               📡 حي
-            </div>
-            <button onclick="initiateAdminAccess()" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 transition-colors shadow-lg">
+            <button onclick="initiateAdminAccess()" class="p-2 bg-slate-800 text-slate-300 rounded-xl border border-slate-700 transition-colors shadow-lg">
                 <i data-lucide="settings" class="w-4 h-4"></i>
             </button>
         </div>
     </div>
 
+    <!-- المحتوى الرئيسي -->
     <div class="flex flex-col gap-6 p-4 max-w-md mx-auto relative z-10">
 
-        <div class="bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-3xl p-5 shadow-2xl relative overflow-hidden transition-colors duration-500">
+        <!-- أداة المسافر -->
+        <div class="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-5 shadow-2xl relative overflow-hidden transition-colors duration-500">
             <div class="absolute -right-10 -top-10 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl"></div>
             <div class="flex justify-between items-center mb-3">
                 <h2 class="text-sm font-bold text-cyan-400 flex items-center gap-2"><i data-lucide="map-pin" class="w-4 h-4"></i> أين تنتظر الحافلة؟</h2>
@@ -92,14 +94,23 @@
                 </button>
             </div>
             
-            <select id="passengerStop" onchange="updateUI()" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-sm text-slate-200 focus:outline-none focus:border-cyan-500 mb-4 appearance-none shadow-inner transition-colors duration-500">
+            <select id="passengerStop" onchange="updateUI()" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-sm text-slate-200 focus:outline-none focus:border-cyan-500 mb-4 shadow-inner transition-colors duration-500">
                 <option value="none" selected disabled>اختر محطتك الحالية...</option>
-                <option value="0">📍 العيايشة (الانطلاق)</option>
-                <option value="13">📍 وسط قاوس (باتجاه جيجل)</option>
-                <option value="23">📍 الكلم 5 (باتجاه جيجل)</option>
-                <option value="35">📍 محطة الحافلات جيجل</option>
-                <option value="55">📍 الكلم 5 (باتجاه العيايشة)</option>
-                <option value="65">📍 وسط قاوس (باتجاه العيايشة)</option>
+                <optgroup label="خط العيايشة (الأحمر)">
+                    <option value="0,-1">📍 العيايشة (الانطلاق)</option>
+                </optgroup>
+                <optgroup label="خط شادية (الأخضر)">
+                    <option value="-1,0">📍 بوهلال (الانطلاق)</option>
+                    <option value="-1,34">📍 شادية (باتجاه جيجل)</option>
+                    <option value="-1,107">📍 شادية (عودة)</option>
+                </optgroup>
+                <optgroup label="الخط المشترك (الأصفر)">
+                    <option value="23,43">📍 الفيرمة (باتجاه جيجل)</option>
+                    <option value="32,52">📍 وسط قاوس (باتجاه جيجل)</option>
+                    <option value="44,64">📍 محطة الحافلات جيجل</option>
+                    <option value="64,88">📍 وسط قاوس (عودة)</option>
+                    <option value="73,97">📍 الفيرمة (عودة)</option>
+                </optgroup>
             </select>
 
             <div id="etaResultBoard" class="hidden bg-slate-800/80 border border-slate-700 rounded-xl p-4 flex items-center justify-between transition-colors duration-500">
@@ -123,53 +134,65 @@
             <p id="etaNoBus" class="hidden text-center text-xs text-amber-500 bg-amber-500/10 p-3 rounded-xl border border-amber-500/30">لا توجد حافلات نشطة في هذا الاتجاه حالياً.</p>
         </div>
 
-        <div class="w-full h-[450px] bg-slate-900/50 backdrop-blur-2xl border border-white/10 rounded-3xl relative overflow-hidden flex items-center justify-center shadow-[0_0_40px_rgba(0,0,0,0.5)] transition-colors duration-500">
+        <!-- الخريطة الحية (Y-Shape) -->
+        <div class="w-full h-[450px] bg-slate-900/50 backdrop-blur-2xl border border-slate-800 rounded-3xl relative overflow-hidden flex items-center justify-center shadow-2xl transition-colors duration-500">
             <div class="absolute inset-0 opacity-[0.04] pointer-events-none" id="mapGrid" style="background-image: linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px); background-size: 20px 20px;"></div>
 
-            <svg class="absolute inset-0 w-full h-full" style="z-index: 0;">
-                <line x1="20%" y1="15%" x2="20%" y2="65%" stroke="rgba(150,150,150,0.3)" stroke-width="4" stroke-linecap="round" />
-                <line x1="20%" y1="15%" x2="20%" y2="65%" stroke="rgba(150,150,150,0.8)" stroke-width="2" stroke-dasharray="8 12" stroke-linecap="round" />
-                <line x1="80%" y1="15%" x2="80%" y2="65%" stroke="rgba(150,150,150,0.3)" stroke-width="4" stroke-linecap="round" />
-                <line x1="80%" y1="15%" x2="80%" y2="65%" stroke="rgba(150,150,150,0.8)" stroke-width="2" stroke-dasharray="8 12" stroke-linecap="round" />
-                <path d="M 20% 15% Q 50% -5% 80% 15%" fill="none" stroke="rgba(150,150,150,0.3)" stroke-width="4" stroke-linecap="round" />
-                <path d="M 20% 15% Q 50% -5% 80% 15%" fill="none" stroke="rgba(150,150,150,0.8)" stroke-width="2" stroke-dasharray="8 12" stroke-linecap="round" />
-                <line x1="20%" y1="65%" x2="50%" y2="86%" stroke="rgba(150,150,150,0.3)" stroke-width="4" stroke-linecap="round" />
-                <line x1="20%" y1="65%" x2="50%" y2="86%" stroke="rgba(150,150,150,0.8)" stroke-width="2" stroke-dasharray="8 12" stroke-linecap="round" />
-                <line x1="80%" y1="65%" x2="50%" y2="86%" stroke="rgba(150,150,150,0.3)" stroke-width="4" stroke-linecap="round" />
-                <line x1="80%" y1="65%" x2="50%" y2="86%" stroke="rgba(150,150,150,0.8)" stroke-width="2" stroke-dasharray="8 12" stroke-linecap="round" />
-            </svg>
-
-            <div class="absolute left-[10%] right-[10%] top-[72%] bottom-[4%] bg-slate-900/80 border border-slate-700/80 rounded-2xl flex flex-col items-center justify-start pt-2 z-0 shadow-2xl transition-colors duration-500">
-                <h3 class="text-slate-200 font-bold text-[10px] tracking-wider mb-2 px-4 py-1 bg-slate-800 rounded-full border border-slate-600">محطة جيجل</h3>
-                <div class="w-full flex justify-center gap-3 px-2">
-                    <div class="border border-dashed border-slate-700 bg-slate-800/50 w-12 h-16 rounded-lg flex items-end justify-center pb-1 text-[8px] text-slate-500">P1</div>
-                    <div class="border border-emerald-500/50 bg-emerald-500/10 w-14 h-16 rounded-lg flex items-end justify-center pb-1 text-[9px] text-emerald-500 font-bold relative pulse-glow">العيايشة</div>
-                    <div class="border border-dashed border-slate-700 bg-slate-800/50 w-12 h-16 rounded-lg flex items-end justify-center pb-1 text-[8px] text-slate-500">P3</div>
-                </div>
+            <!-- محطة جيجل (العلوي) -->
+            <div class="absolute left-[20%] right-[20%] top-[4%] h-[10%] bg-slate-900/80 border border-slate-700/80 rounded-2xl flex flex-col items-center justify-start pt-2 z-0 shadow-2xl">
+                <h3 class="text-slate-200 font-bold text-[9px] tracking-wider mb-1 px-3 py-0.5 bg-slate-800 rounded-full border border-slate-600">محطة الحافلات جيجل</h3>
             </div>
 
-            <div id="stopsContainer"></div>
+            <!-- رسم المسارات (SVG) -->
+            <svg class="absolute inset-0 w-full h-full" style="z-index: 0;">
+                <!-- الخط الأخضر (بوهلال - شادية - الفيرمة) -->
+                <path d="M 25 90 L 55 60" stroke="rgba(34,197,94,0.4)" stroke-width="6" fill="none" stroke-linecap="round" />
+                <path d="M 15 90 L 45 60" stroke="rgba(34,197,94,0.4)" stroke-width="6" fill="none" stroke-linecap="round" />
+                
+                <!-- الخط الأحمر (العيايشة - الفيرمة) -->
+                <path d="M 85 90 L 55 60" stroke="rgba(239,68,68,0.4)" stroke-width="6" fill="none" stroke-linecap="round" />
+                <path d="M 75 90 L 45 60" stroke="rgba(239,68,68,0.4)" stroke-width="6" fill="none" stroke-linecap="round" />
+                
+                <!-- الخط الأصفر المشترك (الفيرمة - قاوس - جيجل) -->
+                <path d="M 55 60 L 55 15 L 50 10 L 45 15 L 45 60" stroke="rgba(234,179,8,0.4)" stroke-width="6" fill="none" stroke-linejoin="round" />
+                
+                <!-- الخطوط المتقطعة (التجميلية) -->
+                <path d="M 25 90 L 55 60 M 15 90 L 45 60" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-dasharray="4 8" fill="none" />
+                <path d="M 85 90 L 55 60 M 75 90 L 45 60" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-dasharray="4 8" fill="none" />
+                <path d="M 55 60 L 55 15 L 50 10 L 45 15 L 45 60" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-dasharray="4 8" fill="none" />
+            </svg>
+
+            <!-- المحطات (النقاط) -->
+            <div id="stopsContainer">
+                <div class="absolute w-3 h-3 rounded-full bg-slate-900 border-[3px] border-red-500 z-10" style="left: 80%; top: 90%; transform: translate(-50%, -50%)"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-[9px] text-white bg-slate-800 px-1.5 py-0.5 rounded border border-slate-600">العيايشة</span></div>
+                <div class="absolute w-3 h-3 rounded-full bg-slate-900 border-[3px] border-green-500 z-10" style="left: 20%; top: 90%; transform: translate(-50%, -50%)"><span class="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] text-white bg-slate-800 px-1.5 py-0.5 rounded border border-slate-600">بوهلال</span></div>
+                <div class="absolute w-3 h-3 rounded-full bg-slate-900 border-[3px] border-green-500 z-10" style="left: 32.5%; top: 75%; transform: translate(-50%, -50%)"><span class="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] text-white bg-slate-800 px-1.5 py-0.5 rounded border border-slate-600">شادية</span></div>
+                <div class="absolute w-4 h-4 rounded-full bg-slate-900 border-[4px] border-yellow-500 z-10 pulse-glow" style="left: 50%; top: 60%; transform: translate(-50%, -50%)"><span class="absolute right-5 top-1/2 -translate-y-1/2 text-[9px] font-bold text-yellow-400 bg-slate-900 px-1.5 py-0.5 rounded border border-yellow-600/50">الفيرمة</span></div>
+                <div class="absolute w-3 h-3 rounded-full bg-slate-900 border-[3px] border-yellow-500 z-10" style="left: 50%; top: 40%; transform: translate(-50%, -50%)"><span class="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] text-white bg-slate-800 px-1.5 py-0.5 rounded border border-slate-600">وسط قاوس</span></div>
+            </div>
+
             <div id="mapBusesContainer"></div>
         </div>
 
-        <div class="bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-3xl p-5 shadow-2xl transition-colors duration-500">
-            <h2 class="text-sm font-bold text-slate-300 mb-4 flex items-center gap-2"><i data-lucide="list" class="w-4 h-4"></i> حالة الأسطول (مباشر)</h2>
+        <!-- قائمة الأسطول -->
+        <div class="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-5 shadow-2xl transition-colors duration-500">
+            <h2 class="text-sm font-bold text-slate-300 mb-4 flex items-center gap-2"><i data-lucide="list" class="w-4 h-4"></i> الأسطول المباشر</h2>
             <div id="busListContainer" class="flex flex-col gap-3"></div>
         </div>
 
+        <!-- أزرار التحكم -->
         <div class="flex flex-wrap justify-center gap-2 bg-slate-900/80 backdrop-blur-xl p-3 rounded-2xl border border-slate-800 transition-colors duration-500">
-            <button onclick="togglePlay()" id="btnPlay" class="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 transition-colors">
-                <i data-lucide="pause" class="text-amber-400 w-5 h-5"></i>
-            </button>
-            <button onclick="setMode(true, 1)" id="btnSync" class="flex-1 py-3 rounded-xl text-xs font-bold transition-colors border bg-emerald-600 border-emerald-500 text-white">حي 📡</button>
-            <button onclick="setMode(false, 60)" id="btnX60" class="px-3 py-3 rounded-xl text-xs font-bold flex items-center gap-1 transition-colors border bg-slate-800 border-slate-600 text-slate-300"><i data-lucide="fast-forward" class="w-3 h-3"></i> x60</button>
-            <button onclick="setMode(false, 600)" id="btnX600" class="px-3 py-3 rounded-xl text-xs font-bold flex items-center gap-1 transition-colors border bg-slate-800 border-slate-600 text-slate-300"><i data-lucide="fast-forward" class="w-3 h-3"></i> x600</button>
+            <button onclick="togglePlay()" id="btnPlay" class="p-3 rounded-xl bg-slate-800 border border-slate-700"><i data-lucide="pause" class="text-amber-400 w-5 h-5"></i></button>
+            <button onclick="setMode(true, 1)" class="flex-1 py-3 rounded-xl text-xs font-bold bg-emerald-600 text-white">حي 📡</button>
+            <button onclick="setMode(false, 60)" class="px-3 py-3 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700 flex items-center gap-1"><i data-lucide="fast-forward" class="w-3 h-3"></i> x60</button>
+            <button onclick="setMode(false, 600)" class="px-3 py-3 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700 flex items-center gap-1"><i data-lucide="fast-forward" class="w-3 h-3"></i> x600</button>
         </div>
 
     </div>
 
+    <!-- نافذة تفاصيل الحافلة -->
     <div id="busModal" class="fixed inset-0 z-50 flex items-end justify-center p-0 bg-black/80 backdrop-blur-sm transition-opacity hidden" onclick="closeModal()">
-        <div id="modalContent" class="bg-slate-900 border-t border-slate-700 rounded-t-3xl p-6 shadow-2xl w-full max-w-md relative overflow-hidden flex flex-col transition-colors duration-500" onclick="event.stopPropagation()">
+        <div id="modalContent" class="bg-slate-900 border-t border-slate-700 rounded-t-3xl p-6 shadow-2xl w-full max-w-md relative overflow-hidden flex flex-col" onclick="event.stopPropagation()">
             <div class="w-12 h-1.5 bg-slate-700 rounded-full mx-auto mb-4"></div>
             <div id="modalGlow" class="absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl opacity-20"></div>
             
@@ -183,8 +206,8 @@
             </div>
 
             <div class="flex border-b border-slate-700/50 mt-4 mb-4 flex-shrink-0">
-                <button onclick="switchTab('info')" id="tabBtnInfo" class="flex-1 py-2 text-sm font-bold text-emerald-400 border-b-2 border-emerald-400 transition-colors">المسار</button>
-                <button onclick="switchTab('tickets')" id="tabBtnTickets" class="flex-1 py-2 text-sm font-bold text-slate-400 border-b-2 border-transparent transition-colors">التذاكر</button>
+                <button onclick="switchTab('info')" id="tabBtnInfo" class="flex-1 py-2 text-sm font-bold text-emerald-400 border-b-2 border-emerald-400">المسار</button>
+                <button onclick="switchTab('tickets')" id="tabBtnTickets" class="flex-1 py-2 text-sm font-bold text-slate-400 border-b-2 border-transparent">التذاكر</button>
             </div>
 
             <div class="overflow-y-auto custom-scrollbar flex-1 pb-4">
@@ -199,36 +222,17 @@
                             <div id="modalEtaJijel" class="text-base font-bold text-blue-400" dir="ltr">--</div>
                         </div>
                         <div class="flex-1 bg-slate-900/50 p-2 rounded-xl border border-slate-700 text-center">
-                            <div class="text-[9px] text-slate-500 mb-1">إلى العيايشة</div>
-                            <div id="modalEtaAyaycha" class="text-base font-bold text-emerald-400" dir="ltr">--</div>
-                        </div>
-                    </div>
-                    <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50">
-                        <div class="flex justify-between text-xs mb-2">
-                            <span class="text-slate-400">التقدم الكلي (90 د)</span>
-                            <span id="modalProgressText" class="text-slate-500 font-mono">0%</span>
-                        </div>
-                        <div class="w-full bg-slate-950 rounded-full h-2 overflow-hidden">
-                            <div id="modalProgressBar" class="h-2 rounded-full transition-all duration-300"></div>
+                            <div id="etaDest2Label" class="text-[9px] text-slate-500 mb-1">العودة</div>
+                            <div id="modalEtaHome" class="text-base font-bold text-emerald-400" dir="ltr">--</div>
                         </div>
                     </div>
                 </div>
-
                 <div id="tabTickets" class="space-y-3 hidden">
                     <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50">
                         <ul class="space-y-3">
-                            <li class="flex justify-between items-center border-b border-slate-700/50 pb-2">
-                                <span class="text-sm text-slate-200">قصيرة (قاوس)</span>
-                                <span class="font-bold text-amber-500 bg-amber-500/10 px-2 py-1 rounded-lg text-xs">20 د.ج</span>
-                            </li>
-                            <li class="flex justify-between items-center border-b border-slate-700/50 pb-2">
-                                <span class="text-sm text-slate-200">متوسطة (الكلم 5)</span>
-                                <span class="font-bold text-amber-500 bg-amber-500/10 px-2 py-1 rounded-lg text-xs">25 د.ج</span>
-                            </li>
-                            <li class="flex justify-between items-center">
-                                <span class="text-sm text-slate-200">كاملة (محطة جيجل)</span>
-                                <span class="font-bold text-amber-500 bg-amber-500/10 px-2 py-1 rounded-lg text-xs">30 د.ج</span>
-                            </li>
+                            <li class="flex justify-between border-b border-slate-700/50 pb-2"><span class="text-sm text-slate-200">قصيرة (قاوس)</span><span class="font-bold text-amber-500 text-xs">20 د.ج</span></li>
+                            <li class="flex justify-between border-b border-slate-700/50 pb-2"><span class="text-sm text-slate-200">متوسطة (الفيرمة / شادية)</span><span class="font-bold text-amber-500 text-xs">25 د.ج</span></li>
+                            <li class="flex justify-between"><span class="text-sm text-slate-200">كاملة (محطة جيجل)</span><span class="font-bold text-amber-500 text-xs">30 د.ج</span></li>
                         </ul>
                     </div>
                 </div>
@@ -236,72 +240,90 @@
         </div>
     </div>
 
+    <!-- نافذة تسجيل الدخول -->
     <div id="authModal" class="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden" onclick="closeAuth()">
-        <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl w-full max-w-xs relative" onclick="event.stopPropagation()">
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl w-full max-w-xs" onclick="event.stopPropagation()">
             <h2 class="text-lg font-bold text-center text-white mb-6">دخول الإدارة</h2>
             <div class="space-y-3">
-                <input type="text" id="adminUser" placeholder="Username" class="w-full bg-slate-800 border border-slate-600 rounded-xl p-3 text-sm text-white focus:border-emerald-500 outline-none" dir="ltr" onkeypress="handleAuthKeyPress(event)">
-                <input type="password" id="adminPass" placeholder="Password" class="w-full bg-slate-800 border border-slate-600 rounded-xl p-3 text-sm text-white focus:border-emerald-500 outline-none" dir="ltr" onkeypress="handleAuthKeyPress(event)">
+                <input type="text" id="adminUser" placeholder="Username" class="w-full bg-slate-800 rounded-xl p-3 text-sm text-white" dir="ltr">
+                <input type="password" id="adminPass" placeholder="Password" class="w-full bg-slate-800 rounded-xl p-3 text-sm text-white" dir="ltr">
             </div>
             <p id="authError" class="text-red-400 text-xs text-center mt-2 hidden">بيانات خاطئة!</p>
-            <button onclick="checkAuth()" class="w-full py-3 mt-4 bg-emerald-600 text-white rounded-xl text-sm font-bold shadow-lg active:scale-95 transition-transform">دخول</button>
+            <button onclick="checkAuth()" class="w-full py-3 mt-4 bg-emerald-600 text-white rounded-xl text-sm font-bold">دخول</button>
         </div>
     </div>
 
+    <!-- نافذة لوحة الإدارة -->
     <div id="adminModal" class="fixed inset-0 z-[100] flex items-start justify-center p-4 pt-10 bg-black/80 backdrop-blur-md hidden" onclick="closeAdminPanel()">
-        <div class="bg-slate-900 border border-slate-700 rounded-3xl p-5 shadow-2xl w-full max-w-md max-h-[85vh] overflow-y-auto custom-scrollbar relative transition-colors duration-500" onclick="event.stopPropagation()">
-            <button onclick="closeAdminPanel()" class="absolute top-4 left-4 p-2 bg-slate-800 rounded-full">
-                <i data-lucide="x" class="text-slate-400 w-4 h-4"></i>
-            </button>
-            <h2 class="text-xl font-bold text-emerald-400 mb-6 flex items-center gap-2 border-b border-slate-800 pb-3">
-                <i data-lucide="settings"></i> الإعدادات المتقدمة
-            </h2>
-            
-            <div class="grid grid-cols-2 gap-3 mb-6">
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">وقت البدء</label>
-                    <input type="time" id="adminStartTime" class="w-full bg-slate-800 border border-slate-600 rounded-lg p-2 text-sm text-white" dir="ltr">
-                </div>
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">وقت التوقف</label>
-                    <input type="time" id="adminEndTime" class="w-full bg-slate-800 border border-slate-600 rounded-lg p-2 text-sm text-white" dir="ltr">
-                </div>
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl p-5 shadow-2xl w-full max-w-md max-h-[85vh] overflow-y-auto custom-scrollbar" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-emerald-400">الإعدادات والأسطول</h2>
+                <button onclick="closeAdminPanel()" class="p-2 bg-slate-800 rounded-full"><i data-lucide="x" class="text-slate-400 w-4 h-4"></i></button>
             </div>
-
+            <div class="grid grid-cols-2 gap-3 mb-6">
+                <div><label class="block text-xs text-slate-400 mb-1">وقت البدء</label><input type="time" id="adminStartTime" class="w-full bg-slate-800 rounded-lg p-2 text-sm text-white" dir="ltr"></div>
+                <div><label class="block text-xs text-slate-400 mb-1">وقت التوقف</label><input type="time" id="adminEndTime" class="w-full bg-slate-800 rounded-lg p-2 text-sm text-white" dir="ltr"></div>
+            </div>
             <div class="flex justify-between items-center mb-3">
-                <h3 class="text-sm font-bold text-slate-200">إدارة الأسطول (تحديد الازدحام)</h3>
+                <h3 class="text-sm font-bold text-slate-200">الأسطول المدمج (12 حافلة)</h3>
                 <button onclick="addAdminBus()" class="bg-slate-700 px-2 py-1 rounded text-xs text-white">+ إضافة</button>
             </div>
-            
             <div id="adminBusesList" class="space-y-3 mb-6"></div>
-
-            <div class="flex gap-2 border-t border-slate-700 pt-4">
-                <button id="mainSaveBtn" onclick="saveAdminConfig()" class="flex-1 py-3 bg-emerald-600 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all">
-                    <i data-lucide="cloud-upload" class="w-4 h-4"></i> حفظ ونشر التعديلات للجميع ☁️
-                </button>
-            </div>
+            <button id="mainSaveBtn" onclick="saveAdminConfig()" class="w-full py-4 bg-emerald-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg">
+                <i data-lucide="cloud-upload" class="w-5 h-5"></i> حفظ ونشر للجميع ☁️
+            </button>
         </div>
     </div>
 
     <script>
-        // إعدادات افتراضية
+        // === بيانات الأسطول الافتراضية (يتم تحديثها من السحابة) ===
         let START_TIME_MINUTES = 6 * 60 + 30; 
         let END_TIME_MINUTES = 19 * 60; 
-        let CYCLE_DURATION = 90;
+        
         let BUSES = [
-            { id: 1, name: 'حافلة 1', offset: 0, isPaused: false, capacity: 1, color: 'bg-emerald-500', glow: 'shadow-[0_0_15px_rgba(16,185,129,0.8)]', text: 'text-emerald-500' },
-            { id: 2, name: 'حافلة 2', offset: 30, isPaused: false, capacity: 1, color: 'bg-blue-500', glow: 'shadow-[0_0_15px_rgba(59,130,246,0.8)]', text: 'text-blue-500' },
-            { id: 3, name: 'حافلة 3', offset: 60, isPaused: false, capacity: 1, color: 'bg-purple-500', glow: 'shadow-[0_0_15px_rgba(168,85,247,0.8)]', text: 'text-purple-500' }
+            // خط العيايشة (أحمر) - دورة 90 دقيقة
+            { id: 1, name: 'ل - حافلة 1', route: 'laiachia', offset: 0, isPaused: false, capacity: 1, color: 'bg-red-500', glow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text: 'text-red-500' },
+            { id: 2, name: 'ل - حافلة 2', route: 'laiachia', offset: 30, isPaused: false, capacity: 1, color: 'bg-red-500', glow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text: 'text-red-500' },
+            { id: 3, name: 'ل - حافلة 3', route: 'laiachia', offset: 60, isPaused: false, capacity: 1, color: 'bg-red-500', glow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text: 'text-red-500' },
+            // خط شادية (أخضر) - دورة 120 دقيقة
+            { id: 4, name: 'ش - حافلة 1', route: 'chadia', offset: 0, isPaused: false, capacity: 1, color: 'bg-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500' },
+            { id: 5, name: 'ش - حافلة 2', route: 'chadia', offset: 13, isPaused: false, capacity: 1, color: 'bg-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500' },
+            { id: 6, name: 'ش - حافلة 3', route: 'chadia', offset: 26, isPaused: false, capacity: 1, color: 'bg-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500' },
+            { id: 7, name: 'ش - حافلة 4', route: 'chadia', offset: 39, isPaused: false, capacity: 1, color: 'bg-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500' },
+            { id: 8, name: 'ش - حافلة 5', route: 'chadia', offset: 52, isPaused: false, capacity: 1, color: 'bg-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500' },
+            { id: 9, name: 'ش - حافلة 6', route: 'chadia', offset: 65, isPaused: false, capacity: 1, color: 'bg-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500' },
+            { id: 10, name: 'ش - حافلة 7', route: 'chadia', offset: 78, isPaused: false, capacity: 1, color: 'bg-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500' },
+            { id: 11, name: 'ش - حافلة 8', route: 'chadia', offset: 91, isPaused: false, capacity: 1, color: 'bg-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500' },
+            { id: 12, name: 'ش - حافلة 9', route: 'chadia', offset: 104, isPaused: false, capacity: 1, color: 'bg-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500' }
         ];
 
-        const ROUTE_STEPS = [
-            { id: 's1_out', name: 'العيايشة', x: 20, y: 15, wait: 5, move: 8, nextX: 20, nextY: 35 }, { id: 's2_out', name: 'وسط قاوس', x: 20, y: 35, wait: 2, move: 8, nextX: 20, nextY: 55 },
-            { id: 's3_out', name: 'الكلم 5', x: 20, y: 55, wait: 2, move: 7, nextX: 20, nextY: 65 }, { id: 'term_in', name: 'دخول المحطة', x: 20, y: 65, wait: 0, move: 3, nextX: 50, nextY: 86 },
-            { id: 'terminal', name: 'محطة جيجل', x: 50, y: 86, wait: 10, move: 3, nextX: 80, nextY: 65 }, { id: 'term_out', name: 'خروج من المحطة', x: 80, y: 65, wait: 0, move: 7, nextX: 80, nextY: 55 },
-            { id: 's3_in', name: 'الكلم 5 (عودة)', x: 80, y: 55, wait: 2, move: 8, nextX: 80, nextY: 35 }, { id: 's2_in', name: 'وسط قاوس (عودة)', x: 80, y: 35, wait: 2, move: 8, nextX: 80, nextY: 15 },
-            { id: 's1_in', name: 'العيايشة (عودة)', x: 80, y: 15, wait: 2, move: 8, nextX: 20, nextY: 15 }, { id: 'buffer', name: 'استراحة', x: 20, y: 15, wait: 5, move: 0, nextX: 20, nextY: 15 }
+        // مسار العيايشة (90 دقيقة)
+        const ROUTE_LAIACHIA = [
+            { id: 'l_start', name: 'العيايشة', x: 85, y: 90, wait: 13, move: 10, nextX: 55, nextY: 60 },
+            { id: 'firma_up', name: 'الفيرمة', x: 55, y: 60, wait: 2, move: 7, nextX: 55, nextY: 40 },
+            { id: 'kaous_up', name: 'وسط قاوس', x: 55, y: 40, wait: 2, move: 8, nextX: 55, nextY: 15 },
+            { id: 'jijel_in', name: 'دخول المحطة', x: 55, y: 15, wait: 0, move: 2, nextX: 50, nextY: 10 },
+            { id: 'terminal', name: 'محطة جيجل', x: 50, y: 10, wait: 10, move: 2, nextX: 45, nextY: 15 },
+            { id: 'jijel_out', name: 'خروج من المحطة', x: 45, y: 15, wait: 0, move: 8, nextX: 45, nextY: 40 },
+            { id: 'kaous_down', name: 'وسط قاوس (عودة)', x: 45, y: 40, wait: 2, move: 7, nextX: 45, nextY: 60 },
+            { id: 'firma_down', name: 'الفيرمة (عودة)', x: 45, y: 60, wait: 2, move: 10, nextX: 75, nextY: 90 },
+            { id: 'l_end', name: 'العيايشة (عودة)', x: 75, y: 90, wait: 2, move: 3, nextX: 85, nextY: 90 }
         ];
-        const STOPS = [ { id: 's1', name: 'العيايشة', y: 15 }, { id: 's2', name: 'وسط قاوس', y: 35 }, { id: 's3', name: 'الكلم 5', y: 55 } ];
+
+        // مسار شادية (120 دقيقة)
+        const ROUTE_CHADIA = [
+            { id: 'c_start', name: 'بوهلال', x: 25, y: 90, wait: 28, move: 6, nextX: 40, nextY: 75 },
+            { id: 'chadia_up', name: 'شادية', x: 40, y: 75, wait: 1, move: 8, nextX: 55, nextY: 60 },
+            { id: 'firma_up', name: 'الفيرمة', x: 55, y: 60, wait: 2, move: 7, nextX: 55, nextY: 40 },
+            { id: 'kaous_up', name: 'وسط قاوس', x: 55, y: 40, wait: 2, move: 8, nextX: 55, nextY: 15 },
+            { id: 'jijel_in', name: 'دخول المحطة', x: 55, y: 15, wait: 0, move: 2, nextX: 50, nextY: 10 },
+            { id: 'terminal', name: 'محطة جيجل', x: 50, y: 10, wait: 14, move: 2, nextX: 45, nextY: 15 },
+            { id: 'jijel_out', name: 'خروج من المحطة', x: 45, y: 15, wait: 0, move: 8, nextX: 45, nextY: 40 },
+            { id: 'kaous_down', name: 'وسط قاوس (عودة)', x: 45, y: 40, wait: 2, move: 7, nextX: 45, nextY: 60 },
+            { id: 'firma_down', name: 'الفيرمة (عودة)', x: 45, y: 60, wait: 2, move: 8, nextX: 30, nextY: 75 },
+            { id: 'chadia_down', name: 'شادية (عودة)', x: 30, y: 75, wait: 1, move: 6, nextX: 15, nextY: 90 },
+            { id: 'c_end', name: 'بوهلال (عودة)', x: 15, y: 90, wait: 2, move: 4, nextX: 25, nextY: 90 }
+        ];
 
         let state = { simulatedTime: new Date(), timeMultiplier: 1, isPlaying: true, isLiveMode: true, selectedBusId: null, intervalId: null };
         let isAdminAuthenticated = false; let isCloudEnabled = false; let tempBuses = []; let db = null;
@@ -310,18 +332,12 @@
         function minutesToTime(m) { return `${Math.floor(m/60).toString().padStart(2,'0')}:${(m%60).toString().padStart(2,'0')}`; }
 
         function toggleTheme() {
-            const body = document.body;
-            body.classList.toggle('light-mode');
-            const icon = document.getElementById('themeIcon');
-            if (body.classList.contains('light-mode')) {
-                icon.setAttribute('class', 'lucide lucide-moon w-4 h-4');
-                localStorage.setItem('theme', 'light');
-            } else {
-                icon.setAttribute('class', 'lucide lucide-sun w-4 h-4');
-                localStorage.setItem('theme', 'dark');
-            }
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            document.getElementById('themeIcon').setAttribute('class', isLight ? 'lucide lucide-moon w-4 h-4' : 'lucide lucide-sun w-4 h-4');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
             lucide.createIcons();
-        };
+        }
 
         function detectLocation() {
             const btn = document.getElementById('gpsBtn');
@@ -329,54 +345,55 @@
             lucide.createIcons();
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
-                    (position) => {
+                    () => {
                         setTimeout(() => {
-                            const options = [0, 13, 23, 35, 55, 65];
-                            const randomStop = options[Math.floor(Math.random() * 2)]; 
-                            document.getElementById('passengerStop').value = randomStop;
+                            const options = ["0,-1", "-1,0", "32,52", "64,88"];
+                            document.getElementById('passengerStop').value = options[Math.floor(Math.random() * options.length)]; 
                             updateUI();
                             btn.innerHTML = '<i data-lucide="check" class="w-3 h-3"></i> تم التحديد';
-                            btn.classList.replace('text-cyan-400', 'text-emerald-400');
-                            btn.classList.replace('bg-cyan-500/20', 'bg-emerald-500/20');
-                            btn.classList.replace('border-cyan-500/30', 'border-emerald-500/30');
+                            btn.className = "text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded-lg border border-emerald-500/30 flex items-center gap-1 active:scale-95 transition-all";
                             lucide.createIcons();
                         }, 1000);
                     },
-                    (error) => { alert("يرجى تفعيل الـ GPS في هاتفك."); btn.innerHTML = '<i data-lucide="crosshair" class="w-3 h-3"></i> تحديد مكاني'; lucide.createIcons(); }
+                    () => { alert("يرجى تفعيل الـ GPS في هاتفك."); btn.innerHTML = '<i data-lucide="crosshair" class="w-3 h-3"></i> تحديد مكاني'; lucide.createIcons(); }
                 );
             }
-        };
+        }
 
         function getCapacityDetails(cap) {
-            if(cap === 3) return { color: 'bg-red-500', text: 'ممتلئة 🔴', textColor: 'text-red-400' };
-            if(cap === 2) return { color: 'bg-amber-400', text: 'متوسطة 🟡', textColor: 'text-amber-400' };
-            return { color: 'bg-emerald-500', text: 'فارغة 🟢', textColor: 'text-emerald-400' };
+            if(cap === 3) return { color: 'bg-red-500', text: 'ممتلئة 🔴' };
+            if(cap === 2) return { color: 'bg-amber-400', text: 'متوسطة 🟡' };
+            return { color: 'bg-emerald-500', text: 'فارغة 🟢' };
         }
 
         function getBusData(bus) {
             const currentMinutes = state.simulatedTime.getHours() * 60 + state.simulatedTime.getMinutes() + state.simulatedTime.getSeconds() / 60;
-            const bus2 = BUSES.find(b => b.id === 2);
+            const isChadia = bus.route === 'chadia';
+            const CYCLE_DUR = isChadia ? 120 : 90;
             let dynamicOffset = bus.offset;
             
-            if (bus.id === 1 && bus2 && bus2.isPaused) {
-                if (currentMinutes - START_TIME_MINUTES > 10) dynamicOffset += 15;
+            // التأخير الذكي الموروث للحافلة 1 (خاص بمسار العيايشة)
+            if (bus.id === 1) {
+                const bus2 = BUSES.find(b => b.id === 2);
+                if (bus2 && bus2.isPaused && (currentMinutes - START_TIME_MINUTES > 10)) dynamicOffset += 15;
             }
 
             const diff = currentMinutes - START_TIME_MINUTES - dynamicOffset;
-            if (bus.isPaused) return { status: 'متوقفة مؤقتاً ⚠️', x: 20 + (bus.id * 3), y: 8, isMoving: false, rotation: 180, isParked: true, isPaused: true, progress: 0, cycleTime: -1 };
-            if (diff < 0) return { status: 'بالمرآب (انتظار)', x: 20 + (bus.id * 3), y: 8, isMoving: false, rotation: 180, isParked: true, isPaused: false, progress: 0, cycleTime: -1 };
+            if (bus.isPaused) return { status: 'متوقفة مؤقتاً ⚠️', x: 20 + (bus.id * 2), y: 8, isMoving: false, rotation: 180, isParked: true, isPaused: true, progress: 0, cycleTime: -1 };
+            if (diff < 0) return { status: 'بالمرآب (انتظار)', x: 20 + (bus.id * 2), y: 8, isMoving: false, rotation: 180, isParked: true, isPaused: false, progress: 0, cycleTime: -1 };
 
             const maxAllowed = END_TIME_MINUTES - START_TIME_MINUTES - dynamicOffset;
-            const busEnd = Math.floor(maxAllowed / CYCLE_DURATION) * CYCLE_DURATION;
-            if (diff >= busEnd) return { status: 'نهاية العمل', x: 20 + (bus.id * 3), y: 8, isMoving: false, rotation: 180, isParked: true, isPaused: false, progress: 100, cycleTime: -1 };
+            if (diff >= (Math.floor(maxAllowed / CYCLE_DUR) * CYCLE_DUR)) return { status: 'نهاية العمل', x: 20 + (bus.id * 2), y: 8, isMoving: false, rotation: 180, isParked: true, isPaused: false, progress: 100, cycleTime: -1 };
 
-            const cycleTime = diff % CYCLE_DURATION;
-            const progress = (cycleTime / CYCLE_DURATION) * 100;
-            let acc = 0; let currentStep = ROUTE_STEPS[0]; let timeInStep = 0;
+            const cycleTime = diff % CYCLE_DUR;
+            const progress = (cycleTime / CYCLE_DUR) * 100;
+            const STEPS = isChadia ? ROUTE_CHADIA : ROUTE_LAIACHIA;
+            
+            let acc = 0; let currentStep = STEPS[0]; let timeInStep = 0;
 
-            for (let i = 0; i < ROUTE_STEPS.length; i++) {
-                const stepDuration = ROUTE_STEPS[i].wait + ROUTE_STEPS[i].move;
-                if (cycleTime < acc + stepDuration) { currentStep = ROUTE_STEPS[i]; timeInStep = cycleTime - acc; break; }
+            for (let i = 0; i < STEPS.length; i++) {
+                const stepDuration = STEPS[i].wait + STEPS[i].move;
+                if (cycleTime < acc + stepDuration) { currentStep = STEPS[i]; timeInStep = cycleTime - acc; break; }
                 acc += stepDuration;
             }
 
@@ -386,53 +403,18 @@
                 else status = `${currentStep.name} - صعود`;
             } else {
                 isMoving = true; fraction = (timeInStep - currentStep.wait) / currentStep.move;
-                const nextI = (ROUTE_STEPS.indexOf(currentStep) + 1) % ROUTE_STEPS.length;
-                status = `إلى ${ROUTE_STEPS[nextI].name}`;
+                const nextI = (STEPS.indexOf(currentStep) + 1) % STEPS.length;
+                status = `إلى ${STEPS[nextI].name}`;
             }
 
             const x = currentStep.x + (currentStep.nextX - currentStep.x) * fraction;
             const y = currentStep.y + (currentStep.nextY - currentStep.y) * fraction;
-            let rotation = 0;
-            if (isMoving) rotation = Math.atan2(currentStep.nextY - currentStep.y, currentStep.nextX - currentStep.x) * (180 / Math.PI) + 90; 
-            else if (currentStep.id === 'terminal' || currentStep.x < 50) rotation = 180; 
+            let rotation = isMoving ? (Math.atan2(currentStep.nextY - currentStep.y, currentStep.nextX - currentStep.x) * (180 / Math.PI) + 90) : (currentStep.id === 'terminal' ? 180 : 0);
 
-            return { status, x, y, isMoving, rotation, isParked: false, isPaused: false, progress, 
-                     etaJijel: Math.floor((35 - cycleTime + 90) % 90) + ' د', 
-                     etaAyaycha: Math.floor((75 - cycleTime + 90) % 90) + ' د', cycleTime };
-        }
+            let etaJijel = isChadia ? Math.floor((64 - cycleTime + 120) % 120) : Math.floor((44 - cycleTime + 90) % 90);
+            let etaHome = isChadia ? Math.floor((114 - cycleTime + 120) % 120) : Math.floor((85 - cycleTime + 90) % 90);
 
-        function initDOM() {
-            const stopsContainer = document.getElementById('stopsContainer'); stopsContainer.innerHTML = '';
-            STOPS.forEach(stop => {
-                stopsContainer.innerHTML += `<div class="absolute w-4 h-4 rounded-full bg-slate-800 border-[3px] border-slate-400 z-10" style="left: 20%; top: ${stop.y}%; transform: translate(-50%, -50%)"></div>
-                                             <div class="absolute w-4 h-4 rounded-full bg-slate-800 border-[3px] border-slate-400 z-10" style="left: 80%; top: ${stop.y}%; transform: translate(-50%, -50%)"></div>`;
-            });
-            const listContainer = document.getElementById('busListContainer'); const mapContainer = document.getElementById('mapBusesContainer');
-            listContainer.innerHTML = ''; mapContainer.innerHTML = '';
-
-            BUSES.forEach(bus => {
-                const cap = getCapacityDetails(bus.capacity);
-                listContainer.innerHTML += `
-                    <div onclick="openModal(${bus.id})" class="bg-slate-800/40 border border-slate-700 rounded-2xl p-3 flex items-center gap-3 cursor-pointer relative">
-                        <div id="list-icon-bg-${bus.id}" class="p-2.5 rounded-xl"><i data-lucide="bus" id="list-icon-${bus.id}" class="w-4 h-4"></i></div>
-                        <div class="flex-1">
-                            <div class="flex justify-between items-center">
-                                <h3 class="font-bold text-slate-200 text-sm">${bus.name}</h3>
-                                <span id="list-cap-${bus.id}" class="text-[9px] ${cap.color} text-slate-900 px-2 py-0.5 rounded-full font-bold">${cap.text}</span>
-                            </div>
-                            <p id="list-status-${bus.id}" class="text-[10px] text-slate-400 truncate"></p>
-                        </div>
-                    </div>`;
-                mapContainer.innerHTML += `
-                    <div onclick="openModal(${bus.id})" id="map-bus-container-${bus.id}" class="absolute z-20 bus-element cursor-pointer">
-                        <div id="map-icon-bg-${bus.id}" class="w-10 h-10 -ml-5 -mt-5 rounded-2xl border-2 flex items-center justify-center shadow-lg">
-                            <i data-lucide="bus" id="map-icon-${bus.id}" class="w-4 h-4"></i>
-                            <div id="map-cap-dot-${bus.id}" class="absolute -bottom-1 -right-1 w-3 h-3 border-2 border-slate-900 rounded-full ${cap.color}"></div>
-                            <div id="map-name-${bus.id}" class="absolute -top-6 bg-slate-900/90 text-[9px] px-2 py-0.5 rounded text-white font-bold whitespace-nowrap">${bus.name}</div>
-                        </div>
-                    </div>`;
-            });
-            lucide.createIcons(); startEngine();
+            return { status, x, y, isMoving, rotation, isParked: false, isPaused: false, progress, etaJijel: etaJijel + ' د', etaHome: etaHome + ' د', cycleTime };
         }
 
         function updateUI() {
@@ -441,11 +423,18 @@
             const stopSelect = document.getElementById('passengerStop').value;
             const resBoard = document.getElementById('etaResultBoard');
             const noBus = document.getElementById('etaNoBus');
+            
             if (stopSelect !== 'none') {
-                const targetTime = parseInt(stopSelect); let closestBus = null; let minEta = 999;
+                const targets = stopSelect.split(',').map(Number);
+                let closestBus = null; let minEta = 999;
+                
                 BUSES.forEach(bus => {
                     if (bus.isPaused) return; const data = getBusData(bus); if (data.isParked || data.isPaused) return;
-                    let eta = targetTime - data.cycleTime; if (eta < 0) eta += 90;
+                    let targetTime = bus.route === 'chadia' ? targets[1] : targets[0];
+                    if (targetTime === -1) return;
+                    
+                    let eta = targetTime - data.cycleTime; 
+                    if (eta < 0) eta += (bus.route === 'chadia' ? 120 : 90);
                     if (eta < minEta) { minEta = eta; closestBus = { bus, cap: getCapacityDetails(bus.capacity || 1) }; }
                 });
                 if (closestBus) {
@@ -458,33 +447,59 @@
                 } else { resBoard.classList.add('hidden'); noBus.classList.remove('hidden'); }
             } else { resBoard.classList.add('hidden'); noBus.classList.add('hidden'); }
 
+            const listContainer = document.getElementById('busListContainer');
+            const mapContainer = document.getElementById('mapBusesContainer');
+            if(listContainer.children.length === 0) {
+                // رسم الأسطول للمرة الأولى
+                BUSES.forEach(bus => {
+                    listContainer.innerHTML += `
+                        <div onclick="openModal(${bus.id})" class="bg-slate-800/40 border border-slate-700 rounded-2xl p-3 flex items-center gap-3 cursor-pointer relative transition-all">
+                            <div id="list-icon-bg-${bus.id}" class="p-2.5 rounded-xl"><i data-lucide="bus" id="list-icon-${bus.id}" class="w-4 h-4"></i></div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-center">
+                                    <h3 class="font-bold text-slate-200 text-sm">${bus.name}</h3>
+                                    <span id="list-cap-${bus.id}" class="text-[9px] text-slate-900 px-2 py-0.5 rounded-full font-bold"></span>
+                                </div>
+                                <p id="list-status-${bus.id}" class="text-[10px] text-slate-400 truncate"></p>
+                            </div>
+                        </div>`;
+                    mapContainer.innerHTML += `
+                        <div onclick="openModal(${bus.id})" id="map-bus-container-${bus.id}" class="absolute z-20 bus-element cursor-pointer">
+                            <div id="map-icon-bg-${bus.id}" class="w-10 h-10 -ml-5 -mt-5 rounded-2xl border-2 flex items-center justify-center shadow-lg">
+                                <i data-lucide="bus" id="map-icon-${bus.id}" class="w-4 h-4"></i>
+                                <div id="map-cap-dot-${bus.id}" class="absolute -bottom-1 -right-1 w-3 h-3 border-2 border-slate-900 rounded-full"></div>
+                                <div class="absolute -top-6 bg-slate-900/90 text-[9px] px-2 py-0.5 rounded text-white font-bold whitespace-nowrap">${bus.name.split('-')[0].trim()}</div>
+                            </div>
+                        </div>`;
+                });
+                lucide.createIcons();
+            }
+
             BUSES.forEach(bus => {
                 const data = getBusData(bus);
                 const cap = getCapacityDetails(bus.capacity);
-                document.getElementById(`list-status-${bus.id}`).innerText = data.status;
-                const listBg = document.getElementById(`list-icon-bg-${bus.id}`);
-                const listIcon = document.getElementById(`list-icon-${bus.id}`);
                 
+                document.getElementById(`list-status-${bus.id}`).innerText = data.status;
                 document.getElementById(`list-cap-${bus.id}`).className = `text-[9px] ${cap.color} text-slate-900 px-2 py-0.5 rounded-full font-bold`;
                 document.getElementById(`list-cap-${bus.id}`).innerText = cap.text;
                 document.getElementById(`map-cap-dot-${bus.id}`).className = `absolute -bottom-1 -right-1 w-3 h-3 border-2 border-slate-900 rounded-full ${cap.color}`;
 
+                const listBg = document.getElementById(`list-icon-bg-${bus.id}`);
+                const listIcon = document.getElementById(`list-icon-${bus.id}`);
                 if(data.isParked || data.isPaused) {
                     listBg.className = `p-2.5 rounded-xl bg-slate-700 border border-slate-600`;
                     listIcon.setAttribute('class', `lucide lucide-bus w-4 h-4 text-slate-400`);
-                    document.getElementById(`list-status-${bus.id}`).className = data.isPaused ? "text-[10px] text-amber-500 font-bold" : "text-[10px] text-slate-500";
                 } else {
                     listBg.className = `p-2.5 rounded-xl ${bus.color} ${bus.glow}`;
                     listIcon.setAttribute('class', `lucide lucide-bus w-4 h-4 text-white`);
-                    document.getElementById(`list-status-${bus.id}`).className = "text-[10px] text-slate-300";
                 }
 
                 const mapContainer = document.getElementById(`map-bus-container-${bus.id}`);
                 mapContainer.style.left = `${data.x}%`; mapContainer.style.top = `${data.y}%`;
+                
                 const mapBg = document.getElementById(`map-icon-bg-${bus.id}`);
-                const mapName = document.getElementById(`map-name-${bus.id}`);
-                mapBg.style.transform = `rotate(${data.rotation}deg)`; mapName.style.transform = `rotate(-${data.rotation}deg)`;
-
+                mapBg.style.transform = `rotate(${data.rotation}deg)`;
+                
                 const mapIcon = document.getElementById(`map-icon-${bus.id}`);
                 if(data.isParked || data.isPaused) {
                     mapBg.className = `w-10 h-10 -ml-5 -mt-5 rounded-2xl border-2 flex items-center justify-center ${data.isPaused ? 'bg-amber-900 border-amber-500' : 'bg-slate-700 border-slate-500'}`;
@@ -499,14 +514,14 @@
                     document.getElementById('modalProgressBar').style.width = `${data.progress}%`;
                     document.getElementById('modalProgressText').innerText = `${Math.round(data.progress)}%`;
                     document.getElementById('modalEtaJijel').innerText = data.etaJijel;
-                    document.getElementById('modalEtaAyaycha').innerText = data.etaAyaycha;
+                    document.getElementById('modalEtaHome').innerText = data.etaHome;
                 }
             });
         }
 
         function startEngine() {
             if (state.intervalId) clearInterval(state.intervalId);
-            if (!state.isPlaying) { document.getElementById('btnPlay').innerHTML = '<i data-lucide="play" class="text-emerald-400 w-5 h-5"></i>'; lucide.createIcons(); return; }
+            if (!state.isPlaying) { document.getElementById('btnPlay').innerHTML = '<i data-lucide="play" class="text-amber-400 w-5 h-5"></i>'; lucide.createIcons(); return; }
             state.intervalId = setInterval(() => {
                 if (state.isLiveMode) state.simulatedTime = new Date();
                 else state.simulatedTime = new Date(state.simulatedTime.getTime() + (50 * state.timeMultiplier));
@@ -521,38 +536,31 @@
         function switchTab(t) {
             document.getElementById('tabInfo').className = t==='info' ? 'space-y-3 block' : 'hidden';
             document.getElementById('tabTickets').className = t==='tickets' ? 'space-y-3 block' : 'hidden';
-            document.getElementById('tabBtnInfo').className = `flex-1 py-2 text-sm font-bold transition-colors border-b-2 ${t==='info'?'text-emerald-400 border-emerald-400':'text-slate-500 border-transparent'}`;
-            document.getElementById('tabBtnTickets').className = `flex-1 py-2 text-sm font-bold transition-colors border-b-2 ${t==='tickets'?'text-emerald-400 border-emerald-400':'text-slate-500 border-transparent'}`;
+            document.getElementById('tabBtnInfo').className = `flex-1 py-2 text-sm font-bold border-b-2 ${t==='info'?'text-emerald-400 border-emerald-400':'text-slate-500 border-transparent'}`;
+            document.getElementById('tabBtnTickets').className = `flex-1 py-2 text-sm font-bold border-b-2 ${t==='tickets'?'text-emerald-400 border-emerald-400':'text-slate-500 border-transparent'}`;
         }
 
         function openModal(busId) {
-            state.selectedBusId = busId; const bus = BUSES.find(b => b.id === busId); const data = getBusData(bus); const cap = getCapacityDetails(bus.capacity);
-
+            state.selectedBusId = busId; const bus = BUSES.find(b => b.id === busId); const cap = getCapacityDetails(bus.capacity);
             document.getElementById('modalBusName').innerText = bus.name;
             document.getElementById('modalGlow').className = `absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl opacity-20 ${bus.color}`;
             document.getElementById('modalBusIcon').className = `w-14 h-14 rounded-2xl flex items-center justify-center mb-2 ${bus.color} ${bus.glow}`;
             
-            const sts = document.getElementById('modalBusStatus');
-            sts.innerText = bus.isPaused ? 'متوقفة (أدمن)' : (data.isParked ? 'خارج الخدمة' : 'في الخدمة');
-            sts.className = `px-3 py-1 rounded-full text-[10px] font-bold border border-slate-700 bg-slate-800/50 ${bus.isPaused ? 'text-amber-400' : bus.text}`;
-
+            document.getElementById('etaDest2Label').innerText = bus.route === 'chadia' ? 'إلى بوهلال' : 'إلى العيايشة';
+            
             const badge = document.getElementById('modalCapacityBadge');
             badge.innerText = cap.text; badge.className = `absolute -bottom-2 -right-2 px-2 py-0.5 rounded-full text-[9px] font-bold border-2 border-slate-900 text-slate-900 ${cap.color}`;
-
             document.getElementById('modalProgressBar').className = `h-2 rounded-full transition-all duration-300 ${bus.color}`;
+            
             switchTab('info'); document.getElementById('busModal').classList.remove('hidden'); updateUI(); 
         }
         function closeModal() { state.selectedBusId = null; document.getElementById('busModal').classList.add('hidden'); }
 
-        function initiateAdminAccess() {
-            if (isAdminAuthenticated) openAdminPanel();
-            else { document.getElementById('authModal').classList.remove('hidden'); document.getElementById('authError').classList.add('hidden'); }
-        }
+        function initiateAdminAccess() { document.getElementById('authModal').classList.remove('hidden'); }
         function closeAuth() { document.getElementById('authModal').classList.add('hidden'); }
-        function handleAuthKeyPress(e) { if (e.key === 'Enter') checkAuth(); }
         function checkAuth() {
             const user = document.getElementById('adminUser').value.trim().toLowerCase(); const pass = document.getElementById('adminPass').value.trim();
-            if (user === 'nadjibbenayache' && pass === 'nadjibkaous') { isAdminAuthenticated = true; closeAuth(); openAdminPanel(); } 
+            if (user === 'nadjibbenayache' && pass === 'nadjibkaous') { closeAuth(); openAdminPanel(); } 
             else document.getElementById('authError').classList.remove('hidden');
         }
 
@@ -560,47 +568,45 @@
             document.getElementById('adminStartTime').value = minutesToTime(START_TIME_MINUTES);
             document.getElementById('adminEndTime').value = minutesToTime(END_TIME_MINUTES);
             tempBuses = JSON.parse(JSON.stringify(BUSES)); renderAdminBuses();
-            document.getElementById('mainSaveBtn').innerHTML = '<i data-lucide="cloud-upload" class="w-4 h-4"></i> حفظ ونشر التعديلات للجميع ☁️';
+            document.getElementById('mainSaveBtn').innerHTML = '<i data-lucide="cloud-upload" class="w-5 h-5"></i> حفظ ونشر للجميع ☁️';
             lucide.createIcons(); document.getElementById('adminModal').classList.remove('hidden');
         }
         function closeAdminPanel() { document.getElementById('adminModal').classList.add('hidden'); }
 
         async function toggleAdminPause(index) { 
-            const isPausedBefore = tempBuses[index].isPaused;
-            tempBuses[index].isPaused = !isPausedBefore; 
-            
-            if (!isPausedBefore && tempBuses[index].id === 2 && isCloudEnabled && db) {
-                try {
-                    const toastRefLocal = db.collection('projects').doc('bustruker-9f717').collection('settings').doc('toast');
-                    await toastRefLocal.set({ message: "تنبيه: الحافلة 2 متوقفة مؤقتاً، سيتم تأخير الحافلة 1 بـ 15 دقيقة.", timestamp: Date.now() }); 
-                } catch(e){}
+            tempBuses[index].isPaused = !tempBuses[index].isPaused; 
+            if (tempBuses[index].isPaused && isCloudEnabled && db) {
+                try { await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('toast').set({ message: `تنبيه: ${tempBuses[index].name} متوقفة مؤقتاً!`, timestamp: Date.now() }); } catch(e){}
             }
             renderAdminBuses(); 
         }
 
         function addAdminBus() {
             const id = tempBuses.length ? Math.max(...tempBuses.map(b=>b.id))+1 : 1;
-            tempBuses.push({ id, name:`حافلة ${id}`, offset:tempBuses.length*30, isPaused:false, capacity:1, color:'bg-fuchsia-500', glow:'shadow-[0_0_15px_rgba(217,70,239,0.8)]', text:'text-fuchsia-500' });
+            tempBuses.push({ id, name:`حافلة ${id}`, route:'laiachia', offset:0, isPaused:false, capacity:1, color:'bg-red-500', glow:'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text:'text-red-500' });
             renderAdminBuses();
         }
 
         function renderAdminBuses() {
             const container = document.getElementById('adminBusesList'); container.innerHTML = '';
             tempBuses.forEach((bus, i) => {
-                if(!bus.capacity) bus.capacity = 1;
                 container.innerHTML += `
                     <div class="flex flex-col gap-2 bg-slate-800 p-3 rounded-xl border ${bus.isPaused ? 'border-amber-500/50' : 'border-slate-700'}">
                         <div class="flex items-center gap-2">
-                            <input type="text" value="${bus.name}" onchange="tempBusesEdit(${i}, 'name', this.value)" class="flex-1 bg-slate-900 border border-slate-600 rounded p-1.5 text-xs text-white">
-                            <select onchange="tempBusesEdit(${i}, 'capacity', parseInt(this.value))" class="bg-slate-900 border border-slate-600 rounded p-1.5 text-xs text-white outline-none">
-                                <option value="1" ${bus.capacity===1?'selected':''}>🟢 فارغة</option>
-                                <option value="2" ${bus.capacity===2?'selected':''}>🟡 متوسطة</option>
-                                <option value="3" ${bus.capacity===3?'selected':''}>🔴 ممتلئة</option>
+                            <input type="text" value="${bus.name}" onchange="tempBuses[${i}].name=this.value" class="w-24 bg-slate-900 border border-slate-600 rounded p-1.5 text-xs text-white">
+                            <select onchange="updateBusRoute(this.value, ${i})" class="flex-1 bg-slate-900 border border-slate-600 rounded p-1.5 text-xs text-white outline-none">
+                                <option value="laiachia" ${bus.route==='laiachia'?'selected':''}>العيايشة (أحمر)</option>
+                                <option value="chadia" ${bus.route==='chadia'?'selected':''}>شادية (أخضر)</option>
+                            </select>
+                            <select onchange="tempBuses[${i}].capacity=parseInt(this.value)" class="bg-slate-900 border border-slate-600 rounded p-1.5 text-xs text-white outline-none">
+                                <option value="1" ${bus.capacity===1?'selected':''}>🟢</option>
+                                <option value="2" ${bus.capacity===2?'selected':''}>🟡</option>
+                                <option value="3" ${bus.capacity===3?'selected':''}>🔴</option>
                             </select>
                         </div>
                         <div class="flex items-center justify-between gap-2 mt-1">
-                            <button onclick="toggleAdminPause(${i})" class="flex items-center justify-center gap-1 flex-1 py-1.5 rounded text-xs font-bold transition-colors ${bus.isPaused ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}">
-                                <i data-lucide="${bus.isPaused ? 'play' : 'pause-circle'}" class="w-3 h-3"></i> ${bus.isPaused ? 'استئناف' : 'إيقاف مؤقت'}
+                            <button onclick="toggleAdminPause(${i})" class="flex items-center justify-center gap-1 flex-1 py-1.5 rounded text-xs font-bold transition-colors ${bus.isPaused ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300'}">
+                                <i data-lucide="${bus.isPaused ? 'play' : 'pause-circle'}" class="w-3 h-3"></i> ${bus.isPaused ? 'استئناف' : 'إيقاف'}
                             </button>
                         </div>
                     </div>`;
@@ -608,64 +614,36 @@
             lucide.createIcons();
         }
 
+        function updateBusRoute(val, i) {
+            tempBuses[i].route = val;
+            if(val === 'chadia') { tempBuses[i].color = 'bg-green-500'; tempBuses[i].text = 'text-green-500'; tempBuses[i].glow = 'shadow-[0_0_15px_rgba(34,197,94,0.8)]'; }
+            else { tempBuses[i].color = 'bg-red-500'; tempBuses[i].text = 'text-red-500'; tempBuses[i].glow = 'shadow-[0_0_15px_rgba(239,68,68,0.8)]'; }
+        }
+
         async function saveAdminConfig() {
             const btn = document.getElementById('mainSaveBtn');
-            
-            if (!isCloudEnabled || !db) {
-                alert("❌ فشل النشر: السحابة غير متصلة! يرجى تحديث الصفحة أو فحص الإنترنت.");
-                return;
-            }
-
-            btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> جاري النشر للسحابة...'; lucide.createIcons();
+            if (!isCloudEnabled || !db) return alert("❌ السحابة غير متصلة! يرجى فحص الإنترنت.");
+            btn.innerHTML = '<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> جاري النشر...'; lucide.createIcons();
             try {
                 const start = timeToMinutes(document.getElementById('adminStartTime').value);
                 const end = timeToMinutes(document.getElementById('adminEndTime').value);
-                const newBuses = JSON.parse(JSON.stringify(tempBuses));
-
-                const configRefLocal = db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config');
-                await configRefLocal.set({ START_TIME_MINUTES: start, END_TIME_MINUTES: end, CYCLE_DURATION: CYCLE_DURATION, BUSES: newBuses });
-                
-                START_TIME_MINUTES = start; END_TIME_MINUTES = end; BUSES = newBuses;
-                
-                alert("✅ تم النشر بنجاح لجميع المستخدمين!");
-                closeAdminPanel();
-                updateUI();
-            } catch (error) { 
-                alert("❌ حدث خطأ يمنع النشر:\n" + error.message); 
-            } finally {
-                btn.innerHTML = '<i data-lucide="cloud-upload" class="w-4 h-4"></i> حفظ ونشر التعديلات للجميع ☁️';
-                lucide.createIcons();
-            }
+                await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config').set({ START_TIME_MINUTES: start, END_TIME_MINUTES: end, BUSES: tempBuses });
+                alert("✅ تم الحفظ والنشر بنجاح!"); closeAdminPanel();
+            } catch (error) { alert("❌ حدث خطأ:\n" + error.message); } 
+            finally { btn.innerHTML = '<i data-lucide="cloud-upload" class="w-5 h-5"></i> حفظ ونشر للجميع ☁️'; lucide.createIcons(); }
         }
 
-        function tempBusesEdit(i, key, val) { tempBuses[i][key] = val; renderAdminBuses(); };
-
-        if (localStorage.getItem('theme') === 'light') { document.body.classList.add('light-mode'); }
-
-        try {
-            const savedLocal = localStorage.getItem('busTrackerConfig');
-            if(savedLocal) { 
-                const d = JSON.parse(savedLocal); 
-                START_TIME_MINUTES = d.START_TIME_MINUTES; END_TIME_MINUTES = d.END_TIME_MINUTES; BUSES = d.BUSES; 
-            }
-        } catch(e) {}
-        initDOM(); updateUI();
-
-        // إعداد السحابة
+        if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
+        
+        // تشغيل السحابة
         const firebaseConfig = {
-            apiKey: "AIzaSyAWg5d4zkUkN5ZsUiVHs9hiOBs_hmRwy_k",
-            authDomain: "bustruker-9f717.firebaseapp.com",
-            projectId: "bustruker-9f717",
-            storageBucket: "bustruker-9f717.firebasestorage.app",
-            messagingSenderId: "543529041667",
-            appId: "1:543529041667:web:0063318912541a2bab3336"
+            apiKey: "AIzaSyAWg5d4zkUkN5ZsUiVHs9hiOBs_hmRwy_k", authDomain: "bustruker-9f717.firebaseapp.com",
+            projectId: "bustruker-9f717", storageBucket: "bustruker-9f717.firebasestorage.app",
+            messagingSenderId: "543529041667", appId: "1:543529041667:web:0063318912541a2bab3336"
         };
 
         try {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.firestore();
-            isCloudEnabled = true;
-
+            firebase.initializeApp(firebaseConfig); db = firebase.firestore(); isCloudEnabled = true;
             const confRef = db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config');
             const tstRef = db.collection('projects').doc('bustruker-9f717').collection('settings').doc('toast');
 
@@ -673,12 +651,16 @@
                 document.getElementById('syncIndicator').classList.remove('hidden'); document.getElementById('syncIndicator').classList.add('flex');
                 if (docSnap.exists) {
                     const data = docSnap.data();
-                    START_TIME_MINUTES = data.START_TIME_MINUTES; END_TIME_MINUTES = data.END_TIME_MINUTES; BUSES = data.BUSES;
-                    BUSES.forEach(b => { if(!b.capacity) b.capacity = 1; });
-                    initDOM(); updateUI();
-                } else {
-                    confRef.set({ START_TIME_MINUTES: START_TIME_MINUTES, END_TIME_MINUTES: END_TIME_MINUTES, CYCLE_DURATION: CYCLE_DURATION, BUSES: BUSES });
-                }
+                    let loadedBuses = data.BUSES;
+                    // ترحيل ذكي للبيانات القديمة إذا لم تكن تحتوي على الخط الجديد
+                    if(loadedBuses && loadedBuses.length > 0 && !loadedBuses[0].route) {
+                        loadedBuses = BUSES; // استخدم الأسطول المدمج الجديد
+                        confRef.set({ START_TIME_MINUTES: data.START_TIME_MINUTES, END_TIME_MINUTES: data.END_TIME_MINUTES, BUSES: loadedBuses });
+                    }
+                    START_TIME_MINUTES = data.START_TIME_MINUTES; END_TIME_MINUTES = data.END_TIME_MINUTES; BUSES = loadedBuses || BUSES;
+                    document.getElementById('busListContainer').innerHTML = ''; // إعادة بناء القائمة
+                    updateUI();
+                } else confRef.set({ START_TIME_MINUTES: START_TIME_MINUTES, END_TIME_MINUTES: END_TIME_MINUTES, BUSES: BUSES });
             });
 
             tstRef.onSnapshot((docSnap) => {
@@ -691,8 +673,9 @@
                     }
                 }
             });
-            if (document.body.classList.contains('light-mode')) document.getElementById('themeIcon').setAttribute('class', 'lucide lucide-moon w-4 h-4');
-        } catch(e) { alert("❌ خطأ في الاتصال بالسحابة: " + e.message); }
+        } catch(e) { console.warn("Cloud connection error", e); }
+        
+        startEngine();
     </script>
 </body>
 </html>
