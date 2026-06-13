@@ -301,7 +301,7 @@
             { id: 1, name: 'شركة بوالنوار - حافلة 1', route: 'laiachia', offset: 0, isPaused: false, capacity: 1, color: 'bg-red-500', glow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text: 'text-red-500' },
             { id: 2, name: 'شركة بوالنوار - حافلة 2', route: 'laiachia', offset: 30, isPaused: false, capacity: 1, color: 'bg-red-500', glow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text: 'text-red-500' },
             { id: 3, name: 'شركة بوالنوار - حافلة 3', route: 'laiachia', offset: 60, isPaused: false, capacity: 1, color: 'bg-red-500', glow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text: 'text-red-500' },
-            // الموحدة (شادية - 9 حافلات) -> 126 دقيقة الدورة / 9 = 14 دقيقة بين كل حافلة
+            // الموحدة (شادية - 9 حافلات)
             { id: 4, name: 'النقل الموحدة - حافلة 1', route: 'chadia', offset: 0, isPaused: false, capacity: 1, color: 'bg-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500' },
             { id: 5, name: 'النقل الموحدة - حافلة 2', route: 'chadia', offset: 14, isPaused: false, capacity: 1, color: 'bg-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500' },
             { id: 6, name: 'النقل الموحدة - حافلة 3', route: 'chadia', offset: 28, isPaused: false, capacity: 1, color: 'bg-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500' },
@@ -310,7 +310,9 @@
             { id: 9, name: 'النقل الموحدة - حافلة 6', route: 'chadia', offset: 70, isPaused: false, capacity: 1, color: 'bg-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500' },
             { id: 10, name: 'النقل الموحدة - حافلة 7', route: 'chadia', offset: 84, isPaused: false, capacity: 1, color: 'bg-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500' },
             { id: 11, name: 'النقل الموحدة - حافلة 8', route: 'chadia', offset: 98, isPaused: false, capacity: 1, color: 'bg-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500' },
-            { id: 12, name: 'النقل الموحدة - حافلة 9', route: 'chadia', offset: 112, isPaused: false, capacity: 1, color: 'bg-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500' }
+            { id: 12, name: 'النقل الموحدة - حافلة 9', route: 'chadia', offset: 112, isPaused: false, capacity: 1, color: 'bg-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500' },
+            // الحافلة الصفراء المُضافة (تمت إضافة إزاحة 70 للتشابه مع أوقات الورقة)
+            { id: 13, name: 'حافلة شادية (الصفراء)', route: 'chadia', offset: 70, isPaused: false, capacity: 1, color: 'bg-yellow-500', glow: 'shadow-[0_0_15px_rgba(234,179,8,0.8)]', text: 'text-yellow-500' }
         ];
 
         // === دالة المسارات الديناميكية (20 دقيقة صباحا، 24 دقيقة بعد 3 مساءً) ===
@@ -690,8 +692,17 @@
 
         function updateBusRoute(val, i) {
             tempBuses[i].route = val;
-            if(val === 'chadia') { tempBuses[i].color = 'bg-green-500'; tempBuses[i].text = 'text-green-500'; tempBuses[i].glow = 'shadow-[0_0_15px_rgba(34,197,94,0.8)]'; }
-            else { tempBuses[i].color = 'bg-red-500'; tempBuses[i].text = 'text-red-500'; tempBuses[i].glow = 'shadow-[0_0_15px_rgba(239,68,68,0.8)]'; }
+            if(val === 'chadia') { 
+                // الحفاظ على اللون الأصفر إذا كان الاسم يحتوي على كلمة "الصفراء"
+                if(tempBuses[i].name.includes('الصفراء')) {
+                    tempBuses[i].color = 'bg-yellow-500'; tempBuses[i].text = 'text-yellow-500'; tempBuses[i].glow = 'shadow-[0_0_15px_rgba(234,179,8,0.8)]';
+                } else {
+                    tempBuses[i].color = 'bg-green-500'; tempBuses[i].text = 'text-green-500'; tempBuses[i].glow = 'shadow-[0_0_15px_rgba(34,197,94,0.8)]'; 
+                }
+            }
+            else { 
+                tempBuses[i].color = 'bg-red-500'; tempBuses[i].text = 'text-red-500'; tempBuses[i].glow = 'shadow-[0_0_15px_rgba(239,68,68,0.8)]'; 
+            }
         }
 
         async function saveAdminConfig() {
@@ -699,8 +710,8 @@
             if (!isCloudEnabled || !db) return alert("❌ السحابة غير متصلة! يرجى فحص الإنترنت.");
             btn.innerHTML = '<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> جاري النشر...'; lucide.createIcons();
             try {
-                // حفظ البيانات في مسار جديد v3 لكي يعمل النظام بأحدث الأوقات تلقائياً
-                await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v3').set({ BUSES: tempBuses });
+                // استخدام config_v4 لضمان تحديث الأسطول الجديد (شاملاً الحافلة الصفراء) عند كل المستخدمين
+                await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v4').set({ BUSES: tempBuses });
                 alert("✅ تم الحفظ والنشر بنجاح!"); closeAdminPanel();
             } catch (error) { alert("❌ حدث خطأ:\n" + error.message); } 
             finally { btn.innerHTML = '<i data-lucide="cloud-upload" class="w-5 h-5"></i> حفظ ونشر للجميع ☁️'; lucide.createIcons(); }
@@ -719,7 +730,8 @@
 
         try {
             firebase.initializeApp(firebaseConfig); db = firebase.firestore(); isCloudEnabled = true;
-            const confRef = db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v3');
+            // الاستماع إلى config_v4 لجلب الحافلة الصفراء للمستخدمين
+            const confRef = db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v4');
             const tstRef = db.collection('projects').doc('bustruker-9f717').collection('settings').doc('toast');
 
             confRef.onSnapshot((docSnap) => {
