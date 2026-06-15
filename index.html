@@ -660,15 +660,19 @@
             
             switchTab('info'); document.getElementById('busModal').classList.remove('hidden'); updateUI(); 
         }
-        function closeModal() { state.selectedBusId = null; document.getElementById('busModal').classList.add('hidden'); }
+        
+        function closeModal() { 
+            state.selectedBusId = null; 
+            document.getElementById('busModal').classList.add('hidden'); 
+        }
 
         // =======================
         // منطق تسجيل دخول السائق
         // =======================
         function openDriverAuth() {
-            // الإصلاح هنا: حفظ رقم الحافلة قبل إغلاق النافذة لتفادي ضياعه
+            // حفظ الحافلة في الذاكرة لتجاهل أخطاء التحديث
             currentDriverBusId = state.selectedBusId; 
-            closeModal(); // إغلاق نافذة الركاب
+            closeModal(); // إغلاق نافذة الركاب بعد الحفظ
             
             const bus = BUSES.find(b => b.id === currentDriverBusId);
             
@@ -687,10 +691,12 @@
 
         function checkDriverAuth() {
             const bus = BUSES.find(b => b.id === currentDriverBusId);
-            const user = document.getElementById('driverUser').value.trim();
+            
+            // إضافة toLowerCase() لتجاهل الحروف الكبيرة التي يكتبها الهاتف تلقائياً
+            const user = document.getElementById('driverUser').value.trim().toLowerCase();
             const pass = document.getElementById('driverPass').value.trim();
 
-            const validUser = bus.driverUser || 'admin';
+            const validUser = (bus.driverUser || 'admin').toLowerCase();
             const validPass = bus.driverPass || '1234';
 
             if (user === validUser && pass === validPass) {
@@ -755,7 +761,8 @@
             
             if (isCloudEnabled && db) {
                 try {
-                    await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v6').set({ BUSES: BUSES });
+                    // التحديث إلى config_v7 لضمان سريان التعديل الجديد وكلمات المرور في السحابة
+                    await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v7').set({ BUSES: BUSES });
                     await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('toast').set({ 
                         message: `تنبيه: ${bus.name} قامت بتحديث موقعها يدوياً!`, 
                         timestamp: Date.now() 
@@ -865,7 +872,7 @@
             if (!isCloudEnabled || !db) return alert("❌ السحابة غير متصلة! يرجى فحص الإنترنت.");
             btn.innerHTML = '<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> جاري النشر...'; lucide.createIcons();
             try {
-                await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v6').set({ BUSES: tempBuses });
+                await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v7').set({ BUSES: tempBuses });
                 alert("✅ تم الحفظ والنشر بنجاح!"); closeAdminPanel();
             } catch (error) { alert("❌ حدث خطأ:\n" + error.message); } 
             finally { btn.innerHTML = '<i data-lucide="cloud-upload" class="w-5 h-5"></i> حفظ ونشر للجميع ☁️'; lucide.createIcons(); }
@@ -882,7 +889,8 @@
         try {
             firebase.initializeApp(firebaseConfig); db = firebase.firestore(); isCloudEnabled = true;
             
-            const confRef = db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v6');
+            // قراءة من السحابة v7
+            const confRef = db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v7');
             const tstRef = db.collection('projects').doc('bustruker-9f717').collection('settings').doc('toast');
 
             confRef.onSnapshot((docSnap) => {
