@@ -5,17 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bus Tracker Pro - المرقاب الذكي</title>
     
-    <!-- PWA Setup -->
     <link rel="manifest" href="./manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="#020617">
     <meta name="theme-color" content="#020617">
 
-    <!-- Tailwind & Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Firebase (Classic) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
     
@@ -40,7 +37,6 @@
 </head>
 <body class="min-h-screen bg-slate-950 text-slate-100 font-sans pb-10 transition-colors duration-500">
 
-    <!-- الإشعار السحابي -->
     <div id="adminToast" class="fixed top-20 left-4 right-4 z-[120] bg-amber-600/90 text-white p-4 rounded-2xl shadow-2xl border border-amber-400 hidden animate-bounce backdrop-blur-md">
         <div class="flex items-center gap-3">
             <i data-lucide="alert-triangle" class="w-6 h-6 text-white"></i>
@@ -50,7 +46,6 @@
 
     <div class="fixed inset-0 z-[-1] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/30 via-slate-950 to-black pointer-events-none" id="bgGradient"></div>
 
-    <!-- شريط التنقل -->
     <div class="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800 px-4 py-3 flex justify-between items-center shadow-lg transition-colors duration-500">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.4)]">
@@ -75,17 +70,14 @@
         </div>
     </div>
 
-    <!-- المحتوى الرئيسي -->
     <div class="flex flex-col gap-6 p-4 max-w-md mx-auto relative z-10">
 
-        <!-- الفلترة (الشركات) -->
         <div class="flex gap-2 bg-slate-900/50 p-1.5 rounded-2xl border border-slate-800 backdrop-blur-md">
             <button id="filter-all" onclick="setLineFilter('all')" class="flex-1 py-2 text-xs font-bold rounded-xl bg-slate-700 text-white shadow transition-all">الكل</button>
             <button id="filter-laiachia" onclick="setLineFilter('laiachia')" class="flex-1 py-2 text-[10px] font-bold rounded-xl text-slate-400 hover:text-white transition-all flex items-center justify-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500"></span> بوالنوار</button>
             <button id="filter-chadia" onclick="setLineFilter('chadia')" class="flex-1 py-2 text-[10px] font-bold rounded-xl text-slate-400 hover:text-white transition-all flex items-center justify-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500"></span> الموحدة</button>
         </div>
 
-        <!-- أداة المسافر -->
         <div class="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-5 shadow-2xl relative overflow-hidden transition-colors duration-500">
             <div class="absolute -right-10 -top-10 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl"></div>
             <div class="flex justify-between items-center mb-3">
@@ -135,7 +127,6 @@
             <p id="etaNoBus" class="hidden text-center text-xs text-amber-500 bg-amber-500/10 p-3 rounded-xl border border-amber-500/30">لا توجد حافلات نشطة قريبة.</p>
         </div>
 
-        <!-- الخريطة الحية -->
         <div class="w-full h-[450px] bg-slate-900/50 backdrop-blur-2xl border border-slate-800 rounded-3xl relative overflow-hidden flex items-center justify-center shadow-2xl transition-colors duration-500">
             <div class="absolute inset-0 opacity-[0.04] pointer-events-none" style="background-image: linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px); background-size: 20px 20px;"></div>
 
@@ -143,7 +134,6 @@
                 <h3 class="text-slate-200 font-bold text-[9px] tracking-wider mb-1 px-3 py-0.5 bg-slate-800 rounded-full border border-slate-600">محطة الحافلات جيجل</h3>
             </div>
 
-            <!-- رسم المسارات -->
             <svg class="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none" style="z-index: 0;">
                 <path d="M 20 90 L 35 75 L 50 60" stroke="#22c55e" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" opacity="0.4" />
                 <path d="M 80 90 L 50 60" stroke="#ef4444" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" opacity="0.4" />
@@ -157,7 +147,6 @@
                 <path d="M 45 60 L 45 40 L 45 15" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-dasharray="2 4" fill="none" vector-effect="non-scaling-stroke"/>
             </svg>
 
-            <!-- المحطات -->
             <div id="stopsContainer">
                 <div class="absolute w-4 h-4 rounded-full bg-slate-900 border-[3px] border-red-500 z-10 flex items-center justify-center" style="left: 80%; top: 90%; transform: translate(-50%, -50%)">
                     <span class="absolute left-6 whitespace-nowrap text-[10px] text-white font-bold bg-slate-800 px-2 py-1 rounded-lg border border-slate-600 shadow-lg">العيايشة</span>
@@ -179,13 +168,11 @@
             <div id="mapBusesContainer"></div>
         </div>
 
-        <!-- قائمة الأسطول -->
         <div class="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-5 shadow-2xl transition-colors duration-500">
             <h2 class="text-sm font-bold text-slate-300 mb-4 flex items-center gap-2"><i data-lucide="list" class="w-4 h-4"></i> الأسطول المباشر</h2>
             <div id="busListContainer" class="flex flex-col gap-3"></div>
         </div>
 
-        <!-- أزرار المحاكاة -->
         <div class="flex flex-wrap justify-center gap-2 bg-slate-900/80 backdrop-blur-xl p-3 rounded-2xl border border-slate-800 transition-colors duration-500">
             <button onclick="togglePlay()" id="btnPlay" class="p-3 rounded-xl bg-slate-800 border border-slate-700"><i data-lucide="pause" class="text-amber-400 w-5 h-5"></i></button>
             <button onclick="setMode(true, 1)" class="flex-1 py-3 rounded-xl text-xs font-bold bg-emerald-600 text-white">حي 📡</button>
@@ -195,9 +182,13 @@
 
     </div>
 
-    <!-- نافذة تفاصيل الحافلة -->
     <div id="busModal" class="fixed inset-0 z-50 flex items-end justify-center p-0 bg-black/80 backdrop-blur-sm transition-opacity hidden" onclick="closeModal()">
         <div id="modalContent" class="bg-slate-900 border-t border-slate-700 rounded-t-3xl p-6 shadow-2xl w-full max-w-md relative overflow-hidden flex flex-col" onclick="event.stopPropagation()">
+            
+            <button onclick="openDriverAuth()" class="absolute top-5 left-5 p-2 bg-slate-800/80 rounded-xl border border-slate-700 text-slate-400 shadow-lg z-10 hover:text-white hover:bg-slate-700 transition-all" title="لوحة تحكم السائق">
+                <i data-lucide="user-cog" class="w-5 h-5"></i>
+            </button>
+
             <div class="w-12 h-1.5 bg-slate-700 rounded-full mx-auto mb-4"></div>
             <div id="modalGlow" class="absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl opacity-20"></div>
             
@@ -245,20 +236,54 @@
         </div>
     </div>
 
-    <!-- نافذة تسجيل الدخول للإدارة -->
+    <div id="driverAuthModal" class="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden" onclick="closeDriverAuth()">
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl w-full max-w-xs" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-center mb-4">
+                <div id="driverAuthIcon" class="w-14 h-14 rounded-2xl flex items-center justify-center text-white border-2">
+                    <i data-lucide="steering-wheel" class="w-7 h-7"></i>
+                </div>
+            </div>
+            <h2 id="driverAuthTitle" class="text-sm font-bold text-center text-white mb-6">دخول السائق</h2>
+            <div class="space-y-3">
+                <input type="text" id="driverUser" placeholder="اسم المستخدم" class="w-full bg-slate-800 border border-slate-600 rounded-xl p-3 text-sm text-white outline-none" dir="ltr" onkeypress="if(event.key==='Enter') checkDriverAuth()">
+                <input type="password" id="driverPass" placeholder="الكود السري" class="w-full bg-slate-800 border border-slate-600 rounded-xl p-3 text-sm text-white outline-none" dir="ltr" onkeypress="if(event.key==='Enter') checkDriverAuth()">
+            </div>
+            <p id="driverAuthError" class="text-red-400 text-xs text-center mt-2 hidden">المعلومات غير صحيحة!</p>
+            <button onclick="checkDriverAuth()" class="w-full py-3 mt-4 bg-blue-600 text-white rounded-xl text-sm font-bold shadow-lg">تأكيد الدخول</button>
+        </div>
+    </div>
+
+    <div id="driverPanelModal" class="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden" onclick="closeDriverPanel()">
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl w-full max-w-sm" onclick="event.stopPropagation()">
+            <h2 class="text-lg font-bold text-center text-emerald-400 mb-2">لوحة تحكم الحافلة</h2>
+            <h3 id="driverPanelBusName" class="text-sm text-center font-bold text-slate-300 mb-6 bg-slate-800 p-2 rounded-lg">--</h3>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-bold text-slate-400 mb-2 block">أين تتواجد الحافلة الآن؟</label>
+                    <select id="driverStopSelect" class="w-full bg-slate-800 border border-slate-600 rounded-xl p-3 text-sm text-white outline-none focus:border-emerald-500 transition-colors">
+                        </select>
+                </div>
+                
+                <button onclick="confirmDriverStop()" class="w-full py-3 mt-4 bg-emerald-600 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 shadow-lg">
+                    <i data-lucide="satellite-dish" class="w-5 h-5"></i> تأكيد ونشر الموقع
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div id="authModal" class="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden" onclick="closeAuth()">
         <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl w-full max-w-xs" onclick="event.stopPropagation()">
             <h2 class="text-lg font-bold text-center text-white mb-6">دخول الإدارة</h2>
             <div class="space-y-3">
-                <input type="text" id="adminUser" placeholder="Username" class="w-full bg-slate-800 border border-slate-600 rounded-xl p-3 text-sm text-white outline-none" dir="ltr" onkeypress="handleAuthKeyPress(event)">
-                <input type="password" id="adminPass" placeholder="Password" class="w-full bg-slate-800 border border-slate-600 rounded-xl p-3 text-sm text-white outline-none" dir="ltr" onkeypress="handleAuthKeyPress(event)">
+                <input type="text" id="adminUser" placeholder="Username" class="w-full bg-slate-800 border border-slate-600 rounded-xl p-3 text-sm text-white outline-none" dir="ltr" onkeypress="if(event.key==='Enter') checkAuth()">
+                <input type="password" id="adminPass" placeholder="Password" class="w-full bg-slate-800 border border-slate-600 rounded-xl p-3 text-sm text-white outline-none" dir="ltr" onkeypress="if(event.key==='Enter') checkAuth()">
             </div>
             <p id="authError" class="text-red-400 text-xs text-center mt-2 hidden">بيانات خاطئة!</p>
             <button onclick="checkAuth()" class="w-full py-3 mt-4 bg-emerald-600 text-white rounded-xl text-sm font-bold shadow-lg">دخول</button>
         </div>
     </div>
 
-    <!-- نافذة لوحة الإدارة -->
     <div id="adminModal" class="fixed inset-0 z-[100] flex items-start justify-center p-4 pt-10 bg-black/80 backdrop-blur-md hidden" onclick="closeAdminPanel()">
         <div class="bg-slate-900 border border-slate-700 rounded-3xl p-5 shadow-2xl w-full max-w-md max-h-[85vh] overflow-y-auto custom-scrollbar" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center mb-6">
@@ -292,28 +317,27 @@
             }
         }
 
-        // === بيانات الأسطول والتوقيت ===
         let currentLineFilter = 'all'; 
+        let currentDriverBusId = null;
         
-        // إليك الحافلة الزرقاء في الأسفل (رقم 14)
+        // تم إضافة بيانات السائق لكل حافلة
         let BUSES = [
-            { id: 1, name: 'شركة بوالنوار - حافلة 1', route: 'laiachia', offset: 0, isPaused: false, capacity: 1, color: 'bg-red-500', border: 'border-red-500', glow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text: 'text-red-500' },
-            { id: 2, name: 'شركة بوالنوار - حافلة 2', route: 'laiachia', offset: 30, isPaused: false, capacity: 1, color: 'bg-red-500', border: 'border-red-500', glow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text: 'text-red-500' },
-            { id: 3, name: 'شركة بوالنوار - حافلة 3', route: 'laiachia', offset: 60, isPaused: false, capacity: 1, color: 'bg-red-500', border: 'border-red-500', glow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text: 'text-red-500' },
-            { id: 4, name: 'النقل الموحدة - حافلة 1', route: 'chadia', offset: 0, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500' },
-            { id: 5, name: 'النقل الموحدة - حافلة 2', route: 'chadia', offset: 14, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500' },
-            { id: 6, name: 'النقل الموحدة - حافلة 3', route: 'chadia', offset: 28, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500' },
-            { id: 7, name: 'النقل الموحدة - حافلة 4', route: 'chadia', offset: 42, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500' },
-            { id: 8, name: 'النقل الموحدة - حافلة 5', route: 'chadia', offset: 56, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500' },
-            { id: 9, name: 'النقل الموحدة - حافلة 6', route: 'chadia', offset: 70, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500' },
-            { id: 10, name: 'النقل الموحدة - حافلة 7', route: 'chadia', offset: 84, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500' },
-            { id: 11, name: 'النقل الموحدة - حافلة 8', route: 'chadia', offset: 98, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500' },
-            { id: 12, name: 'النقل الموحدة - حافلة 9', route: 'chadia', offset: 112, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500' },
-            { id: 13, name: 'حافلة شادية (الصفراء)', route: 'chadia', offset: 70, isPaused: false, capacity: 1, color: 'bg-yellow-500', border: 'border-yellow-500', glow: 'shadow-[0_0_15px_rgba(234,179,8,0.8)]', text: 'text-yellow-500' },
-            { id: 14, name: 'حافلة شادية (الزرقاء)', route: 'chadia', offset: 112, isPaused: false, capacity: 1, color: 'bg-blue-500', border: 'border-blue-500', glow: 'shadow-[0_0_15px_rgba(59,130,246,0.8)]', text: 'text-blue-500' }
+            { id: 1, name: 'شركة بوالنوار - حافلة 1', route: 'laiachia', offset: 0, isPaused: false, capacity: 1, color: 'bg-red-500', border: 'border-red-500', glow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text: 'text-red-500', driverUser: 'admin', driverPass: '1234' },
+            { id: 2, name: 'شركة بوالنوار - حافلة 2', route: 'laiachia', offset: 30, isPaused: false, capacity: 1, color: 'bg-red-500', border: 'border-red-500', glow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text: 'text-red-500', driverUser: 'admin', driverPass: '1234' },
+            { id: 3, name: 'شركة بوالنوار - حافلة 3', route: 'laiachia', offset: 60, isPaused: false, capacity: 1, color: 'bg-red-500', border: 'border-red-500', glow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text: 'text-red-500', driverUser: 'admin', driverPass: '1234' },
+            { id: 4, name: 'النقل الموحدة - حافلة 1', route: 'chadia', offset: 0, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'admin', driverPass: '1234' },
+            { id: 5, name: 'النقل الموحدة - حافلة 2', route: 'chadia', offset: 14, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'admin', driverPass: '1234' },
+            { id: 6, name: 'النقل الموحدة - حافلة 3', route: 'chadia', offset: 28, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'admin', driverPass: '1234' },
+            { id: 7, name: 'النقل الموحدة - حافلة 4', route: 'chadia', offset: 42, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'admin', driverPass: '1234' },
+            { id: 8, name: 'النقل الموحدة - حافلة 5', route: 'chadia', offset: 56, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'admin', driverPass: '1234' },
+            { id: 9, name: 'النقل الموحدة - حافلة 6', route: 'chadia', offset: 70, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'admin', driverPass: '1234' },
+            { id: 10, name: 'النقل الموحدة - حافلة 7', route: 'chadia', offset: 84, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'admin', driverPass: '1234' },
+            { id: 11, name: 'النقل الموحدة - حافلة 8', route: 'chadia', offset: 98, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'admin', driverPass: '1234' },
+            { id: 12, name: 'النقل الموحدة - حافلة 9', route: 'chadia', offset: 112, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'admin', driverPass: '1234' },
+            { id: 13, name: 'حافلة شادية (الصفراء)', route: 'chadia', offset: 70, isPaused: false, capacity: 1, color: 'bg-yellow-500', border: 'border-yellow-500', glow: 'shadow-[0_0_15px_rgba(234,179,8,0.8)]', text: 'text-yellow-500', driverUser: 'admin', driverPass: '1234' },
+            { id: 14, name: 'حافلة شادية (الزرقاء)', route: 'chadia', offset: 112, isPaused: false, capacity: 1, color: 'bg-blue-500', border: 'border-blue-500', glow: 'shadow-[0_0_15px_rgba(59,130,246,0.8)]', text: 'text-blue-500', driverUser: 'minoliver', driverPass: 'mino2010' }
         ];
 
-        // === دالة المسارات الديناميكية ===
         function getSteps(isChadia, isRushHour) {
             if (isChadia) {
                 return [
@@ -486,7 +510,6 @@
             
             if(document.getElementById('busListContainer').children.length !== BUSES.length) buildDOM();
 
-            // أداة المسافر
             const stopSelect = document.getElementById('passengerStop').value;
             const resBoard = document.getElementById('etaResultBoard');
             const noBus = document.getElementById('etaNoBus');
@@ -520,7 +543,6 @@
                 } else { resBoard.classList.add('hidden'); noBus.classList.remove('hidden'); }
             } else { resBoard.classList.add('hidden'); noBus.classList.add('hidden'); }
 
-            // تحديث الحافلات والخريطة
             BUSES.forEach(bus => {
                 const data = getBusData(bus);
                 const cap = getCapacityDetails(bus.capacity);
@@ -528,7 +550,6 @@
                 const listItem = document.getElementById(`list-item-${bus.id}`);
                 const mapContainer = document.getElementById(`map-bus-container-${bus.id}`);
                 
-                // الفلترة
                 if(currentLineFilter !== 'all' && bus.route !== currentLineFilter) {
                     listItem.style.display = 'none';
                     mapContainer.style.display = 'none';
@@ -615,6 +636,115 @@
         }
         function closeModal() { state.selectedBusId = null; document.getElementById('busModal').classList.add('hidden'); }
 
+        // =======================
+        // منطق تسجيل دخول السائق
+        // =======================
+        function openDriverAuth() {
+            closeModal(); // إغلاق نافذة الركاب
+            currentDriverBusId = state.selectedBusId; 
+            const bus = BUSES.find(b => b.id === currentDriverBusId);
+            
+            document.getElementById('driverAuthTitle').innerText = 'تسجيل دخول: ' + bus.name;
+            document.getElementById('driverAuthIcon').className = `w-14 h-14 rounded-2xl flex items-center justify-center text-white border-2 border-white ${bus.color} ${bus.glow}`;
+            
+            document.getElementById('driverUser').value = '';
+            document.getElementById('driverPass').value = '';
+            document.getElementById('driverAuthError').classList.add('hidden');
+            document.getElementById('driverAuthModal').classList.remove('hidden');
+        }
+
+        function closeDriverAuth() {
+            document.getElementById('driverAuthModal').classList.add('hidden');
+        }
+
+        function checkDriverAuth() {
+            const bus = BUSES.find(b => b.id === currentDriverBusId);
+            const user = document.getElementById('driverUser').value.trim();
+            const pass = document.getElementById('driverPass').value.trim();
+
+            const validUser = bus.driverUser || 'admin';
+            const validPass = bus.driverPass || '1234';
+
+            if (user === validUser && pass === validPass) {
+                closeDriverAuth();
+                openDriverPanel(bus);
+            } else {
+                document.getElementById('driverAuthError').classList.remove('hidden');
+            }
+        }
+
+        function openDriverPanel(bus) {
+            document.getElementById('driverPanelBusName').innerText = bus.name;
+            const select = document.getElementById('driverStopSelect');
+            select.innerHTML = '';
+            
+            // حساب المسافات الزمنية بدقة بناءً على دالة getSteps
+            if (bus.route === 'chadia') {
+                select.innerHTML = `
+                    <option value="0">بوهلال (الانطلاق)</option>
+                    <option value="26">زيتونا (باتجاه جيجل)</option>
+                    <option value="36">الفيرمة (باتجاه جيجل)</option>
+                    <option value="41">وسط قاوس (باتجاه جيجل)</option>
+                    <option value="63">محطة جيجل (وصول)</option>
+                    <option value="96">وسط قاوس (عودة)</option>
+                    <option value="101">الفيرمة (عودة)</option>
+                    <option value="111">شادية (عودة)</option>
+                `;
+            } else {
+                select.innerHTML = `
+                    <option value="0">العيايشة (الانطلاق)</option>
+                    <option value="15">الفيرمة (باتجاه جيجل)</option>
+                    <option value="21">وسط قاوس (باتجاه جيجل)</option>
+                    <option value="39">محطة جيجل (وصول)</option>
+                    <option value="73">وسط قاوس (عودة)</option>
+                    <option value="79">الفيرمة (عودة)</option>
+                `;
+            }
+            
+            document.getElementById('driverPanelModal').classList.remove('hidden');
+        }
+
+        function closeDriverPanel() {
+            document.getElementById('driverPanelModal').classList.add('hidden');
+        }
+
+        async function confirmDriverStop() {
+            const busIndex = BUSES.findIndex(b => b.id === currentDriverBusId);
+            if (busIndex === -1) return;
+            
+            const targetCycleTime = parseInt(document.getElementById('driverStopSelect').value);
+            const bus = BUSES[busIndex];
+            const isChadia = bus.route === 'chadia';
+            
+            const currentMinutes = state.simulatedTime.getHours() * 60 + state.simulatedTime.getMinutes() + state.simulatedTime.getSeconds() / 60;
+            const ROUTE_START = isChadia ? (5 * 60 + 30) : (6 * 60 + 30);
+            
+            // المعادلة الذكية: تعديل الإزاحة لتتطابق مع موقع المحطة الحالي
+            const newOffset = currentMinutes - ROUTE_START - targetCycleTime;
+            
+            BUSES[busIndex].offset = newOffset;
+            BUSES[busIndex].isPaused = false; 
+
+            closeDriverPanel();
+            
+            if (isCloudEnabled && db) {
+                const btn = document.getElementById('mainSaveBtn'); // For loading state if needed
+                try {
+                    await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v6').set({ BUSES: BUSES });
+                    await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('toast').set({ 
+                        message: `تنبيه: ${bus.name} قامت بتحديث موقعها يدوياً!`, 
+                        timestamp: Date.now() 
+                    });
+                } catch(e) {
+                    alert("❌ حدث خطأ في الاتصال بالإنترنت.");
+                }
+            }
+            updateUI();
+        }
+
+        // =======================
+        // منطق الإدارة العامة
+        // =======================
         function initiateAdminAccess() { document.getElementById('authModal').classList.remove('hidden'); }
         function closeAuth() { document.getElementById('authModal').classList.add('hidden'); }
         function checkAuth() {
@@ -647,7 +777,7 @@
 
         function addAdminBus() {
             const id = tempBuses.length ? Math.max(...tempBuses.map(b=>b.id))+1 : 1;
-            tempBuses.push({ id, name:`شركة بوالنوار - حافلة ${id}`, route:'laiachia', offset:0, isPaused:false, capacity:1, color:'bg-red-500', border:'border-red-500', glow:'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text:'text-red-500' });
+            tempBuses.push({ id, name:`شركة بوالنوار - حافلة ${id}`, route:'laiachia', offset:0, isPaused:false, capacity:1, color:'bg-red-500', border:'border-red-500', glow:'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text:'text-red-500', driverUser:'admin', driverPass:'1234' });
             renderAdminBuses();
         }
 
@@ -710,8 +840,8 @@
             if (!isCloudEnabled || !db) return alert("❌ السحابة غير متصلة! يرجى فحص الإنترنت.");
             btn.innerHTML = '<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> جاري النشر...'; lucide.createIcons();
             try {
-                // تم التغيير إلى config_v5 لتجاوز ملف الحفظ القديم
-                await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v5').set({ BUSES: tempBuses });
+                // الانتقال إلى إصدار config_v6 لتفعيل التحديثات الجديدة للسائق
+                await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v6').set({ BUSES: tempBuses });
                 alert("✅ تم الحفظ والنشر بنجاح!"); closeAdminPanel();
             } catch (error) { alert("❌ حدث خطأ:\n" + error.message); } 
             finally { btn.innerHTML = '<i data-lucide="cloud-upload" class="w-5 h-5"></i> حفظ ونشر للجميع ☁️'; lucide.createIcons(); }
@@ -729,8 +859,8 @@
         try {
             firebase.initializeApp(firebaseConfig); db = firebase.firestore(); isCloudEnabled = true;
             
-            // تم التغيير إلى config_v5 هنا أيضاً لإنشاء الاستماع الجديد
-            const confRef = db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v5');
+            // قراءة من السحابة بآخر إصدار v6
+            const confRef = db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v6');
             const tstRef = db.collection('projects').doc('bustruker-9f717').collection('settings').doc('toast');
 
             confRef.onSnapshot((docSnap) => {
