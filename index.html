@@ -5,14 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bus Tracker Pro - المرقاب الذكي</title>
     
+    <!-- PWA Setup -->
     <link rel="manifest" href="./manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="#020617">
     <meta name="theme-color" content="#020617">
 
+    <!-- Tailwind & Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 
+    <!-- Firebase (Classic) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
     
@@ -37,6 +40,7 @@
 </head>
 <body class="min-h-screen bg-slate-950 text-slate-100 font-sans pb-10 transition-colors duration-500">
 
+    <!-- الإشعار السحابي -->
     <div id="adminToast" class="fixed top-20 left-4 right-4 z-[120] bg-amber-600/90 text-white p-4 rounded-2xl shadow-2xl border border-amber-400 hidden animate-bounce backdrop-blur-md">
         <div class="flex items-center gap-3">
             <i data-lucide="alert-triangle" class="w-6 h-6 text-white"></i>
@@ -46,6 +50,7 @@
 
     <div class="fixed inset-0 z-[-1] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/30 via-slate-950 to-black pointer-events-none" id="bgGradient"></div>
 
+    <!-- شريط التنقل -->
     <div class="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800 px-4 py-3 flex justify-between items-center shadow-lg transition-colors duration-500">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.4)]">
@@ -70,14 +75,17 @@
         </div>
     </div>
 
+    <!-- المحتوى الرئيسي -->
     <div class="flex flex-col gap-6 p-4 max-w-md mx-auto relative z-10">
 
+        <!-- الفلترة (الشركات) -->
         <div class="flex gap-2 bg-slate-900/50 p-1.5 rounded-2xl border border-slate-800 backdrop-blur-md">
             <button id="filter-all" onclick="setLineFilter('all')" class="flex-1 py-2 text-xs font-bold rounded-xl bg-slate-700 text-white shadow transition-all">الكل</button>
             <button id="filter-laiachia" onclick="setLineFilter('laiachia')" class="flex-1 py-2 text-[10px] font-bold rounded-xl text-slate-400 hover:text-white transition-all flex items-center justify-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500"></span> بوالنوار</button>
             <button id="filter-chadia" onclick="setLineFilter('chadia')" class="flex-1 py-2 text-[10px] font-bold rounded-xl text-slate-400 hover:text-white transition-all flex items-center justify-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500"></span> الموحدة</button>
         </div>
 
+        <!-- أداة المسافر -->
         <div class="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-5 shadow-2xl relative overflow-hidden transition-colors duration-500">
             <div class="absolute -right-10 -top-10 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl"></div>
             <div class="flex justify-between items-center mb-3">
@@ -127,6 +135,7 @@
             <p id="etaNoBus" class="hidden text-center text-xs text-amber-500 bg-amber-500/10 p-3 rounded-xl border border-amber-500/30">لا توجد حافلات نشطة قريبة.</p>
         </div>
 
+        <!-- الخريطة الحية -->
         <div class="w-full h-[450px] bg-slate-900/50 backdrop-blur-2xl border border-slate-800 rounded-3xl relative overflow-hidden flex items-center justify-center shadow-2xl transition-colors duration-500">
             <div class="absolute inset-0 opacity-[0.04] pointer-events-none" style="background-image: linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px); background-size: 20px 20px;"></div>
 
@@ -134,6 +143,7 @@
                 <h3 class="text-slate-200 font-bold text-[9px] tracking-wider mb-1 px-3 py-0.5 bg-slate-800 rounded-full border border-slate-600">محطة الحافلات جيجل</h3>
             </div>
 
+            <!-- رسم المسارات -->
             <svg class="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none" style="z-index: 0;">
                 <path d="M 20 90 L 35 75 L 50 60" stroke="#22c55e" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" opacity="0.4" />
                 <path d="M 80 90 L 50 60" stroke="#ef4444" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" opacity="0.4" />
@@ -147,6 +157,7 @@
                 <path d="M 45 60 L 45 40 L 45 15" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-dasharray="2 4" fill="none" vector-effect="non-scaling-stroke"/>
             </svg>
 
+            <!-- المحطات -->
             <div id="stopsContainer">
                 <div class="absolute w-4 h-4 rounded-full bg-slate-900 border-[3px] border-red-500 z-10 flex items-center justify-center" style="left: 80%; top: 90%; transform: translate(-50%, -50%)">
                     <span class="absolute left-6 whitespace-nowrap text-[10px] text-white font-bold bg-slate-800 px-2 py-1 rounded-lg border border-slate-600 shadow-lg">العيايشة</span>
@@ -168,11 +179,13 @@
             <div id="mapBusesContainer"></div>
         </div>
 
+        <!-- قائمة الأسطول -->
         <div class="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-5 shadow-2xl transition-colors duration-500">
             <h2 class="text-sm font-bold text-slate-300 mb-4 flex items-center gap-2"><i data-lucide="list" class="w-4 h-4"></i> الأسطول المباشر</h2>
             <div id="busListContainer" class="flex flex-col gap-3"></div>
         </div>
 
+        <!-- أزرار المحاكاة -->
         <div class="flex flex-wrap justify-center gap-2 bg-slate-900/80 backdrop-blur-xl p-3 rounded-2xl border border-slate-800 transition-colors duration-500">
             <button onclick="togglePlay()" id="btnPlay" class="p-3 rounded-xl bg-slate-800 border border-slate-700"><i data-lucide="pause" class="text-amber-400 w-5 h-5"></i></button>
             <button onclick="setMode(true, 1)" class="flex-1 py-3 rounded-xl text-xs font-bold bg-emerald-600 text-white">حي 📡</button>
@@ -182,9 +195,11 @@
 
     </div>
 
+    <!-- نافذة تفاصيل الحافلة للركاب -->
     <div id="busModal" class="fixed inset-0 z-50 flex items-end justify-center p-0 bg-black/80 backdrop-blur-sm transition-opacity hidden" onclick="closeModal()">
         <div id="modalContent" class="bg-slate-900 border-t border-slate-700 rounded-t-3xl p-6 shadow-2xl w-full max-w-md relative overflow-hidden flex flex-col" onclick="event.stopPropagation()">
             
+            <!-- زر دخول السائق -->
             <button onclick="openDriverAuth()" class="absolute top-5 left-5 p-2 bg-slate-800/80 rounded-xl border border-slate-700 text-slate-400 shadow-lg z-10 hover:text-white hover:bg-slate-700 transition-all" title="لوحة تحكم السائق">
                 <i data-lucide="user-cog" class="w-5 h-5"></i>
             </button>
@@ -218,6 +233,7 @@
                             <div id="modalProgressBar" class="h-2 rounded-full transition-all duration-300 w-0"></div>
                         </div>
                     </div>
+
                     <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50 flex gap-2">
                         <div class="flex-1 bg-slate-900/50 p-2 rounded-xl border border-slate-700 text-center">
                             <div class="text-[9px] text-slate-500 mb-1">إلى محطة جيجل</div>
@@ -242,6 +258,7 @@
         </div>
     </div>
 
+    <!-- نافذة تسجيل دخول السائق -->
     <div id="driverAuthModal" class="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden" onclick="closeDriverAuth()">
         <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl w-full max-w-xs" onclick="event.stopPropagation()">
             <div class="flex items-center justify-center mb-4">
@@ -259,6 +276,7 @@
         </div>
     </div>
 
+    <!-- نافذة لوحة تحكم السائق (تحديث المحطة) -->
     <div id="driverPanelModal" class="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden" onclick="closeDriverPanel()">
         <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl w-full max-w-sm" onclick="event.stopPropagation()">
             <h2 class="text-lg font-bold text-center text-emerald-400 mb-2">لوحة تحكم الحافلة</h2>
@@ -268,7 +286,8 @@
                 <div>
                     <label class="text-xs font-bold text-slate-400 mb-2 block">أين تتواجد الحافلة الآن؟</label>
                     <select id="driverStopSelect" class="w-full bg-slate-800 border border-slate-600 rounded-xl p-3 text-sm text-white outline-none focus:border-emerald-500 transition-colors">
-                        </select>
+                        <!-- تُضاف برمجياً -->
+                    </select>
                 </div>
                 
                 <button onclick="confirmDriverStop()" class="w-full py-3 mt-4 bg-emerald-600 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 shadow-lg">
@@ -278,6 +297,7 @@
         </div>
     </div>
 
+    <!-- نافذة تسجيل الدخول للإدارة العامة -->
     <div id="authModal" class="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden" onclick="closeAuth()">
         <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl w-full max-w-xs" onclick="event.stopPropagation()">
             <h2 class="text-lg font-bold text-center text-white mb-6">دخول الإدارة</h2>
@@ -290,6 +310,7 @@
         </div>
     </div>
 
+    <!-- نافذة لوحة الإدارة العامة -->
     <div id="adminModal" class="fixed inset-0 z-[100] flex items-start justify-center p-4 pt-10 bg-black/80 backdrop-blur-md hidden" onclick="closeAdminPanel()">
         <div class="bg-slate-900 border border-slate-700 rounded-3xl p-5 shadow-2xl w-full max-w-md max-h-[85vh] overflow-y-auto custom-scrollbar" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center mb-6">
@@ -590,14 +611,10 @@
                     mapIcon.setAttribute('class', `lucide lucide-bus w-4 h-4 text-white`);
                 }
 
-                // تحديث العناصر المعروضة في النافذة إذا كانت مفتوحة
                 if (state.selectedBusId === bus.id) {
                     document.getElementById('modalLiveStatus').innerText = data.status;
-                    
-                    // شريط التقدم سيعمل بشكل ممتاز الآن
                     document.getElementById('modalProgressBar').style.width = `${data.progress}%`;
                     document.getElementById('modalProgressText').innerText = `${Math.round(data.progress)}%`;
-                    
                     document.getElementById('modalEtaJijel').innerText = data.etaJijel;
                     document.getElementById('modalEtaHome').innerText = data.etaHome;
                 }
@@ -639,8 +656,6 @@
 
             const badge = document.getElementById('modalCapacityBadge');
             badge.innerText = cap.text; badge.className = `absolute -bottom-2 -right-2 px-2 py-0.5 rounded-full text-[9px] font-bold border-2 border-slate-900 text-slate-900 ${cap.color}`;
-            
-            // إعطاء اللون الصحيح لشريط التقدم
             document.getElementById('modalProgressBar').className = `h-2 rounded-full transition-all duration-300 ${bus.color}`;
             
             switchTab('info'); document.getElementById('busModal').classList.remove('hidden'); updateUI(); 
@@ -651,8 +666,10 @@
         // منطق تسجيل دخول السائق
         // =======================
         function openDriverAuth() {
-            closeModal(); // إغلاق نافذة الركاب
+            // الإصلاح هنا: حفظ رقم الحافلة قبل إغلاق النافذة لتفادي ضياعه
             currentDriverBusId = state.selectedBusId; 
+            closeModal(); // إغلاق نافذة الركاب
+            
             const bus = BUSES.find(b => b.id === currentDriverBusId);
             
             document.getElementById('driverAuthTitle').innerText = 'تسجيل دخول: ' + bus.name;
