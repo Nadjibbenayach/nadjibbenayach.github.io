@@ -209,8 +209,14 @@
             <div class="overflow-y-auto custom-scrollbar flex-1 pb-4">
                 <div id="tabInfo" class="space-y-3 block">
                     <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50">
-                        <p class="text-xs text-slate-400 mb-1">الحالة الحالية</p>
-                        <div id="modalLiveStatus" class="text-sm font-bold text-slate-200"></div>
+                        <div class="flex justify-between items-end mb-1">
+                            <p class="text-xs text-slate-400">الحالة الحالية</p>
+                            <span id="modalProgressText" class="text-[10px] font-bold text-slate-500">0%</span>
+                        </div>
+                        <div id="modalLiveStatus" class="text-sm font-bold text-slate-200 mb-3"></div>
+                        <div class="w-full bg-slate-900 rounded-full h-2 border border-slate-700">
+                            <div id="modalProgressBar" class="h-2 rounded-full transition-all duration-300 w-0"></div>
+                        </div>
                     </div>
                     <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50 flex gap-2">
                         <div class="flex-1 bg-slate-900/50 p-2 rounded-xl border border-slate-700 text-center">
@@ -320,7 +326,6 @@
         let currentLineFilter = 'all'; 
         let currentDriverBusId = null;
         
-        // تم إضافة بيانات السائق لكل حافلة
         let BUSES = [
             { id: 1, name: 'شركة بوالنوار - حافلة 1', route: 'laiachia', offset: 0, isPaused: false, capacity: 1, color: 'bg-red-500', border: 'border-red-500', glow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text: 'text-red-500', driverUser: 'admin', driverPass: '1234' },
             { id: 2, name: 'شركة بوالنوار - حافلة 2', route: 'laiachia', offset: 30, isPaused: false, capacity: 1, color: 'bg-red-500', border: 'border-red-500', glow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text: 'text-red-500', driverUser: 'admin', driverPass: '1234' },
@@ -585,10 +590,14 @@
                     mapIcon.setAttribute('class', `lucide lucide-bus w-4 h-4 text-white`);
                 }
 
+                // تحديث العناصر المعروضة في النافذة إذا كانت مفتوحة
                 if (state.selectedBusId === bus.id) {
                     document.getElementById('modalLiveStatus').innerText = data.status;
+                    
+                    // شريط التقدم سيعمل بشكل ممتاز الآن
                     document.getElementById('modalProgressBar').style.width = `${data.progress}%`;
                     document.getElementById('modalProgressText').innerText = `${Math.round(data.progress)}%`;
+                    
                     document.getElementById('modalEtaJijel').innerText = data.etaJijel;
                     document.getElementById('modalEtaHome').innerText = data.etaHome;
                 }
@@ -630,6 +639,8 @@
 
             const badge = document.getElementById('modalCapacityBadge');
             badge.innerText = cap.text; badge.className = `absolute -bottom-2 -right-2 px-2 py-0.5 rounded-full text-[9px] font-bold border-2 border-slate-900 text-slate-900 ${cap.color}`;
+            
+            // إعطاء اللون الصحيح لشريط التقدم
             document.getElementById('modalProgressBar').className = `h-2 rounded-full transition-all duration-300 ${bus.color}`;
             
             switchTab('info'); document.getElementById('busModal').classList.remove('hidden'); updateUI(); 
@@ -678,7 +689,6 @@
             const select = document.getElementById('driverStopSelect');
             select.innerHTML = '';
             
-            // حساب المسافات الزمنية بدقة بناءً على دالة getSteps
             if (bus.route === 'chadia') {
                 select.innerHTML = `
                     <option value="0">بوهلال (الانطلاق)</option>
@@ -719,7 +729,6 @@
             const currentMinutes = state.simulatedTime.getHours() * 60 + state.simulatedTime.getMinutes() + state.simulatedTime.getSeconds() / 60;
             const ROUTE_START = isChadia ? (5 * 60 + 30) : (6 * 60 + 30);
             
-            // المعادلة الذكية: تعديل الإزاحة لتتطابق مع موقع المحطة الحالي
             const newOffset = currentMinutes - ROUTE_START - targetCycleTime;
             
             BUSES[busIndex].offset = newOffset;
@@ -728,7 +737,6 @@
             closeDriverPanel();
             
             if (isCloudEnabled && db) {
-                const btn = document.getElementById('mainSaveBtn'); // For loading state if needed
                 try {
                     await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v6').set({ BUSES: BUSES });
                     await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('toast').set({ 
@@ -840,7 +848,6 @@
             if (!isCloudEnabled || !db) return alert("❌ السحابة غير متصلة! يرجى فحص الإنترنت.");
             btn.innerHTML = '<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> جاري النشر...'; lucide.createIcons();
             try {
-                // الانتقال إلى إصدار config_v6 لتفعيل التحديثات الجديدة للسائق
                 await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v6').set({ BUSES: tempBuses });
                 alert("✅ تم الحفظ والنشر بنجاح!"); closeAdminPanel();
             } catch (error) { alert("❌ حدث خطأ:\n" + error.message); } 
@@ -849,7 +856,6 @@
 
         if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
         
-        // تشغيل السحابة
         const firebaseConfig = {
             apiKey: "AIzaSyAWg5d4zkUkN5ZsUiVHs9hiOBs_hmRwy_k", authDomain: "bustruker-9f717.firebaseapp.com",
             projectId: "bustruker-9f717", storageBucket: "bustruker-9f717.firebasestorage.app",
@@ -859,7 +865,6 @@
         try {
             firebase.initializeApp(firebaseConfig); db = firebase.firestore(); isCloudEnabled = true;
             
-            // قراءة من السحابة بآخر إصدار v6
             const confRef = db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v6');
             const tstRef = db.collection('projects').doc('bustruker-9f717').collection('settings').doc('toast');
 
