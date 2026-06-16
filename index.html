@@ -347,20 +347,21 @@
         let currentLineFilter = 'all'; 
         let currentDriverBusId = null;
         
+        // تم توحيد كلمات المرور minoliver / mino2010 لتشمل جميع الحافلات لضمان عملها بشكل مثالي!
         let BUSES = [
-            { id: 1, name: 'شركة بوالنوار - حافلة 1', route: 'laiachia', offset: 0, isPaused: false, capacity: 1, color: 'bg-red-500', border: 'border-red-500', glow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text: 'text-red-500', driverUser: 'admin', driverPass: '1234' },
-            { id: 2, name: 'شركة بوالنوار - حافلة 2', route: 'laiachia', offset: 30, isPaused: false, capacity: 1, color: 'bg-red-500', border: 'border-red-500', glow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text: 'text-red-500', driverUser: 'admin', driverPass: '1234' },
-            { id: 3, name: 'شركة بوالنوار - حافلة 3', route: 'laiachia', offset: 60, isPaused: false, capacity: 1, color: 'bg-red-500', border: 'border-red-500', glow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text: 'text-red-500', driverUser: 'admin', driverPass: '1234' },
-            { id: 4, name: 'النقل الموحدة - حافلة 1', route: 'chadia', offset: 0, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'admin', driverPass: '1234' },
-            { id: 5, name: 'النقل الموحدة - حافلة 2', route: 'chadia', offset: 14, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'admin', driverPass: '1234' },
-            { id: 6, name: 'النقل الموحدة - حافلة 3', route: 'chadia', offset: 28, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'admin', driverPass: '1234' },
-            { id: 7, name: 'النقل الموحدة - حافلة 4', route: 'chadia', offset: 42, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'admin', driverPass: '1234' },
-            { id: 8, name: 'النقل الموحدة - حافلة 5', route: 'chadia', offset: 56, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'admin', driverPass: '1234' },
-            { id: 9, name: 'النقل الموحدة - حافلة 6', route: 'chadia', offset: 70, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'admin', driverPass: '1234' },
-            { id: 10, name: 'النقل الموحدة - حافلة 7', route: 'chadia', offset: 84, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'admin', driverPass: '1234' },
-            { id: 11, name: 'النقل الموحدة - حافلة 8', route: 'chadia', offset: 98, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'admin', driverPass: '1234' },
-            { id: 12, name: 'النقل الموحدة - حافلة 9', route: 'chadia', offset: 112, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'admin', driverPass: '1234' },
-            { id: 13, name: 'حافلة شادية (الصفراء)', route: 'chadia', offset: 70, isPaused: false, capacity: 1, color: 'bg-yellow-500', border: 'border-yellow-500', glow: 'shadow-[0_0_15px_rgba(234,179,8,0.8)]', text: 'text-yellow-500', driverUser: 'admin', driverPass: '1234' },
+            { id: 1, name: 'شركة بوالنوار - حافلة 1', route: 'laiachia', offset: 0, isPaused: false, capacity: 1, color: 'bg-red-500', border: 'border-red-500', glow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text: 'text-red-500', driverUser: 'minoliver', driverPass: 'mino2010' },
+            { id: 2, name: 'شركة بوالنوار - حافلة 2', route: 'laiachia', offset: 30, isPaused: false, capacity: 1, color: 'bg-red-500', border: 'border-red-500', glow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text: 'text-red-500', driverUser: 'minoliver', driverPass: 'mino2010' },
+            { id: 3, name: 'شركة بوالنوار - حافلة 3', route: 'laiachia', offset: 60, isPaused: false, capacity: 1, color: 'bg-red-500', border: 'border-red-500', glow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text: 'text-red-500', driverUser: 'minoliver', driverPass: 'mino2010' },
+            { id: 4, name: 'النقل الموحدة - حافلة 1', route: 'chadia', offset: 0, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'minoliver', driverPass: 'mino2010' },
+            { id: 5, name: 'النقل الموحدة - حافلة 2', route: 'chadia', offset: 14, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'minoliver', driverPass: 'mino2010' },
+            { id: 6, name: 'النقل الموحدة - حافلة 3', route: 'chadia', offset: 28, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'minoliver', driverPass: 'mino2010' },
+            { id: 7, name: 'النقل الموحدة - حافلة 4', route: 'chadia', offset: 42, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'minoliver', driverPass: 'mino2010' },
+            { id: 8, name: 'النقل الموحدة - حافلة 5', route: 'chadia', offset: 56, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'minoliver', driverPass: 'mino2010' },
+            { id: 9, name: 'النقل الموحدة - حافلة 6', route: 'chadia', offset: 70, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'minoliver', driverPass: 'mino2010' },
+            { id: 10, name: 'النقل الموحدة - حافلة 7', route: 'chadia', offset: 84, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'minoliver', driverPass: 'mino2010' },
+            { id: 11, name: 'النقل الموحدة - حافلة 8', route: 'chadia', offset: 98, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'minoliver', driverPass: 'mino2010' },
+            { id: 12, name: 'النقل الموحدة - حافلة 9', route: 'chadia', offset: 112, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'minoliver', driverPass: 'mino2010' },
+            { id: 13, name: 'حافلة شادية (الصفراء)', route: 'chadia', offset: 70, isPaused: false, capacity: 1, color: 'bg-yellow-500', border: 'border-yellow-500', glow: 'shadow-[0_0_15px_rgba(234,179,8,0.8)]', text: 'text-yellow-500', driverUser: 'minoliver', driverPass: 'mino2010' },
             { id: 14, name: 'حافلة شادية (الزرقاء)', route: 'chadia', offset: 112, isPaused: false, capacity: 1, color: 'bg-blue-500', border: 'border-blue-500', glow: 'shadow-[0_0_15px_rgba(59,130,246,0.8)]', text: 'text-blue-500', driverUser: 'minoliver', driverPass: 'mino2010' }
         ];
 
@@ -457,11 +458,8 @@
             const ROUTE_END = isChadia ? (20 * 60) : (19 * 60); 
             const CYCLE_DUR = isChadia ? 126 : 90; 
             
+            // تم إزالة تأخير حافلة بوالنوار لأنه كان يسبب خللاً في ضبط السائق للمحطة يدوياً
             let dynamicOffset = bus.offset;
-            if (!isChadia && bus.id === 1) {
-                const bus2 = BUSES.find(b => b.id === 2);
-                if (bus2 && bus2.isPaused && (currentMinutes - ROUTE_START > 10)) dynamicOffset += 15;
-            }
 
             const diff = currentMinutes - ROUTE_START - dynamicOffset;
             
@@ -670,9 +668,8 @@
         // منطق تسجيل دخول السائق
         // =======================
         function openDriverAuth() {
-            // حفظ الحافلة في الذاكرة لتجاهل أخطاء التحديث
             currentDriverBusId = state.selectedBusId; 
-            closeModal(); // إغلاق نافذة الركاب بعد الحفظ
+            closeModal(); 
             
             const bus = BUSES.find(b => b.id === currentDriverBusId);
             
@@ -692,12 +689,12 @@
         function checkDriverAuth() {
             const bus = BUSES.find(b => b.id === currentDriverBusId);
             
-            // إضافة toLowerCase() لتجاهل الحروف الكبيرة التي يكتبها الهاتف تلقائياً
             const user = document.getElementById('driverUser').value.trim().toLowerCase();
             const pass = document.getElementById('driverPass').value.trim();
 
-            const validUser = (bus.driverUser || 'admin').toLowerCase();
-            const validPass = bus.driverPass || '1234';
+            // جعلنا minoliver و mino2010 هما الافتراضيين لكل الحافلات دائماً
+            const validUser = (bus.driverUser || 'minoliver').toLowerCase();
+            const validPass = bus.driverPass || 'mino2010';
 
             if (user === validUser && pass === validPass) {
                 closeDriverAuth();
@@ -761,8 +758,8 @@
             
             if (isCloudEnabled && db) {
                 try {
-                    // التحديث إلى config_v7 لضمان سريان التعديل الجديد وكلمات المرور في السحابة
-                    await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v7').set({ BUSES: BUSES });
+                    // التحديث إلى config_v8 لفرض التغييرات الجديدة على السحابة
+                    await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v8').set({ BUSES: BUSES });
                     await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('toast').set({ 
                         message: `تنبيه: ${bus.name} قامت بتحديث موقعها يدوياً!`, 
                         timestamp: Date.now() 
@@ -809,7 +806,7 @@
 
         function addAdminBus() {
             const id = tempBuses.length ? Math.max(...tempBuses.map(b=>b.id))+1 : 1;
-            tempBuses.push({ id, name:`شركة بوالنوار - حافلة ${id}`, route:'laiachia', offset:0, isPaused:false, capacity:1, color:'bg-red-500', border:'border-red-500', glow:'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text:'text-red-500', driverUser:'admin', driverPass:'1234' });
+            tempBuses.push({ id, name:`شركة بوالنوار - حافلة ${id}`, route:'laiachia', offset:0, isPaused:false, capacity:1, color:'bg-red-500', border:'border-red-500', glow:'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text:'text-red-500', driverUser:'minoliver', driverPass:'mino2010' });
             renderAdminBuses();
         }
 
@@ -872,7 +869,8 @@
             if (!isCloudEnabled || !db) return alert("❌ السحابة غير متصلة! يرجى فحص الإنترنت.");
             btn.innerHTML = '<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> جاري النشر...'; lucide.createIcons();
             try {
-                await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v7').set({ BUSES: tempBuses });
+                // حفظ النسخة v8
+                await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v8').set({ BUSES: tempBuses });
                 alert("✅ تم الحفظ والنشر بنجاح!"); closeAdminPanel();
             } catch (error) { alert("❌ حدث خطأ:\n" + error.message); } 
             finally { btn.innerHTML = '<i data-lucide="cloud-upload" class="w-5 h-5"></i> حفظ ونشر للجميع ☁️'; lucide.createIcons(); }
@@ -889,8 +887,8 @@
         try {
             firebase.initializeApp(firebaseConfig); db = firebase.firestore(); isCloudEnabled = true;
             
-            // قراءة من السحابة v7
-            const confRef = db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v7');
+            // قراءة من السحابة v8
+            const confRef = db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v8');
             const tstRef = db.collection('projects').doc('bustruker-9f717').collection('settings').doc('toast');
 
             confRef.onSnapshot((docSnap) => {
