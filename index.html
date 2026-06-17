@@ -5,22 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bus Tracker Pro - المرقاب الذكي</title>
     
-    <!-- PWA Setup -->
     <link rel="manifest" href="./manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="#020617">
     <meta name="theme-color" content="#020617">
 
-    <!-- Tailwind & Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Google Fonts (Tajawal) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 
-    <!-- Firebase (Classic) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
     
@@ -53,13 +49,11 @@
 </head>
 <body class="min-h-screen bg-[#060B19] text-slate-100 font-sans pb-10 transition-colors duration-500 relative selection:bg-emerald-500/30">
 
-    <!-- خلفية حية متدرجة -->
     <div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
         <div class="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-emerald-500/10 blur-[120px] rounded-full mix-blend-screen"></div>
         <div class="absolute top-[40%] -right-[20%] w-[60%] h-[60%] bg-blue-600/10 blur-[150px] rounded-full mix-blend-screen"></div>
     </div>
 
-    <!-- الإشعار السحابي -->
     <div id="adminToast" class="fixed top-24 left-4 right-4 z-[120] bg-gradient-to-r from-amber-500 to-orange-600 text-white p-4 rounded-2xl shadow-2xl border border-amber-400/50 hidden animate-bounce backdrop-blur-md">
         <div class="flex items-center gap-3">
             <div class="p-2 bg-white/20 rounded-full"><i data-lucide="bell-ring" class="w-5 h-5 text-white"></i></div>
@@ -67,7 +61,6 @@
         </div>
     </div>
 
-    <!-- شريط التنقل الطافي العائم -->
     <div class="sticky top-4 z-40 px-4 mb-8">
         <div class="bg-white/5 backdrop-blur-2xl border border-white/10 px-4 py-3 flex justify-between items-center rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] neon-glow transition-all duration-500">
             <div class="flex items-center gap-3">
@@ -97,10 +90,8 @@
         </div>
     </div>
 
-    <!-- المحتوى الرئيسي -->
     <div class="flex flex-col gap-6 p-4 max-w-md mx-auto relative z-10">
 
-        <!-- الفلترة (Segmented Control) -->
         <div class="flex p-1 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 relative">
             <button id="filter-all" onclick="setLineFilter('all')" class="flex-1 py-2.5 text-xs font-bold rounded-xl bg-emerald-500 text-[#060B19] shadow-md transition-all duration-300">الكل</button>
             <button id="filter-laiachia" onclick="setLineFilter('laiachia')" class="flex-1 py-2.5 text-[11px] font-bold rounded-xl text-slate-400 hover:text-white transition-all duration-300 flex items-center justify-center gap-1.5">
@@ -111,7 +102,6 @@
             </button>
         </div>
 
-        <!-- أداة المسافر (تذكرة ذكية) -->
         <div class="relative bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/10 rounded-[2rem] p-6 shadow-2xl overflow-hidden group">
             <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl transition-all group-hover:bg-emerald-500/20"></div>
             
@@ -138,7 +128,11 @@
                     <optgroup label="الخط المشترك (قاوس - جيجل)" id="opt-shared" class="bg-slate-900">
                         <option value="15,36">📍 الفيرمة (باتجاه جيجل)</option>
                         <option value="21,41">📍 وسط قاوس (باتجاه جيجل)</option>
+                        <option value="27,49">📍 الكلم 5 (باتجاه جيجل)</option>
+                        <option value="32,57">📍 التكوين المهني (باتجاه جيجل)</option>
                         <option value="39,63">📍 محطة الحافلات جيجل</option>
+                        <option value="59,82">📍 التكوين المهني (عودة)</option>
+                        <option value="66,89">📍 الكلم 5 (عودة)</option>
                         <option value="73,96">📍 وسط قاوس (عودة)</option>
                         <option value="79,101">📍 الفيرمة (عودة)</option>
                     </optgroup>
@@ -148,7 +142,6 @@
                 </div>
             </div>
 
-            <!-- النتيجة الذكية -->
             <div id="etaResultBoard" class="hidden relative z-10 bg-[#060B19]/60 border border-white/10 rounded-2xl p-4 flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <div id="etaBusIcon" class="w-12 h-12 rounded-2xl flex items-center justify-center border-2 shadow-lg">
@@ -177,9 +170,7 @@
             </div>
         </div>
 
-        <!-- الخريطة الرادارية (Radar Dashboard) -->
         <div class="w-full h-[450px] bg-[#060B19] rounded-[2rem] relative overflow-hidden flex items-center justify-center shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10">
-            <!-- شبكة الرادار -->
             <div class="absolute inset-0 grid-bg opacity-30 pointer-events-none"></div>
             <div class="absolute inset-0 bg-gradient-to-t from-[#060B19] via-transparent to-[#060B19] opacity-80 pointer-events-none z-0"></div>
 
@@ -187,13 +178,11 @@
                 <h3 class="text-white font-black text-[10px] tracking-wider mb-1 px-4 py-1 bg-slate-800 rounded-full border border-slate-600 flex items-center gap-1.5"><i data-lucide="building" class="w-3 h-3 text-cyan-400"></i> محطة جيجل</h3>
             </div>
 
-            <!-- رسم المسارات (بلمسة نيون) -->
             <svg class="absolute inset-0 w-full h-full drop-shadow-xl" viewBox="0 0 100 100" preserveAspectRatio="none" style="z-index: 0;">
                 <path d="M 20 90 L 35 75 L 50 60" stroke="#22c55e" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" opacity="0.2" />
                 <path d="M 80 90 L 50 60" stroke="#ef4444" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" opacity="0.2" />
                 <path d="M 50 60 L 50 15" stroke="#eab308" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" opacity="0.2" />
 
-                <!-- الخطوط المتقطعة المضيئة -->
                 <path d="M 25 90 L 40 75 L 55 60" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" stroke-dasharray="3 5" fill="none" vector-effect="non-scaling-stroke"/>
                 <path d="M 15 90 L 30 75 L 45 60" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" stroke-dasharray="3 5" fill="none" vector-effect="non-scaling-stroke"/>
                 <path d="M 85 90 L 55 60" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" stroke-dasharray="3 5" fill="none" vector-effect="non-scaling-stroke"/>
@@ -202,7 +191,6 @@
                 <path d="M 45 60 L 45 40 L 45 15" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" stroke-dasharray="3 5" fill="none" vector-effect="non-scaling-stroke"/>
             </svg>
 
-            <!-- المحطات -->
             <div id="stopsContainer">
                 <div class="absolute w-4 h-4 rounded-full bg-slate-900 border-[3px] border-red-500 z-10 flex items-center justify-center shadow-[0_0_15px_rgba(239,68,68,0.5)]" style="left: 80%; top: 90%; transform: translate(-50%, -50%)">
                     <span class="absolute left-6 whitespace-nowrap text-[9px] text-white font-bold bg-white/10 backdrop-blur-md px-2 py-1 rounded-lg border border-white/20 shadow-lg">العيايشة</span>
@@ -219,18 +207,23 @@
                 <div class="absolute w-4 h-4 rounded-full bg-slate-900 border-[3px] border-yellow-500 z-10 flex items-center justify-center" style="left: 50%; top: 40%; transform: translate(-50%, -50%)">
                     <span class="absolute right-6 whitespace-nowrap text-[9px] text-white font-bold bg-white/10 backdrop-blur-md px-2 py-1 rounded-lg border border-white/20 shadow-lg">وسط قاوس</span>
                 </div>
+                
+                <div class="absolute w-3 h-3 rounded-full bg-slate-900 border-[2px] border-cyan-400 z-10 flex items-center justify-center" style="left: 50%; top: 30%; transform: translate(-50%, -50%)">
+                    <span class="absolute right-5 whitespace-nowrap text-[8px] text-cyan-200 font-bold bg-white/10 backdrop-blur-md px-1.5 py-0.5 rounded-lg border border-white/20 shadow-lg">الكلم 5</span>
+                </div>
+                <div class="absolute w-3 h-3 rounded-full bg-slate-900 border-[2px] border-cyan-400 z-10 flex items-center justify-center" style="left: 50%; top: 20%; transform: translate(-50%, -50%)">
+                    <span class="absolute right-5 whitespace-nowrap text-[8px] text-cyan-200 font-bold bg-white/10 backdrop-blur-md px-1.5 py-0.5 rounded-lg border border-white/20 shadow-lg">التكوين المهني</span>
+                </div>
             </div>
 
             <div id="mapBusesContainer"></div>
         </div>
 
-        <!-- قائمة الأسطول (تصميم البطاقات) -->
         <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2rem] p-5 shadow-2xl">
             <h2 class="text-sm font-black text-white mb-5 flex items-center gap-2"><i data-lucide="list-video" class="w-4 h-4 text-emerald-400"></i> الأسطول المباشر</h2>
             <div id="busListContainer" class="flex flex-col gap-3"></div>
         </div>
 
-        <!-- أزرار المحاكاة (مخفية بأناقة) -->
         <div class="flex flex-wrap justify-center gap-2 bg-white/5 backdrop-blur-xl p-3 rounded-2xl border border-white/10 mt-2">
             <button onclick="togglePlay()" id="btnPlay" class="p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all"><i data-lucide="pause" class="text-amber-400 w-5 h-5"></i></button>
             <button onclick="setMode(true, 1)" class="flex-1 py-3 rounded-xl text-xs font-bold bg-emerald-500 text-[#060B19] shadow-lg">التوقيت الحي 📡</button>
@@ -240,16 +233,13 @@
 
     </div>
 
-    <!-- نافذة تفاصيل الحافلة للركاب (Slide Up Bottom Sheet) -->
     <div id="busModal" class="fixed inset-0 z-50 flex items-end justify-center p-0 bg-[#060B19]/80 backdrop-blur-sm transition-all duration-300 translate-y-full" onclick="closeModal()">
         <div id="modalContent" class="bg-[#060B19] border-t border-white/10 rounded-t-[2.5rem] p-6 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] w-full max-w-md relative overflow-hidden flex flex-col min-h-[50vh]" onclick="event.stopPropagation()">
             
-            <!-- زر دخول السائق -->
             <button onclick="openDriverAuth()" class="absolute top-6 left-6 p-2.5 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 text-slate-400 shadow-lg z-20 transition-all" title="لوحة تحكم السائق">
                 <i data-lucide="user-cog" class="w-5 h-5"></i>
             </button>
 
-            <!-- مقبض السحب -->
             <div class="w-16 h-1.5 bg-white/20 rounded-full mx-auto mb-6"></div>
             
             <div id="modalGlow" class="absolute -top-20 -right-20 w-48 h-48 rounded-full blur-[80px] opacity-30 pointer-events-none"></div>
@@ -324,7 +314,6 @@
         </div>
     </div>
 
-    <!-- نافذة تسجيل دخول السائق -->
     <div id="driverAuthModal" class="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-[#060B19]/90 backdrop-blur-md transition-opacity duration-300 opacity-0 pointer-events-none" onclick="closeDriverAuth()">
         <div class="bg-slate-900 border border-slate-700 rounded-[2rem] p-8 shadow-2xl w-full max-w-xs relative overflow-hidden" onclick="event.stopPropagation()">
             <div class="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-blue-500"></div>
@@ -354,7 +343,6 @@
         </div>
     </div>
 
-    <!-- نافذة لوحة تحكم السائق (تحديث المحطة) -->
     <div id="driverPanelModal" class="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-[#060B19]/90 backdrop-blur-md transition-opacity duration-300 opacity-0 pointer-events-none" onclick="closeDriverPanel()">
         <div class="bg-slate-900 border border-slate-700 rounded-[2rem] p-8 shadow-2xl w-full max-w-sm relative overflow-hidden" onclick="event.stopPropagation()">
             <div class="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-blue-500"></div>
@@ -369,8 +357,7 @@
                     <label class="text-xs font-bold text-slate-300 mb-3 block uppercase tracking-wider">تحديث الموقع الحالي للحافلة</label>
                     <div class="relative">
                         <select id="driverStopSelect" class="w-full bg-[#060B19] border border-slate-600 rounded-xl p-4 text-sm font-bold text-white appearance-none outline-none focus:border-emerald-500 transition-colors shadow-inner">
-                            <!-- تُضاف برمجياً -->
-                        </select>
+                            </select>
                         <div class="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
                             <i data-lucide="map-pin" class="w-4 h-4 text-emerald-400"></i>
                         </div>
@@ -384,7 +371,6 @@
         </div>
     </div>
 
-    <!-- نافذة تسجيل الدخول للإدارة العامة -->
     <div id="authModal" class="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-[#060B19]/90 backdrop-blur-md hidden" onclick="closeAuth()">
         <div class="bg-slate-900 border border-slate-700 rounded-[2rem] p-8 shadow-2xl w-full max-w-xs" onclick="event.stopPropagation()">
             <div class="flex justify-center mb-4"><i data-lucide="shield" class="w-10 h-10 text-slate-400"></i></div>
@@ -398,7 +384,6 @@
         </div>
     </div>
 
-    <!-- نافذة لوحة الإدارة العامة -->
     <div id="adminModal" class="fixed inset-0 z-[100] flex items-start justify-center p-4 pt-10 bg-[#060B19]/90 backdrop-blur-md hidden" onclick="closeAdminPanel()">
         <div class="bg-slate-900 border border-slate-700 rounded-[2rem] p-6 shadow-2xl w-full max-w-md max-h-[85vh] overflow-y-auto custom-scrollbar" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center mb-8 border-b border-slate-800 pb-4">
@@ -452,16 +437,21 @@
             { id: 14, name: 'حافلة شادية (الزرقاء)', route: 'chadia', offset: 112, isPaused: false, capacity: 1, color: 'bg-blue-500', border: 'border-blue-500', glow: 'shadow-[0_0_15px_rgba(59,130,246,0.8)]', text: 'text-blue-500', driverUser: 'minoliver', driverPass: 'mino2010' }
         ];
 
+        // تم إضافة مسارات "الكلم 5" و "التكوين المهني" مع ضبط دقيق للوقت
         function getSteps(isChadia, isRushHour) {
             if (isChadia) {
                 return [
                     { id: 'c_start', name: 'بوهلال', x: 25, y: 90, wait: 13, move: 13, nextX: 40, nextY: 75 },
                     { id: 'zitouna_up', name: 'زيتونا', x: 40, y: 75, wait: 0, move: 10, nextX: 55, nextY: 60 },
                     { id: 'firma_up', name: 'الفيرمة', x: 55, y: 60, wait: 0, move: 5, nextX: 55, nextY: 40 },
-                    { id: 'kaous_up', name: 'وسط قاوس', x: 55, y: 40, wait: 0, move: 20, nextX: 55, nextY: 15 },
+                    { id: 'kaous_up', name: 'وسط قاوس', x: 55, y: 40, wait: 0, move: 8, nextX: 55, nextY: 30 },
+                    { id: 'km5_up', name: 'الكلم 5', x: 55, y: 30, wait: 0, move: 8, nextX: 55, nextY: 20 },
+                    { id: 'takwin_up', name: 'التكوين المهني', x: 55, y: 20, wait: 0, move: 4, nextX: 55, nextY: 15 },
                     { id: 'jijel_in', name: 'دخول المحطة', x: 55, y: 15, wait: 0, move: 2, nextX: 50, nextY: 10 },
                     { id: 'terminal', name: 'محطة جيجل', x: 50, y: 10, wait: isRushHour ? 9 : 13, move: 2, nextX: 45, nextY: 15 },
-                    { id: 'jijel_out', name: 'خروج من المحطة', x: 45, y: 15, wait: 0, move: isRushHour ? 22 : 18, nextX: 45, nextY: 40 },
+                    { id: 'jijel_out', name: 'خروج من المحطة', x: 45, y: 15, wait: 0, move: isRushHour ? 6 : 4, nextX: 45, nextY: 20 },
+                    { id: 'takwin_down', name: 'التكوين (عودة)', x: 45, y: 20, wait: 0, move: isRushHour ? 8 : 7, nextX: 45, nextY: 30 },
+                    { id: 'km5_down', name: 'الكلم 5 (عودة)', x: 45, y: 30, wait: 0, move: isRushHour ? 8 : 7, nextX: 45, nextY: 40 },
                     { id: 'kaous_down', name: 'وسط قاوس (عودة)', x: 45, y: 40, wait: 0, move: 5, nextX: 45, nextY: 60 },
                     { id: 'firma_down', name: 'الفيرمة (عودة)', x: 45, y: 60, wait: 0, move: 10, nextX: 30, nextY: 75 },
                     { id: 'chadia_down', name: 'شادية (عودة)', x: 30, y: 75, wait: 0, move: 13, nextX: 15, nextY: 90 },
@@ -471,10 +461,14 @@
                 return [
                     { id: 'l_start', name: 'العيايشة', x: 85, y: 90, wait: 7, move: 8, nextX: 55, nextY: 60 },
                     { id: 'firma_up', name: 'الفيرمة', x: 55, y: 60, wait: 1, move: 5, nextX: 55, nextY: 40 },
-                    { id: 'kaous_up', name: 'وسط قاوس', x: 55, y: 40, wait: 1, move: 15, nextX: 55, nextY: 15 },
+                    { id: 'kaous_up', name: 'وسط قاوس', x: 55, y: 40, wait: 1, move: 5, nextX: 55, nextY: 30 },
+                    { id: 'km5_up', name: 'الكلم 5', x: 55, y: 30, wait: 0, move: 5, nextX: 55, nextY: 20 },
+                    { id: 'takwin_up', name: 'التكوين المهني', x: 55, y: 20, wait: 0, move: 5, nextX: 55, nextY: 15 },
                     { id: 'jijel_in', name: 'دخول المحطة', x: 55, y: 15, wait: 0, move: 2, nextX: 50, nextY: 10 },
                     { id: 'terminal', name: 'محطة جيجل', x: 50, y: 10, wait: isRushHour ? 10 : 14, move: 2, nextX: 45, nextY: 15 },
-                    { id: 'jijel_out', name: 'خروج من المحطة', x: 45, y: 15, wait: 0, move: isRushHour ? 22 : 18, nextX: 45, nextY: 40 },
+                    { id: 'jijel_out', name: 'خروج من المحطة', x: 45, y: 15, wait: 0, move: isRushHour ? 6 : 4, nextX: 45, nextY: 20 },
+                    { id: 'takwin_down', name: 'التكوين (عودة)', x: 45, y: 20, wait: 0, move: isRushHour ? 8 : 7, nextX: 45, nextY: 30 },
+                    { id: 'km5_down', name: 'الكلم 5 (عودة)', x: 45, y: 30, wait: 0, move: isRushHour ? 8 : 7, nextX: 45, nextY: 40 },
                     { id: 'kaous_down', name: 'وسط قاوس (عودة)', x: 45, y: 40, wait: 1, move: 5, nextX: 45, nextY: 60 },
                     { id: 'firma_down', name: 'الفيرمة (عودة)', x: 45, y: 60, wait: 1, move: 8, nextX: 75, nextY: 90 },
                     { id: 'l_end', name: 'العيايشة (عودة)', x: 75, y: 90, wait: 1, move: 1, nextX: 85, nextY: 90 }
@@ -488,17 +482,14 @@
         function setLineFilter(line) {
             currentLineFilter = line;
             
-            // تصميم أزرار الفلترة الجديد
             const btnAll = document.getElementById('filter-all');
             const btnLai = document.getElementById('filter-laiachia');
             const btnCha = document.getElementById('filter-chadia');
             
-            // Reset all
             btnAll.className = 'flex-1 py-2.5 text-xs font-bold rounded-xl text-slate-400 hover:text-white transition-all duration-300';
             btnLai.className = 'flex-1 py-2.5 text-[11px] font-bold rounded-xl text-slate-400 hover:text-white transition-all duration-300 flex items-center justify-center gap-1.5';
             btnCha.className = 'flex-1 py-2.5 text-[11px] font-bold rounded-xl text-slate-400 hover:text-white transition-all duration-300 flex items-center justify-center gap-1.5';
             
-            // Set active
             if(line === 'all') btnAll.className = 'flex-1 py-2.5 text-xs font-bold rounded-xl bg-emerald-500 text-[#060B19] shadow-md transition-all duration-300';
             if(line === 'laiachia') btnLai.className = 'flex-1 py-2.5 text-[11px] font-bold rounded-xl bg-slate-800 text-white shadow-md transition-all duration-300 flex items-center justify-center gap-1.5';
             if(line === 'chadia') btnCha.className = 'flex-1 py-2.5 text-[11px] font-bold rounded-xl bg-slate-800 text-white shadow-md transition-all duration-300 flex items-center justify-center gap-1.5';
@@ -525,7 +516,7 @@
                 navigator.geolocation.getCurrentPosition(
                     () => {
                         setTimeout(() => {
-                            let options = ["15,36", "21,41", "39,63", "73,96", "79,101"];
+                            let options = ["15,36", "21,41", "27,49", "32,57", "39,63", "59,82", "66,89", "73,96", "79,101"];
                             if(currentLineFilter === 'all') options.push("7,-1", "-1,13", "-1,26");
                             else if (currentLineFilter === 'laiachia') options.push("7,-1");
                             else if (currentLineFilter === 'chadia') options.push("-1,13", "-1,26");
@@ -687,7 +678,6 @@
 
                 document.getElementById(`list-status-${bus.id}`).innerText = data.status;
                 
-                // تصميم حالة السعة في القائمة
                 const capBadge = document.getElementById(`list-cap-${bus.id}`);
                 capBadge.innerText = cap.text;
                 if(bus.capacity === 3) capBadge.className = `text-[9px] px-2 py-0.5 rounded-md font-black tracking-wider text-red-100 bg-red-500/20 border border-red-500/30`;
@@ -770,7 +760,6 @@
             switchTab('info'); 
             const modal = document.getElementById('busModal');
             modal.classList.remove('hidden'); 
-            // تأخير بسيط لتفعيل أنيميشن الصعود
             setTimeout(() => { modal.classList.remove('translate-y-full'); }, 10);
             updateUI(); 
         }
@@ -838,7 +827,11 @@
                     <option value="26">📍 زيتونا (باتجاه جيجل)</option>
                     <option value="36">📍 الفيرمة (باتجاه جيجل)</option>
                     <option value="41">📍 وسط قاوس (باتجاه جيجل)</option>
+                    <option value="49">📍 الكلم 5 (باتجاه جيجل)</option>
+                    <option value="57">📍 التكوين المهني (باتجاه جيجل)</option>
                     <option value="63">📍 محطة جيجل (وصول)</option>
+                    <option value="82">📍 التكوين المهني (عودة)</option>
+                    <option value="89">📍 الكلم 5 (عودة)</option>
                     <option value="96">📍 وسط قاوس (عودة)</option>
                     <option value="101">📍 الفيرمة (عودة)</option>
                     <option value="111">📍 شادية (عودة)</option>
@@ -848,7 +841,11 @@
                     <option value="0">📍 العيايشة (الانطلاق)</option>
                     <option value="15">📍 الفيرمة (باتجاه جيجل)</option>
                     <option value="21">📍 وسط قاوس (باتجاه جيجل)</option>
+                    <option value="27">📍 الكلم 5 (باتجاه جيجل)</option>
+                    <option value="32">📍 التكوين المهني (باتجاه جيجل)</option>
                     <option value="39">📍 محطة جيجل (وصول)</option>
+                    <option value="59">📍 التكوين المهني (عودة)</option>
+                    <option value="66">📍 الكلم 5 (عودة)</option>
                     <option value="73">📍 وسط قاوس (عودة)</option>
                     <option value="79">📍 الفيرمة (عودة)</option>
                 `;
@@ -887,8 +884,8 @@
             
             if (isCloudEnabled && db) {
                 try {
-                    // التحديث إلى config_v8 
-                    await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v8').set({ BUSES: BUSES });
+                    // التحديث للإصدار v9 لضمان المحطات الجديدة
+                    await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v9').set({ BUSES: BUSES });
                     await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('toast').set({ 
                         message: `تحديث مسار: ${bus.name} الآن في الخدمة!`, 
                         timestamp: Date.now() 
@@ -998,7 +995,7 @@
             if (!isCloudEnabled || !db) return alert("❌ السحابة غير متصلة! يرجى فحص الإنترنت.");
             btn.innerHTML = '<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> جاري النشر...'; lucide.createIcons();
             try {
-                await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v8').set({ BUSES: tempBuses });
+                await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v9').set({ BUSES: tempBuses });
                 alert("✅ تم الحفظ والنشر بنجاح!"); closeAdminPanel();
             } catch (error) { alert("❌ حدث خطأ:\n" + error.message); } 
             finally { btn.innerHTML = '<i data-lucide="cloud-upload" class="w-5 h-5"></i> حفظ ونشر للجميع'; lucide.createIcons(); }
@@ -1015,8 +1012,8 @@
         try {
             firebase.initializeApp(firebaseConfig); db = firebase.firestore(); isCloudEnabled = true;
             
-            // قراءة من السحابة v8
-            const confRef = db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v8');
+            // قراءة من السحابة v9 للمحطات الجديدة
+            const confRef = db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v9');
             const tstRef = db.collection('projects').doc('bustruker-9f717').collection('settings').doc('toast');
 
             confRef.onSnapshot((docSnap) => {
