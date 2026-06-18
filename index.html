@@ -21,8 +21,26 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
     
     <style>
-        body { font-family: 'Tajawal', sans-serif; -webkit-tap-highlight-color: transparent; }
-        .bus-element { transition: left 0.1s linear, top 0.1s linear, transform 0.3s ease-out; }
+        body { 
+            font-family: 'Tajawal', sans-serif; 
+            -webkit-tap-highlight-color: transparent; 
+            /* منع سحب الصفحة للأسفل لتجنب تقطيع الأداء */
+            overscroll-behavior-y: none;
+        }
+
+        /* إجبار الهاتف على معالجة الطبقات بسلاسة ومنع الرمشة السوداء */
+        * {
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+        }
+
+        .bus-element { 
+            transition: left 0.1s linear, top 0.1s linear, transform 0.3s ease-out; 
+            /* إخبار المتصفح مسبقاً بأن هذه العناصر ستتحرك */
+            will-change: left, top, transform; 
+            transform: translateZ(0);
+        }
+        
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
         
@@ -37,6 +55,12 @@
             100% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0); }
         }
 
+        /* إصلاح مشاكل الـ Backdrop Blur في متصفحات الجوال */
+        .backdrop-blur-xl, .backdrop-blur-2xl, .backdrop-blur-md, .backdrop-blur-sm {
+            -webkit-transform: translate3d(0, 0, 0);
+            transform: translate3d(0, 0, 0);
+        }
+
         /* تحسينات المظهر الفاتح */
         body.light-mode { background-color: #f8fafc; color: #0f172a; }
         body.light-mode .bg-slate-950, body.light-mode .bg-slate-900 { background-color: #ffffff !important; }
@@ -49,9 +73,9 @@
 </head>
 <body class="min-h-screen bg-[#060B19] text-slate-100 font-sans pb-10 transition-colors duration-500 relative selection:bg-emerald-500/30">
 
-    <div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
-        <div class="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-emerald-500/10 blur-[120px] rounded-full mix-blend-screen"></div>
-        <div class="absolute top-[40%] -right-[20%] w-[60%] h-[60%] bg-blue-600/10 blur-[150px] rounded-full mix-blend-screen"></div>
+    <div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none" style="transform: translateZ(0);">
+        <div class="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-emerald-500/10 blur-[80px] rounded-full"></div>
+        <div class="absolute top-[40%] -right-[20%] w-[60%] h-[60%] bg-blue-600/10 blur-[100px] rounded-full"></div>
     </div>
 
     <div id="adminToast" class="fixed top-24 left-4 right-4 z-[120] bg-gradient-to-r from-amber-500 to-orange-600 text-white p-4 rounded-2xl shadow-2xl border border-amber-400/50 hidden animate-bounce backdrop-blur-md">
@@ -76,6 +100,15 @@
                 </div>
             </div>
             <div class="flex items-center gap-2">
+                <div class="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-xl shadow-sm transition-all duration-300" title="إجمالي الزوار المباشر">
+                    <div class="relative flex h-2 w-2">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                    </div>
+                    <i data-lucide="users" class="w-3.5 h-3.5 text-blue-400"></i>
+                    <span id="visitorCount" class="text-xs font-black text-blue-400 tracking-wider">...</span>
+                </div>
+
                 <button id="installBtn" onclick="installApp()" class="hidden px-3 py-2 bg-emerald-500 hover:bg-emerald-400 text-[#060B19] text-[10px] font-black rounded-xl shadow-lg transition-colors flex items-center gap-1">
                     تثبيت <i data-lucide="download" class="w-3 h-3"></i>
                 </button>
@@ -884,7 +917,6 @@
             
             if (isCloudEnabled && db) {
                 try {
-                    // التحديث للإصدار v9 لضمان المحطات الجديدة
                     await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v9').set({ BUSES: BUSES });
                     await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('toast').set({ 
                         message: `تحديث مسار: ${bus.name} الآن في الخدمة!`, 
@@ -1001,6 +1033,39 @@
             finally { btn.innerHTML = '<i data-lucide="cloud-upload" class="w-5 h-5"></i> حفظ ونشر للجميع'; lucide.createIcons(); }
         }
 
+        // =======================
+        // دالة عداد الزوار المباشر
+        // =======================
+        async function initVisitorCounter() {
+            if (!isCloudEnabled || !db) return;
+            
+            const statsRef = db.collection('projects').doc('bustruker-9f717').collection('settings').doc('statistics');
+            const visitorCounterEl = document.getElementById('visitorCount');
+
+            try {
+                if (!sessionStorage.getItem('hasVisited')) {
+                    await statsRef.set({
+                        totalVisitors: firebase.firestore.FieldValue.increment(1)
+                    }, { merge: true });
+                    sessionStorage.setItem('hasVisited', 'true');
+                }
+
+                statsRef.onSnapshot((docSnap) => {
+                    if (docSnap.exists) {
+                        const data = docSnap.data();
+                        if (data.totalVisitors) {
+                            visitorCounterEl.innerText = data.totalVisitors;
+                            visitorCounterEl.classList.add('text-white');
+                            setTimeout(() => visitorCounterEl.classList.remove('text-white'), 500);
+                        }
+                    }
+                });
+            } catch (e) {
+                console.warn("تعذر جلب عدد الزوار", e);
+                visitorCounterEl.innerText = "---";
+            }
+        }
+
         if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
         
         const firebaseConfig = {
@@ -1012,7 +1077,9 @@
         try {
             firebase.initializeApp(firebaseConfig); db = firebase.firestore(); isCloudEnabled = true;
             
-            // قراءة من السحابة v9 للمحطات الجديدة
+            // استدعاء دالة العداد
+            initVisitorCounter();
+
             const confRef = db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v9');
             const tstRef = db.collection('projects').doc('bustruker-9f717').collection('settings').doc('toast');
 
