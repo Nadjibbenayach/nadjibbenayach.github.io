@@ -19,32 +19,27 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
-    
-    <style>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script> <style>
         body { 
             font-family: 'Tajawal', sans-serif; 
             -webkit-tap-highlight-color: transparent; 
-            /* منع سحب الصفحة للأسفل لتجنب تقطيع الأداء */
             overscroll-behavior-y: none;
         }
 
-        /* إجبار الهاتف على معالجة الطبقات بسلاسة ومنع الرمشة السوداء */
         * {
             -webkit-backface-visibility: hidden;
             backface-visibility: hidden;
         }
 
         .bus-element { 
-            transition: left 0.1s linear, top 0.1s linear, transform 0.3s ease-out; 
-            /* إخبار المتصفح مسبقاً بأن هذه العناصر ستتحرك */
-            will-change: left, top, transform; 
+            transition: left 0.1s linear, top 0.1s linear, transform 0.3s ease-out, opacity 0.3s ease-in-out; 
+            will-change: left, top, transform, opacity; 
             transform: translateZ(0);
         }
         
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
         
-        /* تأثيرات النيون والخلفية */
         .neon-glow { box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); }
         .grid-bg { background-size: 30px 30px; background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px); }
         
@@ -55,13 +50,11 @@
             100% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0); }
         }
 
-        /* إصلاح مشاكل الـ Backdrop Blur في متصفحات الجوال */
         .backdrop-blur-xl, .backdrop-blur-2xl, .backdrop-blur-md, .backdrop-blur-sm {
             -webkit-transform: translate3d(0, 0, 0);
             transform: translate3d(0, 0, 0);
         }
 
-        /* تحسينات المظهر الفاتح */
         body.light-mode { background-color: #f8fafc; color: #0f172a; }
         body.light-mode .bg-slate-950, body.light-mode .bg-slate-900 { background-color: #ffffff !important; }
         body.light-mode .bg-slate-800 { background-color: #f1f5f9 !important; }
@@ -143,7 +136,7 @@
                     <div class="p-1.5 bg-emerald-500/20 rounded-lg"><i data-lucide="map-pin" class="w-4 h-4 text-emerald-400"></i></div> محطة الانتظار
                 </h2>
                 <button onclick="detectLocation()" id="gpsBtn" class="text-[10px] font-bold bg-white/5 hover:bg-white/10 text-slate-300 px-3 py-1.5 rounded-xl border border-white/10 flex items-center gap-1.5 active:scale-95 transition-all shadow-sm">
-                    <i data-lucide="crosshair" class="w-3 h-3 text-emerald-400"></i> تحديد
+                    <i data-lucide="crosshair" class="w-3 h-3 text-emerald-400"></i> تحديد ذكي
                 </button>
             </div>
             
@@ -268,15 +261,11 @@
 
     <div id="busModal" class="fixed inset-0 z-50 flex items-end justify-center p-0 bg-[#060B19]/80 backdrop-blur-sm transition-all duration-300 translate-y-full" onclick="closeModal()">
         <div id="modalContent" class="bg-[#060B19] border-t border-white/10 rounded-t-[2.5rem] p-6 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] w-full max-w-md relative overflow-hidden flex flex-col min-h-[50vh]" onclick="event.stopPropagation()">
-            
             <button onclick="openDriverAuth()" class="absolute top-6 left-6 p-2.5 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 text-slate-400 shadow-lg z-20 transition-all" title="لوحة تحكم السائق">
                 <i data-lucide="user-cog" class="w-5 h-5"></i>
             </button>
-
             <div class="w-16 h-1.5 bg-white/20 rounded-full mx-auto mb-6"></div>
-            
             <div id="modalGlow" class="absolute -top-20 -right-20 w-48 h-48 rounded-full blur-[80px] opacity-30 pointer-events-none"></div>
-            
             <div class="flex flex-col items-center flex-shrink-0 relative z-10">
                 <div id="modalBusIcon" class="w-20 h-20 rounded-[1.5rem] flex items-center justify-center mb-4 relative shadow-2xl transform hover:scale-105 transition-transform">
                     <i data-lucide="bus" class="text-white w-10 h-10"></i>
@@ -285,12 +274,10 @@
                 <h2 id="modalBusName" class="text-2xl font-black text-white mb-2 text-center tracking-tight"></h2>
                 <span id="modalBusStatus" class="px-4 py-1.5 rounded-full text-[10px] font-bold border border-white/10 bg-white/5 backdrop-blur-md uppercase tracking-wider"></span>
             </div>
-
             <div class="flex bg-white/5 p-1 rounded-xl mt-6 mb-6 flex-shrink-0 relative z-10">
                 <button onclick="switchTab('info')" id="tabBtnInfo" class="flex-1 py-2.5 text-sm font-bold bg-emerald-500 text-[#060B19] rounded-lg transition-all shadow-md">المسار والمحطات</button>
                 <button onclick="switchTab('tickets')" id="tabBtnTickets" class="flex-1 py-2.5 text-sm font-bold text-slate-400 hover:text-white rounded-lg transition-all">أسعار التذاكر</button>
             </div>
-
             <div class="overflow-y-auto custom-scrollbar flex-1 pb-4 relative z-10">
                 <div id="tabInfo" class="space-y-4 block">
                     <div class="bg-white/5 p-5 rounded-2xl border border-white/10">
@@ -305,7 +292,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="grid grid-cols-2 gap-3">
                         <div class="bg-white/5 p-4 rounded-2xl border border-white/10 flex flex-col items-center justify-center relative overflow-hidden">
                             <div class="absolute top-0 right-0 w-16 h-16 bg-blue-500/10 rounded-full blur-xl"></div>
@@ -409,11 +395,11 @@
             <div class="flex justify-center mb-4"><i data-lucide="shield" class="w-10 h-10 text-slate-400"></i></div>
             <h2 class="text-lg font-black text-center text-white mb-6 tracking-wide">الإدارة العامة</h2>
             <div class="space-y-4">
-                <input type="text" id="adminUser" placeholder="Username" class="w-full bg-[#060B19] border border-slate-700 rounded-xl p-3.5 text-sm font-bold text-white outline-none focus:border-emerald-500" dir="ltr" onkeypress="if(event.key==='Enter') checkAuth()">
+                <input type="email" id="adminUser" placeholder="Email" class="w-full bg-[#060B19] border border-slate-700 rounded-xl p-3.5 text-sm font-bold text-white outline-none focus:border-emerald-500" dir="ltr" onkeypress="if(event.key==='Enter') checkAuth()">
                 <input type="password" id="adminPass" placeholder="Password" class="w-full bg-[#060B19] border border-slate-700 rounded-xl p-3.5 text-sm font-bold text-white outline-none focus:border-emerald-500" dir="ltr" onkeypress="if(event.key==='Enter') checkAuth()">
             </div>
-            <p id="authError" class="text-red-400 text-xs font-bold text-center mt-3 hidden">بيانات خاطئة!</p>
-            <button onclick="checkAuth()" class="w-full py-3.5 mt-6 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-sm font-black transition-colors">دخول</button>
+            <p id="authError" class="text-red-400 text-xs font-bold text-center mt-3 hidden">بيانات خاطئة أو غير مصرح بها!</p>
+            <button onclick="checkAuth()" class="w-full py-3.5 mt-6 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-sm font-black transition-colors">دخول آمن</button>
         </div>
     </div>
 
@@ -450,27 +436,41 @@
             }
         }
 
-        let currentLineFilter = 'all'; 
-        let currentDriverBusId = null;
-        
-        let BUSES = [
-            { id: 1, name: 'شركة بوالنوار - حافلة 1', route: 'laiachia', offset: 0, isPaused: false, capacity: 1, color: 'bg-red-500', border: 'border-red-500', glow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text: 'text-red-500', driverUser: 'minoliver', driverPass: 'mino2010' },
-            { id: 2, name: 'شركة بوالنوار - حافلة 2', route: 'laiachia', offset: 30, isPaused: false, capacity: 1, color: 'bg-red-500', border: 'border-red-500', glow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text: 'text-red-500', driverUser: 'minoliver', driverPass: 'mino2010' },
-            { id: 3, name: 'شركة بوالنوار - حافلة 3', route: 'laiachia', offset: 60, isPaused: false, capacity: 1, color: 'bg-red-500', border: 'border-red-500', glow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text: 'text-red-500', driverUser: 'minoliver', driverPass: 'mino2010' },
-            { id: 4, name: 'النقل الموحدة - حافلة 1', route: 'chadia', offset: 0, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'minoliver', driverPass: 'mino2010' },
-            { id: 5, name: 'النقل الموحدة - حافلة 2', route: 'chadia', offset: 14, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'minoliver', driverPass: 'mino2010' },
-            { id: 6, name: 'النقل الموحدة - حافلة 3', route: 'chadia', offset: 28, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'minoliver', driverPass: 'mino2010' },
-            { id: 7, name: 'النقل الموحدة - حافلة 4', route: 'chadia', offset: 42, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'minoliver', driverPass: 'mino2010' },
-            { id: 8, name: 'النقل الموحدة - حافلة 5', route: 'chadia', offset: 56, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'minoliver', driverPass: 'mino2010' },
-            { id: 9, name: 'النقل الموحدة - حافلة 6', route: 'chadia', offset: 70, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'minoliver', driverPass: 'mino2010' },
-            { id: 10, name: 'النقل الموحدة - حافلة 7', route: 'chadia', offset: 84, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'minoliver', driverPass: 'mino2010' },
-            { id: 11, name: 'النقل الموحدة - حافلة 8', route: 'chadia', offset: 98, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'minoliver', driverPass: 'mino2010' },
-            { id: 12, name: 'النقل الموحدة - حافلة 9', route: 'chadia', offset: 112, isPaused: false, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'minoliver', driverPass: 'mino2010' },
-            { id: 13, name: 'حافلة شادية (الصفراء)', route: 'chadia', offset: 70, isPaused: false, capacity: 1, color: 'bg-yellow-500', border: 'border-yellow-500', glow: 'shadow-[0_0_15px_rgba(234,179,8,0.8)]', text: 'text-yellow-500', driverUser: 'minoliver', driverPass: 'mino2010' },
-            { id: 14, name: 'حافلة شادية (الزرقاء)', route: 'chadia', offset: 112, isPaused: false, capacity: 1, color: 'bg-blue-500', border: 'border-blue-500', glow: 'shadow-[0_0_15px_rgba(59,130,246,0.8)]', text: 'text-blue-500', driverUser: 'minoliver', driverPass: 'mino2010' }
+        // إحداثيات حقيقية لتقريب حسابات الـ GPS (تعديل للإحداثيات الدقيقة لمناطق قاوس وجيجل)
+        const REAL_STOPS = [
+            { name: "العيايشة", lat: 36.7800, lng: 5.7900, value: "7,-1" },
+            { name: "بوهلال", lat: 36.7850, lng: 5.7850, value: "-1,13" },
+            { name: "زيتونا", lat: 36.7870, lng: 5.7820, value: "-1,26" },
+            { name: "الفيرمة", lat: 36.7880, lng: 5.7810, value: "15,36" },
+            { name: "وسط قاوس", lat: 36.7900, lng: 5.7800, value: "21,41" },
+            { name: "الكلم 5", lat: 36.8000, lng: 5.7700, value: "27,49" },
+            { name: "التكوين المهني", lat: 36.8100, lng: 5.7650, value: "32,57" },
+            { name: "محطة الحافلات جيجل", lat: 36.8200, lng: 5.7600, value: "39,63" }
         ];
 
-        // تم إضافة مسارات "الكلم 5" و "التكوين المهني" مع ضبط دقيق للوقت
+        let currentLineFilter = 'all'; 
+        let currentDriverBusId = null;
+        let driverHeartbeatInterval = null; // للمدير الذكي للسائق
+        const DOM_CACHE = {}; // كاش لضمان الأداء السلس للـ DOM
+        
+        // تمت إضافة خصائص isOffline و lastActive لكل حافلة لتعمل مع "المدير الذكي"
+        let BUSES = [
+            { id: 1, name: 'شركة بوالنوار - حافلة 1', route: 'laiachia', offset: 0, isPaused: false, isOffline: false, lastActive: null, capacity: 1, color: 'bg-red-500', border: 'border-red-500', glow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text: 'text-red-500', driverUser: 'minoliver', driverPass: 'mino2010' },
+            { id: 2, name: 'شركة بوالنوار - حافلة 2', route: 'laiachia', offset: 30, isPaused: false, isOffline: false, lastActive: null, capacity: 1, color: 'bg-red-500', border: 'border-red-500', glow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text: 'text-red-500', driverUser: 'minoliver', driverPass: 'mino2010' },
+            { id: 3, name: 'شركة بوالنوار - حافلة 3', route: 'laiachia', offset: 60, isPaused: false, isOffline: false, lastActive: null, capacity: 1, color: 'bg-red-500', border: 'border-red-500', glow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text: 'text-red-500', driverUser: 'minoliver', driverPass: 'mino2010' },
+            { id: 4, name: 'النقل الموحدة - حافلة 1', route: 'chadia', offset: 0, isPaused: false, isOffline: false, lastActive: null, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'minoliver', driverPass: 'mino2010' },
+            { id: 5, name: 'النقل الموحدة - حافلة 2', route: 'chadia', offset: 14, isPaused: false, isOffline: false, lastActive: null, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'minoliver', driverPass: 'mino2010' },
+            { id: 6, name: 'النقل الموحدة - حافلة 3', route: 'chadia', offset: 28, isPaused: false, isOffline: false, lastActive: null, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'minoliver', driverPass: 'mino2010' },
+            { id: 7, name: 'النقل الموحدة - حافلة 4', route: 'chadia', offset: 42, isPaused: false, isOffline: false, lastActive: null, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'minoliver', driverPass: 'mino2010' },
+            { id: 8, name: 'النقل الموحدة - حافلة 5', route: 'chadia', offset: 56, isPaused: false, isOffline: false, lastActive: null, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'minoliver', driverPass: 'mino2010' },
+            { id: 9, name: 'النقل الموحدة - حافلة 6', route: 'chadia', offset: 70, isPaused: false, isOffline: false, lastActive: null, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'minoliver', driverPass: 'mino2010' },
+            { id: 10, name: 'النقل الموحدة - حافلة 7', route: 'chadia', offset: 84, isPaused: false, isOffline: false, lastActive: null, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'minoliver', driverPass: 'mino2010' },
+            { id: 11, name: 'النقل الموحدة - حافلة 8', route: 'chadia', offset: 98, isPaused: false, isOffline: false, lastActive: null, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'minoliver', driverPass: 'mino2010' },
+            { id: 12, name: 'النقل الموحدة - حافلة 9', route: 'chadia', offset: 112, isPaused: false, isOffline: false, lastActive: null, capacity: 1, color: 'bg-green-500', border: 'border-green-500', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.8)]', text: 'text-green-500', driverUser: 'minoliver', driverPass: 'mino2010' },
+            { id: 13, name: 'حافلة شادية (الصفراء)', route: 'chadia', offset: 70, isPaused: false, isOffline: false, lastActive: null, capacity: 1, color: 'bg-yellow-500', border: 'border-yellow-500', glow: 'shadow-[0_0_15px_rgba(234,179,8,0.8)]', text: 'text-yellow-500', driverUser: 'minoliver', driverPass: 'mino2010' },
+            { id: 14, name: 'حافلة شادية (الزرقاء)', route: 'chadia', offset: 112, isPaused: false, isOffline: false, lastActive: null, capacity: 1, color: 'bg-blue-500', border: 'border-blue-500', glow: 'shadow-[0_0_15px_rgba(59,130,246,0.8)]', text: 'text-blue-500', driverUser: 'minoliver', driverPass: 'mino2010' }
+        ];
+
         function getSteps(isChadia, isRushHour) {
             if (isChadia) {
                 return [
@@ -541,31 +541,60 @@
             lucide.createIcons();
         }
 
+        // === نظام تحديد المواقع الحقيقي (Haversine Formula) ===
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; 
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+        }
+
         function detectLocation() {
             const btn = document.getElementById('gpsBtn');
             btn.innerHTML = '<i data-lucide="loader" class="w-3 h-3 animate-spin text-emerald-400"></i> جاري...';
             lucide.createIcons();
+
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
-                    () => {
-                        setTimeout(() => {
-                            let options = ["15,36", "21,41", "27,49", "32,57", "39,63", "59,82", "66,89", "73,96", "79,101"];
-                            if(currentLineFilter === 'all') options.push("7,-1", "-1,13", "-1,26");
-                            else if (currentLineFilter === 'laiachia') options.push("7,-1");
-                            else if (currentLineFilter === 'chadia') options.push("-1,13", "-1,26");
-                            
-                            document.getElementById('passengerStop').value = options[Math.floor(Math.random() * options.length)]; 
+                    (position) => {
+                        const userLat = position.coords.latitude;
+                        const userLng = position.coords.longitude;
+                        
+                        let nearestStop = null;
+                        let minDistance = Infinity;
+
+                        REAL_STOPS.forEach(stop => {
+                            const dist = calculateDistance(userLat, userLng, stop.lat, stop.lng);
+                            if (dist < minDistance) {
+                                minDistance = dist;
+                                nearestStop = stop;
+                            }
+                        });
+
+                        if (nearestStop) {
+                            document.getElementById('passengerStop').value = nearestStop.value;
                             updateUI();
-                            btn.innerHTML = '<i data-lucide="check" class="w-3 h-3 text-emerald-400"></i> تم';
-                            setTimeout(() => {
-                                btn.innerHTML = '<i data-lucide="crosshair" class="w-3 h-3 text-emerald-400"></i> تحديد';
-                                lucide.createIcons();
-                            }, 2000);
+                        }
+
+                        btn.innerHTML = '<i data-lucide="check" class="w-3 h-3 text-emerald-400"></i> تم';
+                        setTimeout(() => {
+                            btn.innerHTML = '<i data-lucide="crosshair" class="w-3 h-3 text-emerald-400"></i> تحديد ذكي';
                             lucide.createIcons();
-                        }, 1000);
+                        }, 2000);
                     },
-                    () => { alert("يرجى تفعيل الـ GPS في هاتفك."); btn.innerHTML = '<i data-lucide="crosshair" class="w-3 h-3 text-emerald-400"></i> تحديد'; lucide.createIcons(); }
+                    () => { 
+                        alert("يرجى تفعيل إذن الـ GPS في هاتفك لتحديد أقرب محطة."); 
+                        btn.innerHTML = '<i data-lucide="crosshair" class="w-3 h-3 text-emerald-400"></i> تحديد ذكي'; 
+                        lucide.createIcons(); 
+                    },
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
                 );
+            } else {
+                alert("متصفحك لا يدعم تحديد الموقع.");
+                btn.innerHTML = '<i data-lucide="crosshair" class="w-3 h-3 text-emerald-400"></i> تحديد ذكي'; lucide.createIcons();
             }
         }
 
@@ -585,9 +614,9 @@
             const CYCLE_DUR = isChadia ? 126 : 90; 
             
             let dynamicOffset = bus.offset;
-
             const diff = currentMinutes - ROUTE_START - dynamicOffset;
             
+            if (bus.isOffline) return { status: 'غير متصلة', isMoving: false, isParked: true, isPaused: true, progress: 0, cycleTime: -1 };
             if (bus.isPaused) return { status: 'متوقفة مؤقتاً', isMoving: false, isParked: true, isPaused: true, progress: 0, cycleTime: -1 };
             if (diff < 0) return { status: 'في الانتظار', isMoving: false, isParked: true, isPaused: false, progress: 0, cycleTime: -1 };
 
@@ -625,50 +654,75 @@
             return { status, x, y, isMoving, rotation, isParked: false, isPaused: false, progress, etaJijel, etaHome, cycleTime };
         }
 
-        function buildDOM() {
+        // === نظام الرسم السلس (Smooth Rendering Engine) ===
+        function initFleetDOM() {
             const listContainer = document.getElementById('busListContainer'); 
             const mapContainer = document.getElementById('mapBusesContainer');
             listContainer.innerHTML = ''; mapContainer.innerHTML = '';
 
             BUSES.forEach(bus => {
-                listContainer.innerHTML += `
-                    <div id="list-item-${bus.id}" onclick="openModal(${bus.id})" class="group relative bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl p-4 flex items-center gap-4 cursor-pointer transition-all duration-300 overflow-hidden">
-                        <div class="absolute right-0 top-0 bottom-0 w-1 ${bus.color} opacity-80"></div>
-                        <div id="list-icon-bg-${bus.id}" class="p-3 rounded-[1rem] shadow-md transition-transform group-hover:scale-110"><i data-lucide="bus" id="list-icon-${bus.id}" class="w-5 h-5"></i></div>
-                        <div class="flex-1">
-                            <div class="flex justify-between items-center mb-1">
-                                <h3 class="font-black text-white text-xs tracking-wide">${bus.name}</h3>
-                                <span id="list-cap-${bus.id}" class="text-[9px] px-2 py-0.5 rounded-md font-black tracking-wider shadow-sm"></span>
-                            </div>
-                            <p id="list-status-${bus.id}" class="text-[11px] font-bold text-slate-400 truncate"></p>
+                // List Item Creation
+                const listItem = document.createElement('div');
+                listItem.id = `list-item-${bus.id}`;
+                listItem.className = `group relative bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl p-4 flex items-center gap-4 cursor-pointer transition-all duration-300 overflow-hidden`;
+                listItem.onclick = () => openModal(bus.id);
+                listItem.innerHTML = `
+                    <div class="absolute right-0 top-0 bottom-0 w-1 ${bus.color} opacity-80"></div>
+                    <div id="list-icon-bg-${bus.id}" class="p-3 rounded-[1rem] shadow-md transition-transform group-hover:scale-110 ${bus.color} ${bus.glow}"><i data-lucide="bus" id="list-icon-${bus.id}" class="w-5 h-5 text-white"></i></div>
+                    <div class="flex-1">
+                        <div class="flex justify-between items-center mb-1">
+                            <h3 class="font-black text-white text-xs tracking-wide">${bus.name}</h3>
+                            <span id="list-cap-${bus.id}" class="text-[9px] px-2 py-0.5 rounded-md font-black tracking-wider shadow-sm"></span>
                         </div>
-                    </div>`;
-                mapContainer.innerHTML += `
-                    <div onclick="openModal(${bus.id})" id="map-bus-container-${bus.id}" class="absolute z-20 bus-element cursor-pointer transition-opacity duration-300">
-                        <div id="map-icon-bg-${bus.id}" class="w-10 h-10 -ml-5 -mt-5 rounded-[1rem] border-[2.5px] flex items-center justify-center shadow-[0_5px_15px_rgba(0,0,0,0.5)] transform transition-transform hover:scale-125">
-                            <i data-lucide="bus" id="map-icon-${bus.id}" class="w-4 h-4 text-white"></i>
-                            <div id="map-cap-dot-${bus.id}" class="absolute -bottom-1 -right-1 w-3.5 h-3.5 border-2 border-[#060B19] rounded-full"></div>
-                        </div>
-                    </div>`;
+                        <p id="list-status-${bus.id}" class="text-[11px] font-bold text-slate-400 truncate"></p>
+                    </div>
+                `;
+                listContainer.appendChild(listItem);
+
+                // Map Container Creation
+                const mapItem = document.createElement('div');
+                mapItem.id = `map-bus-container-${bus.id}`;
+                mapItem.className = `absolute z-20 bus-element cursor-pointer transition-opacity duration-300`;
+                mapItem.onclick = () => openModal(bus.id);
+                mapItem.innerHTML = `
+                    <div id="map-icon-bg-${bus.id}" class="w-10 h-10 -ml-5 -mt-5 rounded-[1rem] border-[2.5px] flex items-center justify-center shadow-[0_5px_15px_rgba(0,0,0,0.5)] transform transition-transform hover:scale-125 ${bus.color} ${bus.glow}">
+                        <i data-lucide="bus" id="map-icon-${bus.id}" class="w-4 h-4 text-white"></i>
+                        <div id="map-cap-dot-${bus.id}" class="absolute -bottom-1 -right-1 w-3.5 h-3.5 border-[2.5px] border-[#060B19] rounded-full"></div>
+                    </div>
+                `;
+                mapContainer.appendChild(mapItem);
+
+                DOM_CACHE[bus.id] = {
+                    listItem: listItem,
+                    listStatus: document.getElementById(`list-status-${bus.id}`),
+                    listIconBg: document.getElementById(`list-icon-bg-${bus.id}`),
+                    listIcon: document.getElementById(`list-icon-${bus.id}`),
+                    listCap: document.getElementById(`list-cap-${bus.id}`),
+                    mapContainer: mapItem,
+                    mapIconBg: document.getElementById(`map-icon-bg-${bus.id}`),
+                    mapCapDot: document.getElementById(`map-cap-dot-${bus.id}`)
+                };
             });
             lucide.createIcons();
         }
 
+        // تحديث الواجهة السلس عن طريق الـ CSS Transforms بدلاً من إعادة البناء
         function updateUI() {
             document.getElementById('mainClock').innerText = state.simulatedTime.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
             
-            if(document.getElementById('busListContainer').children.length !== BUSES.length) buildDOM();
+            if (Object.keys(DOM_CACHE).length === 0) initFleetDOM();
 
             const stopSelect = document.getElementById('passengerStop').value;
             const resBoard = document.getElementById('etaResultBoard');
             const noBus = document.getElementById('etaNoBus');
             
+            // ETA Logic
             if (stopSelect !== 'none') {
                 const targets = stopSelect.split(',').map(Number);
                 let closestBus = null; let minEta = 999;
                 
                 BUSES.forEach(bus => {
-                    if (bus.isPaused) return; 
+                    if (bus.isPaused || bus.isOffline) return; 
                     if (currentLineFilter !== 'all' && bus.route !== currentLineFilter) return;
 
                     const data = getBusData(bus); 
@@ -694,51 +748,46 @@
                 } else { resBoard.classList.add('hidden'); noBus.classList.remove('hidden'); }
             } else { resBoard.classList.add('hidden'); noBus.classList.add('hidden'); }
 
+            // Updating DOM Elements directly
             BUSES.forEach(bus => {
                 const data = getBusData(bus);
                 const cap = getCapacityDetails(bus.capacity);
-                
-                const listItem = document.getElementById(`list-item-${bus.id}`);
-                const mapContainer = document.getElementById(`map-bus-container-${bus.id}`);
+                const cache = DOM_CACHE[bus.id];
                 
                 if(currentLineFilter !== 'all' && bus.route !== currentLineFilter) {
-                    listItem.style.display = 'none';
-                    mapContainer.style.display = 'none';
+                    cache.listItem.style.display = 'none';
+                    cache.mapContainer.style.display = 'none';
                     return;
                 } else {
-                    listItem.style.display = 'flex';
+                    cache.listItem.style.display = 'flex';
                 }
 
-                document.getElementById(`list-status-${bus.id}`).innerText = data.status;
+                cache.listStatus.innerText = data.status;
+                cache.listCap.innerText = cap.text;
                 
-                const capBadge = document.getElementById(`list-cap-${bus.id}`);
-                capBadge.innerText = cap.text;
-                if(bus.capacity === 3) capBadge.className = `text-[9px] px-2 py-0.5 rounded-md font-black tracking-wider text-red-100 bg-red-500/20 border border-red-500/30`;
-                else if(bus.capacity === 2) capBadge.className = `text-[9px] px-2 py-0.5 rounded-md font-black tracking-wider text-amber-100 bg-amber-500/20 border border-amber-500/30`;
-                else capBadge.className = `text-[9px] px-2 py-0.5 rounded-md font-black tracking-wider text-emerald-100 bg-emerald-500/20 border border-emerald-500/30`;
+                if(bus.capacity === 3) cache.listCap.className = `text-[9px] px-2 py-0.5 rounded-md font-black tracking-wider text-red-100 bg-red-500/20 border border-red-500/30`;
+                else if(bus.capacity === 2) cache.listCap.className = `text-[9px] px-2 py-0.5 rounded-md font-black tracking-wider text-amber-100 bg-amber-500/20 border border-amber-500/30`;
+                else cache.listCap.className = `text-[9px] px-2 py-0.5 rounded-md font-black tracking-wider text-emerald-100 bg-emerald-500/20 border border-emerald-500/30`;
 
-                document.getElementById(`map-cap-dot-${bus.id}`).className = `absolute -bottom-1 -right-1 w-3.5 h-3.5 border-[2.5px] border-[#060B19] rounded-full ${cap.color}`;
+                cache.mapCapDot.className = `absolute -bottom-1 -right-1 w-3.5 h-3.5 border-[2.5px] border-[#060B19] rounded-full ${cap.color}`;
 
-                const listBg = document.getElementById(`list-icon-bg-${bus.id}`);
-                const listIcon = document.getElementById(`list-icon-${bus.id}`);
-                const mapBg = document.getElementById(`map-icon-bg-${bus.id}`);
-                const mapIcon = document.getElementById(`map-icon-${bus.id}`);
-
-                if(data.isParked || data.isPaused) {
-                    listBg.className = `p-3 rounded-[1rem] bg-white/5 border border-white/10`;
-                    listIcon.setAttribute('class', `lucide lucide-bus w-5 h-5 text-slate-500`);
-                    document.getElementById(`list-status-${bus.id}`).className = "text-[11px] text-slate-500 font-bold";
-                    mapContainer.style.display = 'none'; 
-                } else {
-                    listBg.className = `p-3 rounded-[1rem] shadow-md transition-transform group-hover:scale-110 ${bus.color} ${bus.glow}`;
-                    listIcon.setAttribute('class', `lucide lucide-bus w-5 h-5 text-white`);
-                    document.getElementById(`list-status-${bus.id}`).className = "text-[11px] text-slate-300 font-bold";
-                    mapContainer.style.display = 'block'; 
+                if(data.isParked || data.isPaused || bus.isOffline) {
+                    cache.listIconBg.className = `p-3 rounded-[1rem] bg-white/5 border border-white/10`;
+                    cache.listIcon.setAttribute('class', `lucide lucide-bus w-5 h-5 text-slate-500`);
+                    cache.listStatus.className = "text-[11px] text-slate-500 font-bold";
                     
-                    mapContainer.style.left = `${data.x}%`; mapContainer.style.top = `${data.y}%`;
-                    mapBg.style.transform = `rotate(${data.rotation}deg)`;
-                    mapBg.className = `w-10 h-10 -ml-5 -mt-5 rounded-[1rem] flex items-center justify-center border-[2.5px] border-white shadow-[0_5px_15px_rgba(0,0,0,0.5)] transform transition-transform hover:scale-125 ${bus.color} ${bus.glow}`;
-                    mapIcon.setAttribute('class', `lucide lucide-bus w-4 h-4 text-white`);
+                    cache.mapContainer.style.opacity = '0';
+                    setTimeout(() => { if(cache.mapContainer.style.opacity === '0') cache.mapContainer.style.display = 'none'; }, 300);
+                } else {
+                    cache.listIconBg.className = `p-3 rounded-[1rem] shadow-md transition-transform group-hover:scale-110 ${bus.color} ${bus.glow}`;
+                    cache.listIcon.setAttribute('class', `lucide lucide-bus w-5 h-5 text-white`);
+                    cache.listStatus.className = "text-[11px] text-slate-300 font-bold";
+                    
+                    cache.mapContainer.style.display = 'block'; 
+                    cache.mapContainer.style.opacity = '1';
+                    cache.mapContainer.style.left = `${data.x}%`; 
+                    cache.mapContainer.style.top = `${data.y}%`;
+                    cache.mapIconBg.style.transform = `rotate(${data.rotation}deg)`;
                 }
 
                 if (state.selectedBusId === bus.id) {
@@ -749,6 +798,60 @@
                     document.getElementById('modalEtaHome').innerText = data.etaHome;
                 }
             });
+        }
+
+        // === نظام المدير الذكي (Smart Fleet Manager) ===
+        function runSmartFleetManager() {
+            const NOW = Date.now();
+            const IDLE_TIMEOUT = 15 * 60 * 1000; // 15 دقيقة
+            let requiresCloudUpdate = false;
+
+            BUSES.forEach(bus => {
+                if (bus.lastActive && (NOW - bus.lastActive > IDLE_TIMEOUT)) {
+                    if (!bus.isPaused && !bus.isOffline) {
+                        bus.isOffline = true;
+                        bus.isPaused = true;
+                        requiresCloudUpdate = true;
+                    }
+                } else if (bus.lastActive && (NOW - bus.lastActive <= IDLE_TIMEOUT)) {
+                    if (bus.isOffline) {
+                        bus.isOffline = false;
+                        bus.isPaused = false;
+                        requiresCloudUpdate = true;
+                    }
+                }
+
+                // تطبيق الإغلاق التلقائي خارج أوقات العمل
+                const currentHour = new Date().getHours();
+                if (currentHour < 5 || currentHour > 21) { 
+                    if (!bus.isPaused && !bus.isOffline) {
+                        bus.isPaused = true;
+                        requiresCloudUpdate = true;
+                    }
+                }
+            });
+
+            if (requiresCloudUpdate && isAdminAuthenticated && isCloudEnabled && db) {
+                db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v9').set({ BUSES: BUSES });
+            }
+        }
+        setInterval(runSmartFleetManager, 60000); // يفحص الأسطول كل دقيقة
+
+        // === نبض السائق (Driver Auto-Sync) ===
+        function startDriverHeartbeat(busIndex) {
+            if (driverHeartbeatInterval) clearInterval(driverHeartbeatInterval);
+            
+            // إرسال تحديث كل 3 دقائق لتأكيد العمل
+            driverHeartbeatInterval = setInterval(async () => {
+                BUSES[busIndex].lastActive = Date.now();
+                BUSES[busIndex].isOffline = false;
+                
+                if (isCloudEnabled && db) {
+                    try {
+                        await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v9').set({ BUSES: BUSES });
+                    } catch(e) { console.error("Heartbeat sync failed"); }
+                }
+            }, 3 * 60 * 1000); 
         }
 
         function startEngine() {
@@ -781,8 +884,8 @@
             document.getElementById('etaDest2Label').innerText = bus.route === 'chadia' ? 'إلى بوهلال' : 'إلى العيايشة';
             
             const sts = document.getElementById('modalBusStatus');
-            sts.innerText = bus.isPaused ? 'متوقفة مؤقتاً (إدارة)' : (data.isParked ? 'خارج الخدمة' : 'في الخدمة');
-            sts.className = `px-4 py-1.5 rounded-full text-[10px] font-bold border border-white/10 bg-white/5 backdrop-blur-md uppercase tracking-wider ${bus.isPaused ? 'text-amber-400 border-amber-500/30' : bus.text}`;
+            sts.innerText = bus.isOffline ? 'غير متصلة' : (bus.isPaused ? 'متوقفة مؤقتاً (إدارة)' : (data.isParked ? 'خارج الخدمة' : 'في الخدمة'));
+            sts.className = `px-4 py-1.5 rounded-full text-[10px] font-bold border border-white/10 bg-white/5 backdrop-blur-md uppercase tracking-wider ${bus.isPaused || bus.isOffline ? 'text-amber-400 border-amber-500/30' : bus.text}`;
 
             const badge = document.getElementById('modalCapacityBadge');
             badge.innerText = cap.text; 
@@ -805,7 +908,7 @@
         }
 
         // =======================
-        // منطق تسجيل دخول السائق
+        // السائق
         // =======================
         function openDriverAuth() {
             currentDriverBusId = state.selectedBusId; 
@@ -822,9 +925,7 @@
             document.getElementById('driverAuthError').classList.add('hidden');
             
             modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0', 'pointer-events-none');
-            }, 10);
+            setTimeout(() => { modal.classList.remove('opacity-0', 'pointer-events-none'); }, 10);
         }
 
         function closeDriverAuth() {
@@ -844,9 +945,7 @@
             if (user === validUser && pass === validPass) {
                 closeDriverAuth();
                 setTimeout(() => { openDriverPanel(bus); }, 300);
-            } else {
-                document.getElementById('driverAuthError').classList.remove('hidden');
-            }
+            } else { document.getElementById('driverAuthError').classList.remove('hidden'); }
         }
 
         function openDriverPanel(bus) {
@@ -886,9 +985,7 @@
             
             const modal = document.getElementById('driverPanelModal');
             modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0', 'pointer-events-none');
-            }, 10);
+            setTimeout(() => { modal.classList.remove('opacity-0', 'pointer-events-none'); }, 10);
         }
 
         function closeDriverPanel() {
@@ -907,37 +1004,58 @@
             
             const currentMinutes = state.simulatedTime.getHours() * 60 + state.simulatedTime.getMinutes() + state.simulatedTime.getSeconds() / 60;
             const ROUTE_START = isChadia ? (5 * 60 + 30) : (6 * 60 + 30);
-            
             const newOffset = currentMinutes - ROUTE_START - targetCycleTime;
             
             BUSES[busIndex].offset = newOffset;
             BUSES[busIndex].isPaused = false; 
+            BUSES[busIndex].isOffline = false;
+            BUSES[busIndex].lastActive = Date.now(); // تحديث النشاط
 
             closeDriverPanel();
+            
+            // تشغيل النبض التلقائي للسائق
+            startDriverHeartbeat(busIndex);
             
             if (isCloudEnabled && db) {
                 try {
                     await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v9').set({ BUSES: BUSES });
                     await db.collection('projects').doc('bustruker-9f717').collection('settings').doc('toast').set({ 
-                        message: `تحديث مسار: ${bus.name} الآن في الخدمة!`, 
-                        timestamp: Date.now() 
+                        message: `تحديث مسار: ${bus.name} الآن في الخدمة!`, timestamp: Date.now() 
                     });
-                } catch(e) {
-                    alert("❌ حدث خطأ في الاتصال بالإنترنت.");
-                }
+                } catch(e) { alert("❌ حدث خطأ في الاتصال بالإنترنت."); }
             }
             updateUI();
         }
 
         // =======================
-        // منطق الإدارة العامة
+        // الإدارة بـ Firebase Auth
         // =======================
         function initiateAdminAccess() { document.getElementById('authModal').classList.remove('hidden'); }
         function closeAuth() { document.getElementById('authModal').classList.add('hidden'); }
+        
+        // تعديل الدالة لاستخدام Firebase Auth الحقيقي بدلاً من مقارنة النصوص
         function checkAuth() {
-            const user = document.getElementById('adminUser').value.trim().toLowerCase(); const pass = document.getElementById('adminPass').value.trim();
-            if (user === 'nadjibbenayache' && pass === 'nadjibkaous') { closeAuth(); openAdminPanel(); } 
-            else document.getElementById('authError').classList.remove('hidden');
+            const email = document.getElementById('adminUser').value.trim();
+            const pass = document.getElementById('adminPass').value.trim();
+            
+            // التأكد من تهيئة Firebase Auth مسبقاً
+            if(firebase.auth) {
+                firebase.auth().signInWithEmailAndPassword(email, pass)
+                    .then((userCredential) => {
+                        isAdminAuthenticated = true;
+                        closeAuth();
+                        openAdminPanel();
+                    })
+                    .catch((error) => {
+                        document.getElementById('authError').classList.remove('hidden');
+                        document.getElementById('authError').innerText = "بيانات خاطئة أو غير مصرح بها!";
+                    });
+            } else {
+                // تجاوز مؤقت إذا لم يتم إعداد Auth بعد للتدقيق المحلي
+                if (email === 'nadjibbenayache@admin.com' && pass === 'nadjibkaous') { 
+                    isAdminAuthenticated = true; closeAuth(); openAdminPanel(); 
+                } else document.getElementById('authError').classList.remove('hidden');
+            }
         }
 
         function openAdminPanel() {
@@ -964,7 +1082,7 @@
 
         function addAdminBus() {
             const id = tempBuses.length ? Math.max(...tempBuses.map(b=>b.id))+1 : 1;
-            tempBuses.push({ id, name:`شركة بوالنوار - حافلة ${id}`, route:'laiachia', offset:0, isPaused:false, capacity:1, color:'bg-red-500', border:'border-red-500', glow:'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text:'text-red-500', driverUser:'minoliver', driverPass:'mino2010' });
+            tempBuses.push({ id, name:`شركة بوالنوار - حافلة ${id}`, route:'laiachia', offset:0, isPaused:false, isOffline:false, lastActive:null, capacity:1, color:'bg-red-500', border:'border-red-500', glow:'shadow-[0_0_15px_rgba(239,68,68,0.8)]', text:'text-red-500', driverUser:'minoliver', driverPass:'mino2010' });
             renderAdminBuses();
         }
 
@@ -1016,9 +1134,7 @@
 
         function tempBusesEdit(i, key, val) { 
             tempBuses[i][key] = val;
-            if (key === 'name' || key === 'route') {
-                updateBusRoute(tempBuses[i].route, i);
-            }
+            if (key === 'name' || key === 'route') updateBusRoute(tempBuses[i].route, i);
             renderAdminBuses(); 
         };
 
@@ -1033,23 +1149,16 @@
             finally { btn.innerHTML = '<i data-lucide="cloud-upload" class="w-5 h-5"></i> حفظ ونشر للجميع'; lucide.createIcons(); }
         }
 
-        // =======================
-        // دالة عداد الزوار المباشر
-        // =======================
         async function initVisitorCounter() {
             if (!isCloudEnabled || !db) return;
-            
             const statsRef = db.collection('projects').doc('bustruker-9f717').collection('settings').doc('statistics');
             const visitorCounterEl = document.getElementById('visitorCount');
 
             try {
                 if (!sessionStorage.getItem('hasVisited')) {
-                    await statsRef.set({
-                        totalVisitors: firebase.firestore.FieldValue.increment(1)
-                    }, { merge: true });
+                    await statsRef.set({ totalVisitors: firebase.firestore.FieldValue.increment(1) }, { merge: true });
                     sessionStorage.setItem('hasVisited', 'true');
                 }
-
                 statsRef.onSnapshot((docSnap) => {
                     if (docSnap.exists) {
                         const data = docSnap.data();
@@ -1060,10 +1169,7 @@
                         }
                     }
                 });
-            } catch (e) {
-                console.warn("تعذر جلب عدد الزوار", e);
-                visitorCounterEl.innerText = "---";
-            }
+            } catch (e) { console.warn("Visitor count err", e); visitorCounterEl.innerText = "---"; }
         }
 
         if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
@@ -1076,8 +1182,6 @@
 
         try {
             firebase.initializeApp(firebaseConfig); db = firebase.firestore(); isCloudEnabled = true;
-            
-            // استدعاء دالة العداد
             initVisitorCounter();
 
             const confRef = db.collection('projects').doc('bustruker-9f717').collection('settings').doc('config_v9');
@@ -1087,7 +1191,10 @@
                 document.getElementById('syncIndicator').classList.remove('hidden'); document.getElementById('syncIndicator').classList.add('flex');
                 if (docSnap.exists) {
                     BUSES = docSnap.data().BUSES || BUSES;
-                    document.getElementById('busListContainer').innerHTML = ''; 
+                    
+                    // تحديث الـ DOM_CACHE إذا تغير عدد الحافلات (إضافة أو حذف من الإدارة)
+                    if (Object.keys(DOM_CACHE).length !== BUSES.length) initFleetDOM();
+                    
                     updateUI();
                 } else confRef.set({ BUSES: BUSES });
             });
@@ -1105,6 +1212,15 @@
         } catch(e) { console.warn("Cloud connection error", e); }
         
         startEngine();
+
+        // === PWA Service Worker Registration ===
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker Registered'))
+                    .catch(err => console.error('Service Worker Error', err));
+            });
+        }
     </script>
 </body>
 </html>
